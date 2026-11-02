@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <RP_Prairie.label>草原</RP_Prairie.label>
+  <RP_Prairie.description>草原是廣闊的乾燥草地，樹木稀疏。儘管降雨量較少，土壤仍然肥沃，支持著堅韌的草類和野花。開闊的空間幾乎無法提供對極端天氣的保護，夏天炎熱，冬天寒冷。草原野生動物已經適應了這些條件，許多食草動物和它們的捕食者都把這些被風吹過的平原稱為家園。</RP_Prairie.description>
+
+  <RP_Savanna.label>稀樹草原</RP_Savanna.label>
+  <RP_Savanna.description>稀樹草原是典型位於雨林和沙漠之間的混合林地/草地生態系統。零散的樹木點綴著以抗旱草類為主的景觀。野生動物豐富多樣，適應了濕季和旱季。氣候全年溫暖，有明顯的雨季和旱季。</RP_Savanna.description>
+
+  <RP_Steppe.label>草原</RP_Steppe.label>
+  <RP_Steppe.description>草原是高海拔草地區域，嚴酷的冬季和乾燥的條件創造了一個充滿挑戰的環境。這些寒冷、多風的平原土壤薄，植被稀疏，但支持著堅韌的草類和頑強的野生動物。季節之間的極端溫度變化使生存變得困難，但開闊的景觀提供了極好的能見度和移動性。</RP_Steppe.description>
+
+  <RP_TemperateDesert.label>溫帶沙漠</RP_TemperateDesert.label>
+  <RP_TemperateDesert.description>溫帶沙漠比亞熱帶沙漠更冷，但通常更加乾燥。植被稀少，土壤通常更多是岩石而非沙質。</RP_TemperateDesert.description>
+
+  <RP_Permafrost.label>永凍土</RP_Permafrost.label>
+  <RP_Permafrost.description>永凍土存在於苔原和冰蓋之間的邊界。土壤永久凍結，大部分被冰覆蓋，但冰最多只有幾米厚，而不是幾公里。除了硬灌木外幾乎沒有植被，動物也很少。</RP_Permafrost.description>
+
+  <RP_Oasis.label>綠洲</RP_Oasis.label>
+  <RP_Oasis.description>綠洲是沙漠中地下水位接近地表的地方，因此植物可以生長，動物可以吃草。</RP_Oasis.description>
+
+</LanguageData>

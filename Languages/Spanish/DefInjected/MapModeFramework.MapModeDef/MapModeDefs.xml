@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <Default.label>Por defecto</Default.label>
+
+  <Features.label>Características</Features.label>
+
+  <Elevation.label>Elevación</Elevation.label>
+  <Elevation.description>Muestra la elevación. Los colores van del nivel del mar a 9000 m. El terreno más alto usa el color superior.</Elevation.description>
+
+  <RP_Hilliness.label>Accidentes del terreno</RP_Hilliness.label>
+  <RP_Hilliness.description>Muestra la accidentabilidad del terreno desde llano (verde) hasta montañas infranqueables (rojo oscuro). Útil para costes de movimiento y opciones de asentamiento.</RP_Hilliness.description>
+
+  <Biome.label>Bioma</Biome.label>
+  <Biome.description>Muestra la distribución de biomas con menú desplegable de selección.</Biome.description>
+
+  <Temperature.label>Temperatura</Temperature.label>
+  <Temperature.description>Muestra la temperatura media anual con rangos a escala terrestre (-50 °C a +50 °C) y datos climáticos mejorados.</Temperature.description>
+
+  <RP_SeasonalAmplitude.label>Variación estacional de temperatura</RP_SeasonalAmplitude.label>
+  <RP_SeasonalAmplitude.description>Muestra la amplitud térmica estacional: cuánto varía la temperatura entre verano e invierno. Interiores continentales y altas latitudes muestran variación extrema.</RP_SeasonalAmplitude.description>
+
+  <RP_Continentality.label>Continental vs marítimo</RP_Continentality.label>
+  <RP_Continentality.description>Muestra la distancia al océano y la clasificación climática continental/marítima. Zonas costeras en azul, interiores continentales en rojo-marrón.</RP_Continentality.description>
+
+  <RP_Monsoon.label>Intensidad monzónica</RP_Monsoon.label>
+  <RP_Monsoon.description>Muestra el aporte estacional de humedad monzónica (mm/año adicional en zonas monzónicas). Regiones tropicales y subtropicales con proximidad oceánica y reversión estacional del viento.</RP_Monsoon.description>
+
+  <Rainfall.label>Precipitación</Rainfall.label>
+  <Rainfall.description>Muestra la precipitación anual con rangos a escala terrestre (0 mm a 8000 mm) y modelado de precipitación mejorado.</Rainfall.description>
+
+  <RP_AridityIndex.label>Índice de aridez</RP_AridityIndex.label>
+  <RP_AridityIndex.description>Muestra el índice de aridez (ratio precipitación/ETP), una medida científica de disponibilidad de humedad. Valores &lt;0,2 indican regiones áridas; &gt;1,0 indican regiones húmedas.</RP_AridityIndex.description>
+
+  <RP_InitialBasins.label>Cuencas iniciales (depuración)</RP_InitialBasins.label>
+  <RP_InitialBasins.description>Muestra las cuencas topográficas previas al rellenado/vertido según sumideros iniciales. Las casillas rojas indican ubicaciones de sumidero.</RP_InitialBasins.description>
+
+  <RP_MergedBasins.label>Cuencas fusionadas (depuración)</RP_MergedBasins.label>
+  <RP_MergedBasins.description>Muestra las cuencas fusionadas tras la simulación de rellenado y vertido. Lagos terminales en rojo; lagos con vertido/salidas en verde.</RP_MergedBasins.description>
+
+  <RP_RiverSystems.label>Sistemas fluviales</RP_RiverSystems.label>
+  <RP_RiverSystems.description>Muestra los sistemas fluviales agregados (cuencas principales) tras fusionar cuencas pequeñas. Cada color representa un sistema de drenaje principal compuesto por varias cuencas elementales.</RP_RiverSystems.description>
+
+  <RP_DrainageType.label>Tipo de drenaje (depuración)</RP_DrainageType.label>
+  <RP_DrainageType.description>Clasifica las casillas como exorreicas (azul), endorreicas (naranja), lago terminal (rojo) o lago con vertido (verde).</RP_DrainageType.description>
+
+  <RP_FlowAccumulation.label>Acumulación de flujo (topología)</RP_FlowAccumulation.label>
+  <RP_FlowAccumulation.description>Muestra las áreas de drenaje de la ejecución topológica (flujo uniforme). El azul más oscuro indica más casillas aguas arriba; revela cursos fluviales y ubicaciones de humedales.</RP_FlowAccumulation.description>
+
+  <RP_FlowAccumulationHydrology.label>Acumulación de flujo (clima)</RP_FlowAccumulationHydrology.label>
+  <RP_FlowAccumulationHydrology.description>Nivel 2: muestra el flujo impulsado por el clima (precipitación × área). Solo hay datos cuando la hidrología avanzada está activada.</RP_FlowAccumulationHydrology.description>
+
+  <RP_Wetlands.label>Pantanosidad</RP_Wetlands.label>
+  <RP_Wetlands.description>Muestra la puntuación de pantanosidad según drenaje, clima y terreno. Las zonas verdes indican pantanos, marismas y humedales.</RP_Wetlands.description>
+
+  <GrowingPeriod.label>Período de cultivo</GrowingPeriod.label>
+
+  <AnimalCommonality.label>Comunalidad animal</AnimalCommonality.label>
+
+  <PlantCommonality.label>Comunalidad vegetal</PlantCommonality.label>
+
+</LanguageData>

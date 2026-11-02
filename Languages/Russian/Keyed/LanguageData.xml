@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+	<!-- General / UI -->
+	<Planets.Advanced>Дополнительно</Planets.Advanced>
+	<Planets.Description>Описание:</Planets.Description>
+	<Planets.MiscSettings>Прочие настройки</Planets.MiscSettings>
+	<Planets.ModName>Realistic Planets 2</Planets.ModName>
+	<Planets.Mods>Моды</Planets.Mods>
+
+	<!-- Map Mode Framework (MMF) - Core & UI -->
+	<MMF.Commonality>Распространённость</MMF.Commonality>
+	<MMF.CurrentMapMode>Текущий режим карты</MMF.CurrentMapMode>
+	<MMF.Overlay.Off>Выкл.</MMF.Overlay.Off>
+	<MMF.Overlay.On>Вкл.</MMF.Overlay.On>
+	<MMF.Settings.CacheData>Кэш данных</MMF.Settings.CacheData>
+	<MMF.Settings.CacheOnStart>Кэшировать при запуске</MMF.Settings.CacheOnStart>
+	<MMF.Settings.EnableCaching>Включить кэширование</MMF.Settings.EnableCaching>
+	<MMF.Type>Тип</MMF.Type>
+	<MMF.UI.Caching>Кэширование</MMF.UI.Caching>
+	<MMF.UI.LoadProgress>Подготовлено {0} из {1} клеток</MMF.UI.LoadProgress>
+	<MMF.UI.Tooltip.Category>Режимы карты: {0}</MMF.UI.Tooltip.Category>
+	<MMF.UI.Category.Mods>Моды</MMF.UI.Category.Mods>
+	<MMF.UI.Category.Options>Параметры</MMF.UI.Category.Options>
+	<MMF.UI.TryCache>Включите кэширование для этого режима карты, чтобы ускорить пересчёт.</MMF.UI.TryCache>
+
+	<!-- Map Mode Framework (MMF) - Draw Settings -->
+	<MMF.DrawSettings>Настройки отображения</MMF.DrawSettings>
+	<MMF.DrawSettings.ShowLabel>Показывать подпись</MMF.DrawSettings.ShowLabel>
+	<MMF.DrawSettings.ShowTooltip>Показывать подсказку</MMF.DrawSettings.ShowTooltip>
+	<MMF.DrawSettings.ShowFeaturesText>Показывать текст объектов</MMF.DrawSettings.ShowFeaturesText>
+	<MMF.DrawSettings.DrawHills>Рисовать холмы</MMF.DrawSettings.DrawHills>
+	<MMF.DrawSettings.DrawMonsoonWind>Стрелки муссонного ветра</MMF.DrawSettings.DrawMonsoonWind>
+	<MMF.DrawSettings.DrawOrographicUplift>Орографический подъём (наветренный)</MMF.DrawSettings.DrawOrographicUplift>
+	<MMF.DrawSettings.DrawPollution>Рисовать загрязнение</MMF.DrawSettings.DrawPollution>
+	<MMF.DrawSettings.DrawRainShadow>Дождевая тень (подветренный)</MMF.DrawSettings.DrawRainShadow>
+	<MMF.DrawSettings.DrawRidgeNormal>Стрелки нормали хребта</MMF.DrawSettings.DrawRidgeNormal>
+	<MMF.DrawSettings.DrawRidges>Выделять хребты</MMF.DrawSettings.DrawRidges>
+	<MMF.DrawSettings.DrawRivers>Рисовать реки</MMF.DrawSettings.DrawRivers>
+	<MMF.DrawSettings.DrawRoads>Рисовать дороги</MMF.DrawSettings.DrawRoads>
+	<MMF.DrawSettings.DrawWindDirection>Стрелки направления ветра</MMF.DrawSettings.DrawWindDirection>
+  <MMF.DrawSettings.WindDirection.Tooltip>Стрелки показывают, куда дует ветер. Цвет — направление (Красный=Восток, Голубой=Запад, Жёлто-зелёный=Север, Сине-фиолетовый=Юг). Насыщенность — скорость.</MMF.DrawSettings.WindDirection.Tooltip>
+	<MMF.DrawSettings.DrawWorldObjects>Рисовать объекты мира</MMF.DrawSettings.DrawWorldObjects>
+	<MMF.DrawSettings.IncludeWater>Включать воду</MMF.DrawSettings.IncludeWater>
+
+	<!-- Map Mode Framework (MMF) - World Features -->
+	<MMF.WorldFeatures.Archipelago>Архипелаг</MMF.WorldFeatures.Archipelago>
+	<MMF.WorldFeatures.AridShrubland>Аридный кустарник</MMF.WorldFeatures.AridShrubland>
+	<MMF.WorldFeatures.Bay>Залив</MMF.WorldFeatures.Bay>
+	<MMF.WorldFeatures.BorealForest>Тайга</MMF.WorldFeatures.BorealForest>
+	<MMF.WorldFeatures.ColdBog>Холодное болото</MMF.WorldFeatures.ColdBog>
+	<MMF.WorldFeatures.Desert>Пустыня</MMF.WorldFeatures.Desert>
+	<MMF.WorldFeatures.IceSheet>Ледяной щит</MMF.WorldFeatures.IceSheet>
+	<MMF.WorldFeatures.Island>Остров</MMF.WorldFeatures.Island>
+	<MMF.WorldFeatures.Lake>Озеро</MMF.WorldFeatures.Lake>
+	<MMF.WorldFeatures.MountainRange>Горный хребет</MMF.WorldFeatures.MountainRange>
+	<MMF.WorldFeatures.Ocean>Океан</MMF.WorldFeatures.Ocean>
+	<MMF.WorldFeatures.OceanBay>Океанский залив</MMF.WorldFeatures.OceanBay>
+	<MMF.WorldFeatures.OuterOcean>Внешний океан</MMF.WorldFeatures.OuterOcean>
+	<MMF.WorldFeatures.Peninsula>Полуостров</MMF.WorldFeatures.Peninsula>
+	<MMF.WorldFeatures.Sea>Море</MMF.WorldFeatures.Sea>
+	<MMF.WorldFeatures.TemperateForest>Умеренный лес</MMF.WorldFeatures.TemperateForest>
+	<MMF.WorldFeatures.TemperateSwamp>Умеренное болото</MMF.WorldFeatures.TemperateSwamp>
+	<MMF.WorldFeatures.TropicalRainforest>Тропический лес</MMF.WorldFeatures.TropicalRainforest>
+	<MMF.WorldFeatures.TropicalSwamp>Тропическое болото</MMF.WorldFeatures.TropicalSwamp>
+	<MMF.WorldFeatures.Tundra>Тундра</MMF.WorldFeatures.Tundra>
+
+	<!-- World Generation - Core -->
+	<Planets.PlanetName>Название планеты</Planets.PlanetName>
+	<Planets.PlanetScale>Масштаб планеты</Planets.PlanetScale>
+	<Planets.PlanetScaleTip>Количество клеток планеты (степень разбиения). Меньшие значения — меньше клеток, но крупнее (как Маленькая планета). В стандартном RimWorld — 10.</Planets.PlanetScaleTip>
+	<Planets.Random>Случайная планета</Planets.Random>
+	<Planets.Randomize>Случайно</Planets.Randomize>
+	<Planets.WorldPresets>Пресеты</Planets.WorldPresets>
+
+	<!-- World Generation - Sea Level -->
+	<Planets.SeaLevel>Уровень моря</Planets.SeaLevel>
+	<Planets.SeaLevelTip>Доля планеты, покрытая океаном. Низкий уровень — больше суши и крупнее континенты. Высокий — затопление низменностей, мир островов.</Planets.SeaLevelTip>
+	<Planets.SeaLevel_High>Высокий</Planets.SeaLevel_High>
+	<Planets.SeaLevel_High_Desc>Планета островов. Большая часть мира — океан, суша — острова и малые континенты.</Planets.SeaLevel_High_Desc>
+	<Planets.SeaLevel_Low>Низкий</Planets.SeaLevel_Low>
+	<Planets.SeaLevel_Low_Desc>Меньше океана, небольшие моря. Континенты крупнее земноподобных.</Planets.SeaLevel_Low_Desc>
+	<Planets.SeaLevel_Normal>Ваниль</Planets.SeaLevel_Normal>
+	<Planets.SeaLevel_Normal_Desc>Доля океана ванильного RimWorld. Суши больше, чем на Земле.</Planets.SeaLevel_Normal_Desc>
+	<Planets.SeaLevel_SlightlyHigh>Земноподобный</Planets.SeaLevel_SlightlyHigh>
+	<Planets.SeaLevel_SlightlyHigh_Desc>Примерно земная доля океана. Океана больше, чем в ванили, континенты меньше.</Planets.SeaLevel_SlightlyHigh_Desc>
+	<Planets.SeaLevel_SlightlyLow>Немного низкий</Planets.SeaLevel_SlightlyLow>
+	<Planets.SeaLevel_SlightlyLow_Desc>Немного меньше океана. Больше суши для колоний.</Planets.SeaLevel_SlightlyLow_Desc>
+
+	<!-- World Generation - Rivers & Roads -->
+	<Planets.AncientRoadDensity>Плотность древних дорог</Planets.AncientRoadDensity>
+	<Planets.AncientRoadDensityTip>Плотность древних дорог на карте мира.</Planets.AncientRoadDensityTip>
+	<Planets.FactionRoadDensity>Плотность дорог между поселениями</Planets.FactionRoadDensity>
+	<Planets.FactionRoadDensityTip>Плотность дорог между поселениями фракций.</Planets.FactionRoadDensityTip>
+	<Planets.RiverDensity>Плотность рек</Planets.RiverDensity>
+	<Planets.RiverDensityTip>Количество рек при генерации мира. Выше значение — больше рек: пресная вода, транспорт, естественные преграды.</Planets.RiverDensityTip>
+
+	<!-- World Generation - Climate & Weather -->
+	<Planets.AxialTilt>Наклон оси</Planets.AxialTilt>
+	<Planets.AxialTilt_High>Высокий (33,75°)</Planets.AxialTilt_High>
+	<Planets.AxialTilt_Low>Низкий (11,25°)</Planets.AxialTilt_Low>
+	<Planets.AxialTilt_Normal>Нормальный (22,5°)</Planets.AxialTilt_Normal>
+	<Planets.AxialTilt_VeryHigh>Экстремальный (45°)</Planets.AxialTilt_VeryHigh>
+	<Planets.AxialTilt_VeryLow>Нет (0°)</Planets.AxialTilt_VeryLow>
+	<Planets.OrographicSettings>Орографические (горные) настройки</Planets.OrographicSettings>
+	<!-- Advanced Climate dialog - section headers -->
+	<Planets.ClimateSection.ManualTempTargets>Ручные целевые температуры</Planets.ClimateSection.ManualTempTargets>
+	<Planets.ClimateSection.LatTempCurve>Кривая температуры по широте</Planets.ClimateSection.LatTempCurve>
+	<Planets.ClimateSection.Continentality>Континентальность (влияние океана)</Planets.ClimateSection.Continentality>
+	<Planets.ClimateSection.CoastalModeration>Прибрежная сглаженность</Planets.ClimateSection.CoastalModeration>
+	<Planets.ClimateSection.OceanCurrents>Океанические течения</Planets.ClimateSection.OceanCurrents>
+	<Planets.ClimateSection.BaseRainfallOverride>Переопределение базовых осадков</Planets.ClimateSection.BaseRainfallOverride>
+	<Planets.ClimateSection.ColdLimitation>Ограничение холодом</Planets.ClimateSection.ColdLimitation>
+	<Planets.ClimateSection.RandomVariation>Случайная вариация</Planets.ClimateSection.RandomVariation>
+	<Planets.ClimateSection.MoistureTransport>Перенос влаги (адвекция)</Planets.ClimateSection.MoistureTransport>
+	<Planets.ClimateSection.RainfallConversion>Где влага становится дождём</Planets.ClimateSection.RainfallConversion>
+	<Planets.ClimateSection.Monsoon>Муссон</Planets.ClimateSection.Monsoon>
+	<Planets.ClimateSection.HydrologyScale>Масштаб гидрологии</Planets.ClimateSection.HydrologyScale>
+	<Planets.ClimateSection.BasinThresholds>Климатические пороги бассейнов</Planets.ClimateSection.BasinThresholds>
+	<Planets.ClimateSection.EvaporationModel>Модель испарения</Planets.ClimateSection.EvaporationModel>
+	<Planets.ClimateSection.HydrologyTier2Note>Переключатели испарения по засушливости, озёр и рек — в Настройки мода &gt; Функции.</Planets.ClimateSection.HydrologyTier2Note>
+	<!-- Advanced Climate dialog - tab names -->
+	<Planets.ClimateTab.RainfallTerrain>Осадки: эффекты рельефа</Planets.ClimateTab.RainfallTerrain>
+	<Planets.ClimateTab.RainfallMoisture>Осадки: перенос влаги</Planets.ClimateTab.RainfallMoisture>
+	<Planets.Rainfall_High>Высокие</Planets.Rainfall_High>
+	<Planets.Rainfall_Low>Низкие</Planets.Rainfall_Low>
+	<Planets.Rainfall_Normal>Нормальные</Planets.Rainfall_Normal>
+	<Planets.Rainfall_SlightlyHigh>Немного высокие</Planets.Rainfall_SlightlyHigh>
+	<Planets.Rainfall_SlightlyLow>Немного низкие</Planets.Rainfall_SlightlyLow>
+	<Planets.Rainfall_VeryHigh>Очень высокие</Planets.Rainfall_VeryHigh>
+	<Planets.Rainfall_VeryLow>Очень низкие</Planets.Rainfall_VeryLow>
+	<Planets.TempControlledByAdvanced>Управляется расширенным климатом</Planets.TempControlledByAdvanced>
+	<Planets.TempManualModeTip>Температура задаётся вручную в расширенном климате. Включите «Использовать ручные полярные и экваториальные цели» на вкладке Температура.</Planets.TempManualModeTip>
+	<Planets.RainfallControlledByAdvanced>Управляется расширенным климатом</Planets.RainfallControlledByAdvanced>
+	<Planets.RainfallManualModeTip>Осадки задаются вручную в расширенном климате. Включите «Использовать ручную базовую норму осадков» на вкладке Осадки (мм/год).</Planets.RainfallManualModeTip>
+	<Planets.Temperature_High>Высокая</Planets.Temperature_High>
+	<Planets.Temperature_Low>Низкая</Planets.Temperature_Low>
+	<Planets.Temperature_Normal>Нормальная</Planets.Temperature_Normal>
+	<Planets.Temperature_SlightlyHigh>Немного высокая</Planets.Temperature_SlightlyHigh>
+	<Planets.Temperature_SlightlyLow>Немного низкая</Planets.Temperature_SlightlyLow>
+	<Planets.Temperature_VeryHigh>Очень высокая</Planets.Temperature_VeryHigh>
+	<Planets.Temperature_VeryLow>Очень низкая</Planets.Temperature_VeryLow>
+
+	<!-- World Generation - Population & Landmarks -->
+	<PlanetLandmarkDensity>Плотность ориентиров</PlanetLandmarkDensity>
+	<PlanetLandmarkDensity_Crowded>Очень плотно</PlanetLandmarkDensity_Crowded>
+	<PlanetLandmarkDensity_Normal>Нормально</PlanetLandmarkDensity_Normal>
+	<PlanetLandmarkDensity_SlightlyCrowded>Немного плотно</PlanetLandmarkDensity_SlightlyCrowded>
+	<PlanetLandmarkDensity_SlightlyMoreCrowded>Плотно</PlanetLandmarkDensity_SlightlyMoreCrowded>
+	<PlanetLandmarkDensity_SlightlyMoreSparse>Редко</PlanetLandmarkDensity_SlightlyMoreSparse>
+	<PlanetLandmarkDensity_SlightlySparse>Немного редко</PlanetLandmarkDensity_SlightlySparse>
+	<PlanetLandmarkDensity_Sparse>Очень редко</PlanetLandmarkDensity_Sparse>
+	<Planets.Population_High>Высокая</Planets.Population_High>
+	<Planets.Population_Low>Низкая</Planets.Population_Low>
+	<Planets.Population_Normal>Нормальная</Planets.Population_Normal>
+	<Planets.Population_SlightlyHigh>Немного высокая</Planets.Population_SlightlyHigh>
+	<Planets.Population_SlightlyLow>Немного низкая</Planets.Population_SlightlyLow>
+	<Planets.Population_VeryHigh>Очень высокая</Planets.Population_VeryHigh>
+	<Planets.Population_VeryLow>Очень низкая</Planets.Population_VeryLow>
+
+	<!-- Presets & Profiles -->
+	<Planets.ConfirmDeletePreset>Удалить пресет фракций «{0}»? Это нельзя отменить.</Planets.ConfirmDeletePreset>
+	<Planets.ConfirmDeleteWorldGenPreset>Удалить пресет мира «{0}»? Это нельзя отменить.</Planets.ConfirmDeleteWorldGenPreset>
+	<Planets.ConfirmOverwritePreset>Пресет с именем «{0}» уже существует. Перезаписать?</Planets.ConfirmOverwritePreset>
+	<Planets.CurrentPreset>Загружено: {0}</Planets.CurrentPreset>
+	<Planets.DeletePreset>Удалить</Planets.DeletePreset>
+	<Planets.FactionPresetInfo>Этот пресет сохранит {0} фракцию(й)</Planets.FactionPresetInfo>
+	<Planets.FactionPresetInfoDetailed>Этот пресет сохранит {0} фракцию(й) ({1} уникальных типов)</Planets.FactionPresetInfoDetailed>
+	<Planets.LoadFactions>Загрузить</Planets.LoadFactions>
+	<Planets.MissingFactions>Отсутствующие фракции из удалённых модов:</Planets.MissingFactions>
+	<Planets.NoPresetsFound>Пресеты фракций не найдены</Planets.NoPresetsFound>
+	<Planets.NoWorldGenPresetsFound>Пресеты мира не найдены</Planets.NoWorldGenPresetsFound>
+	<Planets.PresetDeleteFailed>Не удалось удалить пресет фракций</Planets.PresetDeleteFailed>
+	<Planets.PresetDeleted>Пресет фракций «{0}» удалён</Planets.PresetDeleted>
+	<Planets.PresetDeletedAndDefaultCleared>Профиль «{0}» удалён, значение по умолчанию сброшено.</Planets.PresetDeletedAndDefaultCleared>
+	<Planets.PresetHasMissingMods>(отсутствующие моды)</Planets.PresetHasMissingMods>
+	<Planets.PresetLoaded>Загружен пресет «{0}» с {1} фракциями</Planets.PresetLoaded>
+	<Planets.PresetName>Имя:</Planets.PresetName>
+	<Planets.PresetNameExists>Пресет с таким именем уже существует</Planets.PresetNameExists>
+	<Planets.PresetNameRequired>Введите имя пресета</Planets.PresetNameRequired>
+	<Planets.PresetSaveFailed>Не удалось сохранить пресет фракций</Planets.PresetSaveFailed>
+	<Planets.PresetSaved>Пресет фракций «{0}» успешно сохранён</Planets.PresetSaved>
+	<Planets.PresetSetAsDefault>Установить «{0}» профилем фракций по умолчанию.</Planets.PresetSetAsDefault>
+	<Planets.SaveFactionPreset>Сохранить пресет фракций</Planets.SaveFactionPreset>
+	<Planets.SaveFactions>Сохранить</Planets.SaveFactions>
+	<Planets.SavedOn>Сохранено: {0}</Planets.SavedOn>
+	<Planets.WorldGenPresetDeleted>Пресет мира «{0}» удалён</Planets.WorldGenPresetDeleted>
+	<Planets.WorldGenPresetDeletedAndDefaultCleared>Пресет мира «{0}» удалён, значение по умолчанию сброшено.</Planets.WorldGenPresetDeletedAndDefaultCleared>
+	<Planets.WorldGenPresetLoaded>Загружен пресет мира «{0}»</Planets.WorldGenPresetLoaded>
+	<Planets.WorldGenPresetSaveFailed>Не удалось сохранить пресет мира</Planets.WorldGenPresetSaveFailed>
+	<Planets.WorldGenPresetSaved>Пресет мира «{0}» сохранён</Planets.WorldGenPresetSaved>
+	<Planets.WorldGenPresetSetAsDefault>Установить «{0}» пресетом мира по умолчанию.</Planets.WorldGenPresetSetAsDefault>
+
+	<!-- Integrations (Other Mods) -->
+	<VFEI_InsectTerritoryScaleTip>Размер территории фракции Улей. Выше значение — больше регион под контролем насекомых. По умолчанию 100%.</VFEI_InsectTerritoryScaleTip>
+
+	<!-- Messages & Warnings -->
+	<MessageMaxPlanetCoveragePerformanceWarning>Внимание: генерация планеты при высокой детализации может занять много времени и памяти.</MessageMaxPlanetCoveragePerformanceWarning>
+	<Planets.MessageLowPlanetCoverageWarning>Внимание: при очень низкой детализации может не хватить суши для всех поселений фракций.</Planets.MessageLowPlanetCoverageWarning>
+
+	<!-- Vanilla Keys Overridden by Mod -->
+	<Planets.LoadAgainToSetDefault>Загрузите снова, чтобы установить по умолчанию.</Planets.LoadAgainToSetDefault>
+
+	<!-- World preset names (English placeholder) -->
+	<Planets.Vanilla>Vanilla</Planets.Vanilla>
+	<Planets.Desert>Desert</Planets.Desert>
+	<Planets.Frozen>Frozen</Planets.Frozen>
+	<Planets.Earthlike>Earthlike</Planets.Earthlike>
+	<Planets.Boreal>Boreal</Planets.Boreal>
+	<Planets.Iceball>Iceball</Planets.Iceball>
+	<Planets.Jungle>Jungle</Planets.Jungle>
+	<Planets.Ocean>Ocean</Planets.Ocean>
+	<Planets.AlienDiversity>Alien diversity</Planets.AlienDiversity>
+	<Planets.ExoticWetlands>Exotic wetlands</Planets.ExoticWetlands>
+	<Planets.AlienBadlands>Alien badlands</Planets.AlienBadlands>
+	<Planets.Custom>Custom</Planets.Custom>
+	<Planets.IncludeSeedAndName>Include seed and planet name</Planets.IncludeSeedAndName>
+	<Planets.PopulationFactionControl>Faction Control sets population. This slider shows the value Realistic Planets will use and cannot be edited here.</Planets.PopulationFactionControl>
+	<Planets.SparseSettlements>Factions will get about {0} settlements in total (about 1 each). Increase planet scale, coverage or population.</Planets.SparseSettlements>
+
+	<!-- WS18-1 UI Buttons, Dialogs & Sliders (English placeholder) -->
+	<Planets.ResetClear>Reset/Clear</Planets.ResetClear>
+	<Planets.ResetAll>Reset All</Planets.ResetAll>
+	<Planets.SetAsDefaultMenu>Set as Default...</Planets.SetAsDefaultMenu>
+	<Planets.ClearDefault>Clear Default</Planets.ClearDefault>
+	<Planets.SetAsDefaultWorldPreset>Set as Default (World Preset)...</Planets.SetAsDefaultWorldPreset>
+	<Planets.ClearDefaultWorldPreset>Clear Default (World Preset)</Planets.ClearDefaultWorldPreset>
+	<Planets.ClearMapPreview>Clear Map Preview</Planets.ClearMapPreview>
+	<Planets.NewSave>(New Save)</Planets.NewSave>
+	<Planets.Climate>Climate</Planets.Climate>
+	<Planets.Biomes>Biomes</Planets.Biomes>
+	<Planets.MountainHeight>Mountain height</Planets.MountainHeight>
+	<Planets.MountainHeightTip>How tall mountains rise; affects temperature, rain shadows and biomes.</Planets.MountainHeightTip>
+	<Planets.MountainFrequency>Mountain frequency</Planets.MountainFrequency>
+	<Planets.MountainFrequencyTip>How much land is hilly or mountainous; keeps ranges connected.</Planets.MountainFrequencyTip>
+	<Planets.SavePresetAs>Save Preset As...</Planets.SavePresetAs>
+	<Planets.SaveWorldPreset>Save World Preset</Planets.SaveWorldPreset>
+	<Planets.SetAsDefaultAutoLoad>Set as default (auto-load on world creation)</Planets.SetAsDefaultAutoLoad>
+	<Planets.SaveNameAlreadyExists>A save with this name already exists.</Planets.SaveNameAlreadyExists>
+	<Planets.SaveWorldPresetHelp>Saves coverage, climate, hydrology, and world creation parameters. Seed and planet name are saved only when that box is checked. A default preset still does not apply them on a new world. Does not include factions.</Planets.SaveWorldPresetHelp>
+	<Planets.AdvancedBiomeConfigTitle>Advanced Biome Configuration</Planets.AdvancedBiomeConfigTitle>
+	<Planets.SearchBiomes>Search biomes...</Planets.SearchBiomes>
+	<Planets.SaveProfile>Save Profile</Planets.SaveProfile>
+	<Planets.LoadProfile>Load Profile</Planets.LoadProfile>
+	<Planets.DeleteProfile>Delete Profile</Planets.DeleteProfile>
+	<Planets.SavePresetBtn>Save Preset</Planets.SavePresetBtn>
+	<Planets.LoadPresetBtn>Load Preset</Planets.LoadPresetBtn>
+	<Planets.DeletePresetBtn>Delete Preset</Planets.DeletePresetBtn>
+	<Planets.AdvancedClimateTitle>Advanced Climate Settings</Planets.AdvancedClimateTitle>
+	<Planets.AdvancedClimateWarning>These are advanced settings. Extreme values may produce unrealistic climates.</Planets.AdvancedClimateWarning>
+	<Planets.ResetAllClimateConfirm>Reset all climate settings to default values?</Planets.ResetAllClimateConfirm>
+
+</LanguageData>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+	<Operation Class="PatchOperationAdd">
+		<xpath>Defs/PlanetLayerDef[defName="Surface"]/worldDrawLayers</xpath>
+		<value>
+			<li>MapModeFramework.WorldLayer_MapMode_Terrain</li>
+			<li>MapModeFramework.WorldLayer_MapMode_Region</li>
+			<li>MapModeFramework.WorldLayer_MouseRegion</li>
+			<li>MapModeFramework.WorldLayer_SelectedRegion</li>
+			<li>MapModeFramework.WorldLayer_Ridges</li>
+			<li>MapModeFramework.WorldLayer_OrographicUplift</li>
+			<li>MapModeFramework.WorldLayer_RainShadow</li>
+			<li>MapModeFramework.WorldLayer_WindDirection</li>
+			<li>MapModeFramework.WorldLayer_RidgeNormal</li>
+			<li>MapModeFramework.WorldLayer_MonsoonWind</li>
+		</value>
+	</Operation>
+
+</Patch>

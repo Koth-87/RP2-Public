@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<BiomeDef>
+		<defName>RP_Steppe</defName>
+		<label>steppe</label>
+		<description>Steppes are high-altitude grassland regions where harsh winters and dry conditions create a challenging environment. These cold, windswept plains have thin soil and sparse vegetation, yet support hardy grasses and resilient wildlife. The extreme temperature variations between seasons make survival difficult, but the open landscape offers excellent visibility and movement.</description>
+		<workerClass>Planets.Biomes.Custom.Steppe</workerClass>
+		<animalDensity>1.2</animalDensity>
+		<plantDensity>0.35</plantDensity>
+		<settlementSelectionWeight>0.6</settlementSelectionWeight>
+		<movementDifficulty>1</movementDifficulty>
+		<texture>Steppe</texture>
+		<forageability>0.5</forageability>
+		<foragedFood>RawBerries</foragedFood>
+		<wildPlantRegrowDays>30</wildPlantRegrowDays>
+		<soundsAmbient>
+			<li>Ambient_NightInsects_Standard</li>
+		</soundsAmbient>
+		<diseaseMtbDays>75</diseaseMtbDays>
+		<diseases>
+			<li>
+				<diseaseInc>Disease_Flu</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_Plague</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_FibrousMechanites</diseaseInc>
+				<commonality>30</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_SensoryMechanites</diseaseInc>
+				<commonality>30</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_GutWorms</diseaseInc>
+				<commonality>40</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_MuscleParasites</diseaseInc>
+				<commonality>40</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_AnimalFlu</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_AnimalPlague</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+		</diseases>
+		<!-- New 1.6/Odyssey terrain fields -->
+		<coastalBeachTerrain>Gravel</coastalBeachTerrain>
+		<lakeBeachTerrain>Gravel</lakeBeachTerrain>
+		<riverbankTerrain>Gravel</riverbankTerrain>
+		<riverbankSizeRange>4~6</riverbankSizeRange>
+		<terrainsByFertility>
+			<li>
+				<terrain>Gravel</terrain>
+				<min>-999</min>
+				<max>0.3</max>
+			</li>
+			<li>
+				<terrain>Soil</terrain>
+				<min>0.3</min>
+				<max>999</max>
+			</li>
+		</terrainsByFertility>
+		<terrainPatchMakers>
+			<li>
+				<perlinFrequency>0.04</perlinFrequency>
+				<thresholds>
+					<li>
+						<terrain>SoilRich</terrain>
+						<min>0.7</min>
+						<max>999</max>
+					</li>
+				</thresholds>
+			</li>
+		</terrainPatchMakers>
+		<baseWeatherCommonalities>
+			<Clear>18</Clear>
+			<Fog>1</Fog>
+			<Rain>2</Rain>
+			<DryThunderstorm>2</DryThunderstorm>
+			<RainyThunderstorm>1</RainyThunderstorm>
+			<FoggyRain>1</FoggyRain>
+			<SnowGentle>8</SnowGentle>
+			<SnowHard>10</SnowHard>
+			<GrayPall MayRequire="Ludeon.RimWorld.Anomaly">1</GrayPall>
+			<Windy MayRequire="Ludeon.RimWorld.Odyssey">1</Windy>
+			<Overcast MayRequire="Ludeon.RimWorld.Odyssey">1</Overcast>
+			<Blizzard MayRequire="Ludeon.RimWorld.Odyssey">2</Blizzard>
+		</baseWeatherCommonalities>
+		<wildPlants>
+			<Plant_Grass>5</Plant_Grass>
+			<Plant_Dandelion>0.15</Plant_Dandelion>
+			<Plant_TallGrass>1</Plant_TallGrass>
+			<Plant_Bush>0.07</Plant_Bush>
+			<Plant_TreeOak>0.03</Plant_TreeOak>
+			<Plant_TreePine>0.03</Plant_TreePine>
+			<Plant_Berry>0.02</Plant_Berry>
+			<Plant_HealrootWild>0.05</Plant_HealrootWild>
+			<Plant_Ambrosia>0.005</Plant_Ambrosia>
+			<Plant_GrayGrass MayRequire="Ludeon.RimWorld.Biotech">3</Plant_GrayGrass>
+		</wildPlants>
+		<wildAnimals>
+			<Hare>0.5</Hare>
+			<Rat>0.4</Rat>
+			<GuineaPig>0.2</GuineaPig>
+			<Ibex>0.4</Ibex>
+			<Muffalo>0.4</Muffalo>
+			<Caribou>0.1</Caribou>
+			<Deer>0.3</Deer>
+			<Gazelle>0.2</Gazelle>
+			<Turkey>0.1</Turkey>
+			<Alpaca>0.1</Alpaca>
+			<Fox_Arctic>0.05</Fox_Arctic>
+			<Warg>0.05</Warg>
+			<WildBoar>0.2</WildBoar>
+			<Bear_Grizzly>0.05</Bear_Grizzly>
+			<Boomalope>0.2</Boomalope>
+			<Boomrat>0.5</Boomrat>
+			<Bison>0.05</Bison>
+			<Horse>0.5</Horse>
+			<Yak>0.05</Yak>
+			<Moose MayRequire="Ludeon.RimWorld.Odyssey">0.2</Moose>
+			<Wolf_Great MayRequire="Ludeon.RimWorld.Odyssey">0.02</Wolf_Great>
+			<Porcupine MayRequire="Ludeon.RimWorld.Odyssey">0.2</Porcupine>
+			<Badger MayRequire="Ludeon.RimWorld.Odyssey">0.2</Badger>
+			<Wolverine MayRequire="Ludeon.RimWorld.Odyssey">0.07</Wolverine>
+			<Mink MayRequire="Ludeon.RimWorld.Odyssey">0.2</Mink>
+			<Swan MayRequire="Ludeon.RimWorld.Odyssey">0.1</Swan>
+			<Sparrow MayRequire="Ludeon.RimWorld.Odyssey">0.5</Sparrow>
+			<Crow MayRequire="Ludeon.RimWorld.Odyssey">0.5</Crow>
+			<Muskox MayRequire="Ludeon.RimWorld.Odyssey">0.25</Muskox>
+			<Cat_Scimitar MayRequire="Ludeon.RimWorld.Odyssey">0.1</Cat_Scimitar>
+			<Mastodon MayRequire="Ludeon.RimWorld.Odyssey">0.1</Mastodon>
+			<Bluebird MayRequire="Ludeon.RimWorld.Odyssey">0.1</Bluebird>
+		</wildAnimals>
+		<pollutionWildAnimals MayRequire="Ludeon.RimWorld.Biotech">
+			<WasteRat MayRequire="Ludeon.RimWorld.Biotech">1</WasteRat>
+			<Warg>0.05</Warg>
+		</pollutionWildAnimals>
+		<coastalWildAnimals>
+			<Walrus MayRequire="Ludeon.RimWorld.Odyssey">0.1</Walrus>
+			<SeaLion MayRequire="Ludeon.RimWorld.Odyssey">0.1</SeaLion>
+			<Otter MayRequire="Ludeon.RimWorld.Odyssey">0.1</Otter>
+		</coastalWildAnimals>
+		<maxFishPopulation>420</maxFishPopulation>
+		<fishTypes MayRequire="Ludeon.RimWorld.Odyssey">
+			<freshwater_Common>
+				<Fish_Salmon MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Salmon>
+			</freshwater_Common>
+			<freshwater_Uncommon>
+				<Fish_Frostfish MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Frostfish>
+			</freshwater_Uncommon>
+			<saltwater_Common>
+				<Fish_Salmon MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Salmon>
+				<Fish_Cod MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Cod>
+			</saltwater_Common>
+			<saltwater_Uncommon>
+				<Fish_Dogfish MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Dogfish>
+			</saltwater_Uncommon>
+			<rareCatchesSetMaker MayRequire="Ludeon.RimWorld.Odyssey">RareFishingCatches_Cold</rareCatchesSetMaker>
+		</fishTypes>
+		<allowedPackAnimals>
+			<li>Muffalo</li>
+		</allowedPackAnimals>
+	</BiomeDef>
+</Defs>

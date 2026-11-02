@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <Default.label>默认</Default.label>
+
+  <Features.label>地貌</Features.label>
+
+  <Elevation.label>海拔</Elevation.label>
+  <Elevation.description>显示海拔。颜色从海平面到 9000 米。更高的地形使用最上面的颜色。</Elevation.description>
+
+  <RP_Hilliness.label>起伏度</RP_Hilliness.label>
+  <RP_Hilliness.description>显示地形起伏度，从平坦（绿色）到不可逾越的山脉（深红色）。便于了解移动消耗与定居选择。</RP_Hilliness.description>
+
+  <Biome.label>生物群系</Biome.label>
+  <Biome.description>显示生物群系分布，带选择下拉框。</Biome.description>
+
+  <Temperature.label>温度</Temperature.label>
+  <Temperature.description>显示年平均温度，使用地球尺度范围（-50°C 至 +50°C），含增强气候数据。</Temperature.description>
+
+  <RP_SeasonalAmplitude.label>季节温差</RP_SeasonalAmplitude.label>
+  <RP_SeasonalAmplitude.description>显示季节温度振幅——冬夏温差。大陆内部与高纬度地区变化极大。</RP_SeasonalAmplitude.description>
+
+  <RP_Continentality.label>大陆性 vs 海洋性</RP_Continentality.label>
+  <RP_Continentality.description>显示与海洋的距离及大陆/海洋性气候分类。沿海为蓝色，内陆深处为红褐色。</RP_Continentality.description>
+
+  <RP_Monsoon.label>季风强度</RP_Monsoon.label>
+  <RP_Monsoon.description>显示季节季风增湿（季风区额外毫米/年）。靠近海洋、季风转向的热带与亚热带区域。</RP_Monsoon.description>
+
+  <Rainfall.label>降雨量</Rainfall.label>
+  <Rainfall.description>显示年降雨量，使用地球尺度范围（0毫米至8000毫米），含增强降水模拟。</Rainfall.description>
+
+  <RP_AridityIndex.label>干旱指数</RP_AridityIndex.label>
+  <RP_AridityIndex.description>显示干旱指数（降雨/蒸散比）——水分可用性的科学指标。低于0.2为干旱区，高于1.0为湿润区。</RP_AridityIndex.description>
+
+  <RP_InitialBasins.label>初始流域（调试）</RP_InitialBasins.label>
+  <RP_InitialBasins.description>显示基于初始汇点的填溢前地形流域。红色格为汇点位置。</RP_InitialBasins.description>
+
+  <RP_MergedBasins.label>合并流域（调试）</RP_MergedBasins.label>
+  <RP_MergedBasins.description>显示填溢模拟后的合并流域。终端湖为红色，溢流湖/出口为绿色。</RP_MergedBasins.description>
+
+  <RP_RiverSystems.label>河网系统</RP_RiverSystems.label>
+  <RP_RiverSystems.description>显示小流域合并后的聚合河网（主要流域）。每色代表由多个基本流域组成的主要排水系统。</RP_RiverSystems.description>
+
+  <RP_DrainageType.label>排水类型（调试）</RP_DrainageType.label>
+  <RP_DrainageType.description>将格点分为外流（蓝）、内流（橙）、终端湖（红）或溢流湖（绿）。</RP_DrainageType.description>
+
+  <RP_FlowAccumulation.label>径流累积（拓扑）</RP_FlowAccumulation.label>
+  <RP_FlowAccumulation.description>显示拓扑运行的排水区（均匀径流）。蓝色越深表示上游格越多；揭示河道与湿地位置。</RP_FlowAccumulation.description>
+
+  <RP_FlowAccumulationHydrology.label>径流累积（气候）</RP_FlowAccumulationHydrology.label>
+  <RP_FlowAccumulationHydrology.description>第二层：显示气候驱动的径流（降雨×面积）。仅当启用高级水文学时有数据。</RP_FlowAccumulationHydrology.description>
+
+  <RP_Wetlands.label>沼泽度</RP_Wetlands.label>
+  <RP_Wetlands.description>根据排水、气候与地形显示沼泽度。绿色区域表示沼泽、湿地。</RP_Wetlands.description>
+
+  <GrowingPeriod.label>生长季</GrowingPeriod.label>
+
+  <AnimalCommonality.label>动物常见度</AnimalCommonality.label>
+
+  <PlantCommonality.label>植物常见度</PlantCommonality.label>
+
+</LanguageData>

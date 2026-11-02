@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	
+	<!-- ==================== ABSTRACT BASE DEFINITION ==================== -->
+	
+	<MapModeFramework.MapModeDef Name="MapMode_Terrain" Abstract="True">
+		<mapModeClass>MapModeFramework.MapMode_Terrain</mapModeClass>
+		<worldLayerClass>MapModeFramework.WorldLayer_MapMode_Terrain</worldLayerClass>
+		<drawWorldObjects>false</drawWorldObjects>
+		<drawHills>false</drawHills>
+		<drawRivers>true</drawRivers>
+		<drawRoads>false</drawRoads>
+		<drawPollution>false</drawPollution>
+		<disableFeaturesText>true</disableFeaturesText>
+		<displayLabels>true</displayLabels>
+		<doTooltip>true</doTooltip>
+	</MapModeFramework.MapModeDef>
+	
+	<!-- ==================== 1. BASE/NAVIGATION MODES ==================== -->
+	
+	<MapModeFramework.MapModeDef>
+		<mapModeClass>MapModeFramework.MapMode_Default</mapModeClass>
+		<defName>Default</defName>
+		<label>Default</label>
+		<category>Base</category>
+		
+		<drawWorldObjects>true</drawWorldObjects>
+		<drawHills>true</drawHills>
+		<drawRivers>true</drawRivers>
+		<drawRoads>true</drawRoads>
+		<drawPollution>true</drawPollution>
+		<disableFeaturesText>false</disableFeaturesText>
+		
+		<iconPath>UI/MapModes/Default</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef>
+		<mapModeClass>MapModeFramework.MapMode_Features</mapModeClass>
+		<worldLayerClass>MapModeFramework.WorldLayer_MapMode_Region</worldLayerClass>
+		<defName>Features</defName>
+		<label>Features</label>
+		<category>Base</category>
+		<canCache>true</canCache>
+		
+		<drawWorldObjects>true</drawWorldObjects>
+		<drawHills>true</drawHills>
+		<drawRivers>true</drawRivers>
+		<drawRoads>true</drawRoads>
+		<drawPollution>true</drawPollution>
+		<disableFeaturesText>false</disableFeaturesText>
+		<doTooltip>true</doTooltip>
+		
+		<iconPath>UI/MapModes/Features</iconPath>
+		<RegionProperties>
+			<overrideSelector>true</overrideSelector>
+			<doBorders>true</doBorders>
+			<borderWidth>0.5</borderWidth>
+		</RegionProperties>
+	</MapModeFramework.MapModeDef>
+	
+	<!-- ==================== 2. PHYSICAL GEOGRAPHY MODES ==================== -->
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>Elevation</defName>
+		<label>Elevation</label>
+		<category>Geography</category>
+		<description>Shows elevation. Colors run from sea level to 9000 m. Higher ground uses the top color.</description>
+		<iconPath>UI/MapModes/Elevation</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_Hilliness</defName>
+		<label>Hilliness</label>
+		<category>Geography</category>
+		<description>Shows terrain hilliness from flat (green) to impassable mountains (dark red). Useful for understanding movement costs and settlement options.</description>
+		<iconPath>UI/MapModes/Elevation</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_Biome</mapModeClass>
+		<defName>Biome</defName>
+		<label>Biome</label>
+		<category>Geography</category>
+		<description>Shows biome distribution with selection dropdown.</description>
+		
+		<displayLabels>false</displayLabels>
+		<doTooltip>false</doTooltip>
+		
+		<iconPath>UI/MapModes/Biome</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_RockTypes</mapModeClass>
+		<defName>RockTypes</defName>
+		<label>Rock types</label>
+		<category>Geography</category>
+		<description>Shows where a chosen natural rock type occurs. Pick the rock from the button.</description>
+		<displayLabels>false</displayLabels>
+		<doTooltip>false</doTooltip>
+		<iconPath>UI/MapModes/RockTypes</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<!-- ==================== 3. TEMPERATURE & CLIMATE MODES ==================== -->
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>Temperature</defName>
+		<label>Temperature</label>
+		<category>Climate</category>
+		<allowWaterTiles>true</allowWaterTiles>
+		<description>Shows annual average temperature using Earth-scale ranges (-50°C to +50°C) with enhanced climate data.</description>
+		<iconPath>UI/MapModes/Temperature</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_SeasonalAmplitude</defName>
+		<label>Seasonal Temperature Variation</label>
+		<category>Climate</category>
+		<allowWaterTiles>true</allowWaterTiles>
+		<description>Shows seasonal temperature amplitude - how much temperature varies between summer and winter. Continental interiors and high latitudes show extreme variation.</description>
+		<iconPath>UI/MapModes/Temperature</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_Continentality</defName>
+		<label>Continental vs Maritime</label>
+		<category>Climate</category>
+		<debugOnly>true</debugOnly>
+		<description>Shows how maritime or continental a tile is. Blue is maritime, red-brown continental. With the new climate, ocean air is carried along the wind, mostly by the winter wind: land downwind of an ocean stays maritime far inland, and a coast with the wind blowing offshore is continental almost to the shore. Otherwise the value falls with distance from the coast, and a large enclosed sea adds a shorter blue band.</description>
+		<iconPath>UI/MapModes/Temperature</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_Monsoon</defName>
+		<label>Monsoon intensity</label>
+		<category>Climate</category>
+		<description>Shows seasonal monsoon moisture boost (additional mm/year in monsoon zones). Tropical and subtropical regions with ocean proximity and seasonal wind reversal.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<!-- ==================== 4. WATER & HYDROLOGY MODES ==================== -->
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>Rainfall</defName>
+		<label>Rainfall</label>
+		<category>Hydrology</category>
+		<description>Shows annual rainfall using Earth-scale ranges (0mm to 8000mm) with enhanced precipitation modeling.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_AridityIndex</defName>
+		<label>Aridity Index</label>
+		<category>Hydrology</category>
+		<description>Shows the aridity index (rainfall/PET ratio) - a scientific measure of moisture availability. Values below 0.2 indicate arid regions, above 1.0 indicate humid regions.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_InitialBasins</defName>
+		<label>Initial Basins (Debug)</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<description>Shows pre-fill/spill topographic basins based on initial sinks. Red tiles indicate sink locations.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+		<displayLabels>true</displayLabels>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_MergedBasins</defName>
+		<label>Merged Basins (Debug)</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<description>Shows merged basins after fill-and-spill simulation. Terminal lakes are Red, Spilling lakes/outlets are Green.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+		<displayLabels>true</displayLabels>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_RiverSystems</defName>
+		<label>River Systems</label>
+		<category>Hydrology</category>
+		<description>Shows aggregated river systems (major watersheds) after small basins have been merged. Each color represents a major drainage system composed of multiple elementary basins.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+		<displayLabels>true</displayLabels>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_DrainageType</defName>
+		<label>Drainage Type (Debug)</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<description>Classifies tiles as Exorheic (Blue), Endorheic (Orange), Terminal Lake (Red), or Spilling Lake (Green).</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+		<displayLabels>true</displayLabels>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_RiverFlow</defName>
+		<label>River flow (RP2)</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<description>Rain-weighted flow on RP2 drainage. Brighter tiles carry more water. Rivers are drawn from this.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_IncomingMoisture</defName>
+		<label>Incoming moisture</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<allowWaterTiles>true</allowWaterTiles>
+		<includeWater>true</includeWater>
+		<description>Moisture arriving at each tile, in millimeters, before it rains out.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_Condensation</defName>
+		<label>Condensation</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<allowWaterTiles>true</allowWaterTiles>
+		<includeWater>true</includeWater>
+		<description>Moisture that rains out at each tile, in millimeters.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_RemainingMoisture</defName>
+		<label>Remaining moisture</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<allowWaterTiles>true</allowWaterTiles>
+		<includeWater>true</includeWater>
+		<description>Moisture still in the air after this tile, in millimeters.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_DryingRatio</defName>
+		<label>Drying ratio</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<allowWaterTiles>true</allowWaterTiles>
+		<includeWater>true</includeWater>
+		<description>Remaining moisture divided by incoming moisture. 1 means the air kept its moisture.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_CurrentAnomaly</defName>
+		<label>Current temperature</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<allowWaterTiles>true</allowWaterTiles>
+		<includeWater>true</includeWater>
+		<description>Ocean-current temperature anomaly in degrees. Warm currents are one end of the scale, cool currents the other.</description>
+		<iconPath>UI/MapModes/Temperature</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_Convergence</defName>
+		<label>Convergence</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<allowWaterTiles>true</allowWaterTiles>
+		<includeWater>true</includeWater>
+		<description>Rising air is positive. Sinking air is negative.</description>
+		<iconPath>UI/MapModes/Temperature</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_DailyRange</defName>
+		<label>Daily temperature range</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<description>Estimated mean daily temperature range in degrees. Evaporation uses this only when that debug switch is on.</description>
+		<iconPath>UI/MapModes/Temperature</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_FlowAccumulation</defName>
+		<label>Flow Accumulation (Topology)</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<description>Shows drainage areas from topology run (uniform flow). Darker blue indicates more upstream tiles; reveals river paths and wetland locations.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_FlowAccumulationHydrology</defName>
+		<label>Flow Accumulation (Climate)</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<description>Tier 2: Shows climate-driven flow (rainfall × area). Only has data when Advanced Hydrology is enabled.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_MaritimeShare</defName>
+		<label>Maritime air share</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<allowWaterTiles>true</allowWaterTiles>
+		<includeWater>true</includeWater>
+		<description>Annual share of air that arrived from the ocean along the wind.</description>
+		<iconPath>UI/MapModes/Temperature</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_PrecipitableWater</defName>
+		<label>Precipitable water</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<allowWaterTiles>true</allowWaterTiles>
+		<includeWater>true</includeWater>
+		<description>Annual-mean column water vapour W in millimeters.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_LandEvaporation</defName>
+		<label>Land evaporation (ET)</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<description>Annual Fu-Budyko land evapotranspiration in millimeters.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_OceanWaterShare</defName>
+		<label>Ocean water share</label>
+		<category>Debug</category>
+		<debugOnly>true</debugOnly>
+		<allowWaterTiles>true</allowWaterTiles>
+		<includeWater>true</includeWater>
+		<description>Share of moisture supplied directly from ocean evaporation versus recycled land evaporation.</description>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<!-- ==================== 5. ECOLOGICAL SYSTEMS MODES ==================== -->
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>RP_Wetlands</defName>
+		<label>Swampiness</label>
+		<category>Hydrology</category>
+		<description>Shows swampiness score based on drainage, climate, and terrain. Green areas indicate swamps, marshes, and wetlands.</description>
+		<iconPath>UI/MapModes/GrowingPeriod</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_GrowingPeriod</mapModeClass>
+		<defName>GrowingPeriod</defName>
+		<label>Growing Period</label>
+		<category>Ecology</category>
+		<canCache>true</canCache>
+		
+		<displayLabels>false</displayLabels>
+		<doTooltip>true</doTooltip>
+		
+		<iconPath>UI/MapModes/GrowingPeriod</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_AnimalCommonality</mapModeClass>
+		<defName>AnimalCommonality</defName>
+		<label>Animal Commonality</label>
+		<category>Ecology</category>
+		
+		<iconPath>UI/MapModes/AnimalCommonality</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_PlantCommonality</mapModeClass>
+		<defName>PlantCommonality</defName>
+		<label>Plant Commonality</label>
+		<category>Ecology</category>
+		
+		<iconPath>UI/MapModes/PlantCommonality</iconPath>
+	</MapModeFramework.MapModeDef>
+
+</Defs>

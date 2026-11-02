@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- When World Map Beautification Project (WMBP) is loaded, add BiomesKitControls to RP2 biomes so WMBP uses our WorldMaterials/BiomesKit/RP_* textures. -->
+<Patch>
+	<Operation Class="PatchOperationFindMod">
+		<mods>
+			<li>World Map Beautification Project (Continued)</li>
+		</mods>
+		<match Class="PatchOperationSequence">
+			<operations>
+				<li Class="PatchOperationConditional">
+					<xpath>/Defs/BiomeDef[defName = "RP_Prairie"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls" or @Class="ReGrowthCore.BiomesKitControl"]</xpath>
+					<nomatch Class="PatchOperationAddModExtension">
+						<xpath>/Defs/BiomeDef[defName = "RP_Prairie"]</xpath>
+						<value>
+						<li Class="BiomesKit.BiomesKitControls">
+							<forested>true</forested>
+							<uniqueHills>true</uniqueHills>
+							<forestSparseBelow>1100</forestSparseBelow>
+							<forestDenseAbove>1500</forestDenseAbove>
+							<mountainsSemiSnowyBelow>10</mountainsSemiSnowyBelow>
+							<impassableSemiSnowyBelow>25</impassableSemiSnowyBelow>
+							<mountainsSnowyBelow>-5</mountainsSnowyBelow>
+							<impassableSnowyBelow>0</impassableSnowyBelow>
+							<mountainsVerySnowyBelow>-12</mountainsVerySnowyBelow>
+							<impassableVerySnowyBelow>-5</impassableVerySnowyBelow>
+							<materialRandomRotation>false</materialRandomRotation>
+							<smallHillSizeMultiplier>1.5</smallHillSizeMultiplier>
+							<largeHillSizeMultiplier>2</largeHillSizeMultiplier>
+							<mountainSizeMultiplier>1.4</mountainSizeMultiplier>
+							<impassableSizeMultiplier>1.3</impassableSizeMultiplier>
+						</li>
+						</value>
+					</nomatch>
+				</li>
+				<li Class="PatchOperationConditional">
+					<xpath>/Defs/BiomeDef[defName = "RP_Savanna"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls" or @Class="ReGrowthCore.BiomesKitControl"]</xpath>
+					<nomatch Class="PatchOperationAddModExtension">
+						<xpath>/Defs/BiomeDef[defName = "RP_Savanna"]</xpath>
+						<value>
+						<li Class="BiomesKit.BiomesKitControls">
+							<forested>true</forested>
+							<uniqueHills>true</uniqueHills>
+							<forestSparseBelow>1500</forestSparseBelow>
+							<forestDenseAbove>1800</forestDenseAbove>
+							<mountainsSemiSnowyBelow>10</mountainsSemiSnowyBelow>
+							<impassableSemiSnowyBelow>25</impassableSemiSnowyBelow>
+							<mountainsSnowyBelow>-5</mountainsSnowyBelow>
+							<impassableSnowyBelow>0</impassableSnowyBelow>
+							<mountainsVerySnowyBelow>-12</mountainsVerySnowyBelow>
+							<impassableVerySnowyBelow>-5</impassableVerySnowyBelow>
+							<materialRandomRotation>false</materialRandomRotation>
+							<smallHillSizeMultiplier>1.5</smallHillSizeMultiplier>
+							<largeHillSizeMultiplier>2</largeHillSizeMultiplier>
+							<mountainSizeMultiplier>1.4</mountainSizeMultiplier>
+							<impassableSizeMultiplier>1.3</impassableSizeMultiplier>
+						</li>
+						</value>
+					</nomatch>
+				</li>
+				<li Class="PatchOperationConditional">
+					<xpath>/Defs/BiomeDef[defName = "RP_Steppe"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls" or @Class="ReGrowthCore.BiomesKitControl"]</xpath>
+					<nomatch Class="PatchOperationAddModExtension">
+						<xpath>/Defs/BiomeDef[defName = "RP_Steppe"]</xpath>
+						<value>
+						<li Class="BiomesKit.BiomesKitControls">
+							<forested>true</forested>
+							<uniqueHills>true</uniqueHills>
+							<forestSparseBelow>600</forestSparseBelow>
+							<forestDenseAbove>1500</forestDenseAbove>
+							<mountainsSemiSnowyBelow>10</mountainsSemiSnowyBelow>
+							<impassableSemiSnowyBelow>25</impassableSemiSnowyBelow>
+							<mountainsSnowyBelow>-5</mountainsSnowyBelow>
+							<impassableSnowyBelow>0</impassableSnowyBelow>
+							<mountainsVerySnowyBelow>-12</mountainsVerySnowyBelow>
+							<impassableVerySnowyBelow>-5</impassableVerySnowyBelow>
+							<materialRandomRotation>false</materialRandomRotation>
+							<smallHillSizeMultiplier>1.5</smallHillSizeMultiplier>
+							<largeHillSizeMultiplier>2</largeHillSizeMultiplier>
+							<mountainSizeMultiplier>1.4</mountainSizeMultiplier>
+							<impassableSizeMultiplier>1.3</impassableSizeMultiplier>
+						</li>
+						</value>
+					</nomatch>
+				</li>
+				<li Class="PatchOperationConditional">
+					<xpath>/Defs/BiomeDef[defName = "RP_ColdDesert"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls" or @Class="ReGrowthCore.BiomesKitControl"]</xpath>
+					<nomatch Class="PatchOperationAddModExtension">
+						<xpath>/Defs/BiomeDef[defName = "RP_ColdDesert"]</xpath>
+						<value>
+						<li Class="BiomesKit.BiomesKitControls">
+							<forested>true</forested>
+							<uniqueHills>true</uniqueHills>
+							<forestSparseBelow>800</forestSparseBelow>
+							<forestDenseAbove>1500</forestDenseAbove>
+							<mountainsSemiSnowyBelow>10</mountainsSemiSnowyBelow>
+							<impassableSemiSnowyBelow>25</impassableSemiSnowyBelow>
+							<mountainsSnowyBelow>-5</mountainsSnowyBelow>
+							<impassableSnowyBelow>0</impassableSnowyBelow>
+							<mountainsVerySnowyBelow>-12</mountainsVerySnowyBelow>
+							<impassableVerySnowyBelow>-5</impassableVerySnowyBelow>
+							<materialRandomRotation>false</materialRandomRotation>
+							<smallHillSizeMultiplier>1.5</smallHillSizeMultiplier>
+							<largeHillSizeMultiplier>2</largeHillSizeMultiplier>
+							<mountainSizeMultiplier>1.4</mountainSizeMultiplier>
+							<impassableSizeMultiplier>1.3</impassableSizeMultiplier>
+						</li>
+						</value>
+					</nomatch>
+				</li>
+				<li Class="PatchOperationConditional">
+					<xpath>/Defs/BiomeDef[defName = "RP_Permafrost"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls" or @Class="ReGrowthCore.BiomesKitControl"]</xpath>
+					<nomatch Class="PatchOperationAddModExtension">
+						<xpath>/Defs/BiomeDef[defName = "RP_Permafrost"]</xpath>
+						<value>
+						<li Class="BiomesKit.BiomesKitControls">
+							<forested>true</forested>
+							<uniqueHills>true</uniqueHills>
+							<forestSparseBelow>1100</forestSparseBelow>
+							<forestDenseAbove>1500</forestDenseAbove>
+							<mountainsSemiSnowyBelow>10</mountainsSemiSnowyBelow>
+							<impassableSemiSnowyBelow>25</impassableSemiSnowyBelow>
+							<mountainsSnowyBelow>-5</mountainsSnowyBelow>
+							<impassableSnowyBelow>0</impassableSnowyBelow>
+							<mountainsVerySnowyBelow>-12</mountainsVerySnowyBelow>
+							<impassableVerySnowyBelow>-5</impassableVerySnowyBelow>
+							<materialRandomRotation>false</materialRandomRotation>
+							<smallHillSizeMultiplier>1.5</smallHillSizeMultiplier>
+							<largeHillSizeMultiplier>2</largeHillSizeMultiplier>
+							<mountainSizeMultiplier>1.4</mountainSizeMultiplier>
+							<impassableSizeMultiplier>1.3</impassableSizeMultiplier>
+						</li>
+						</value>
+					</nomatch>
+				</li>
+				<li Class="PatchOperationConditional">
+					<xpath>/Defs/BiomeDef[defName = "RP_Oasis"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls" or @Class="ReGrowthCore.BiomesKitControl"]</xpath>
+					<nomatch Class="PatchOperationAddModExtension">
+						<xpath>/Defs/BiomeDef[defName = "RP_Oasis"]</xpath>
+						<value>
+						<li Class="BiomesKit.BiomesKitControls">
+							<forested>true</forested>
+							<uniqueHills>false</uniqueHills>
+							<forestSparseBelow>100</forestSparseBelow>
+							<forestDenseAbove>400</forestDenseAbove>
+							<materialRandomRotation>false</materialRandomRotation>
+							<smallHillSizeMultiplier>1.5</smallHillSizeMultiplier>
+							<largeHillSizeMultiplier>2</largeHillSizeMultiplier>
+							<mountainSizeMultiplier>1.4</mountainSizeMultiplier>
+							<impassableSizeMultiplier>1.3</impassableSizeMultiplier>
+						</li>
+						</value>
+					</nomatch>
+				</li>
+				<!-- Grasslands fix for WMBP: Missing Snowy and VerySnowy thresholds -->
+				<li Class="PatchOperationConditional">
+					<xpath>/Defs/BiomeDef[defName="Grasslands"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]</xpath>
+					<match Class="PatchOperationSequence">
+						<operations>
+							<li Class="PatchOperationConditional">
+								<xpath>/Defs/BiomeDef[defName="Grasslands"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]/mountainsSnowyBelow</xpath>
+								<nomatch Class="PatchOperationAdd">
+									<xpath>/Defs/BiomeDef[defName="Grasslands"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]</xpath>
+									<value>
+										<mountainsSnowyBelow>-5</mountainsSnowyBelow>
+										<impassableSnowyBelow>0</impassableSnowyBelow>
+										<mountainsVerySnowyBelow>-12</mountainsVerySnowyBelow>
+										<impassableVerySnowyBelow>-5</impassableVerySnowyBelow>
+									</value>
+								</nomatch>
+							</li>
+						</operations>
+					</match>
+				</li>
+				<!-- Fix missing IceSheet hill textures: always use snowpile variants -->
+				<li Class="PatchOperationConditional">
+					<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]</xpath>
+					<nomatch Class="PatchOperationAddModExtension">
+						<xpath>/Defs/BiomeDef[defName = "IceSheet"]</xpath>
+						<value>
+							<li Class="BiomesKit.BiomesKitControls">
+								<uniqueHills>true</uniqueHills>
+								<snowpilesBelow>999</snowpilesBelow>
+								<mountainsSnowyBelow>999</mountainsSnowyBelow>
+								<impassableSnowyBelow>999</impassableSnowyBelow>
+								<mountainsVerySnowyBelow>-12</mountainsVerySnowyBelow>
+								<impassableVerySnowyBelow>-5</impassableVerySnowyBelow>
+								<mountainsFullySnowyBelow>-21</mountainsFullySnowyBelow>
+								<impassableFullySnowyBelow>-21</impassableFullySnowyBelow>
+								<materialRandomRotation>false</materialRandomRotation>
+								<smallHillSizeMultiplier>1.5</smallHillSizeMultiplier>
+								<largeHillSizeMultiplier>2</largeHillSizeMultiplier>
+								<mountainSizeMultiplier>1.4</mountainSizeMultiplier>
+								<impassableSizeMultiplier>1.3</impassableSizeMultiplier>
+							</li>
+						</value>
+					</nomatch>
+					<match Class="PatchOperationSequence">
+						<operations>
+							<li Class="PatchOperationConditional">
+								<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]/snowpilesBelow</xpath>
+								<match Class="PatchOperationReplace">
+									<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]/snowpilesBelow</xpath>
+									<value><snowpilesBelow>999</snowpilesBelow></value>
+								</match>
+								<nomatch Class="PatchOperationAdd">
+									<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]</xpath>
+									<value><snowpilesBelow>999</snowpilesBelow></value>
+								</nomatch>
+							</li>
+							<li Class="PatchOperationConditional">
+								<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]/mountainsSnowyBelow</xpath>
+								<match Class="PatchOperationReplace">
+									<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]/mountainsSnowyBelow</xpath>
+									<value><mountainsSnowyBelow>999</mountainsSnowyBelow></value>
+								</match>
+								<nomatch Class="PatchOperationAdd">
+									<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]</xpath>
+									<value><mountainsSnowyBelow>999</mountainsSnowyBelow></value>
+								</nomatch>
+							</li>
+							<li Class="PatchOperationConditional">
+								<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]/impassableSnowyBelow</xpath>
+								<match Class="PatchOperationReplace">
+									<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]/impassableSnowyBelow</xpath>
+									<value><impassableSnowyBelow>999</impassableSnowyBelow></value>
+								</match>
+								<nomatch Class="PatchOperationAdd">
+									<xpath>/Defs/BiomeDef[defName = "IceSheet"]/modExtensions/li[@Class="BiomesKit.BiomesKitControls"]</xpath>
+									<value><impassableSnowyBelow>999</impassableSnowyBelow></value>
+								</nomatch>
+							</li>
+						</operations>
+					</match>
+				</li>
+			</operations>
+		</match>
+	</Operation>
+</Patch>

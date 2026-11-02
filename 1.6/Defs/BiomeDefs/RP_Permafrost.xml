@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<BiomeDef>
+		<defName>RP_Permafrost</defName>
+		<label>permafrost</label>
+		<description>Permafrost regions are places where the ground remains at or below freezing year-round. Only the surface thaws briefly in summer, supporting limited vegetation like mosses, lichens, and hardy grasses. Wildlife is scarce but specialized, and the extreme cold makes survival exceptionally challenging. The permanently frozen ground prevents most construction and farming.</description>
+		<workerClass>Planets.Biomes.Custom.Permafrost</workerClass>
+		<animalDensity>0.5</animalDensity>
+		<plantDensity>0.15</plantDensity>
+		<settlementSelectionWeight>0.3</settlementSelectionWeight>
+		<movementDifficulty>1.5</movementDifficulty>
+		<texture>Permafrost</texture>
+		<forageability>0.1</forageability>
+		<foragedFood>RawBerries</foragedFood>
+		<wildPlantRegrowDays>40</wildPlantRegrowDays>
+		<soundsAmbient>
+			<li>Ambient_Wind_Desolate</li>
+		</soundsAmbient>
+		<diseaseMtbDays>90</diseaseMtbDays>
+		<diseases>
+			<li>
+				<diseaseInc>Disease_Flu</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_Plague</diseaseInc>
+				<commonality>80</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_FibrousMechanites</diseaseInc>
+				<commonality>30</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_SensoryMechanites</diseaseInc>
+				<commonality>30</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_AnimalFlu</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_AnimalPlague</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+		</diseases>
+		<!-- New 1.6/Odyssey terrain fields -->
+		<coastalBeachTerrain>Ice</coastalBeachTerrain>
+		<lakeBeachTerrain>Ice</lakeBeachTerrain>
+		<riverbankTerrain>Ice</riverbankTerrain>
+		<riverbankSizeRange>2~4</riverbankSizeRange>
+		<mudTerrain>Ice</mudTerrain>
+		<terrainsByFertility>
+			<li>
+				<terrain>Ice</terrain>
+				<min>-999</min>
+				<max>0.2</max>
+			</li>
+			<li>
+				<terrain>Gravel</terrain>
+				<min>0.2</min>
+				<max>0.5</max>
+			</li>
+			<li>
+				<terrain>Soil</terrain>
+				<min>0.5</min>
+				<max>999</max>
+			</li>
+		</terrainsByFertility>
+		<terrainPatchMakers>
+			<li>
+				<perlinFrequency>0.04</perlinFrequency>
+				<thresholds>
+					<li>
+						<terrain>Soil</terrain>
+						<min>0.9</min>
+						<max>999</max>
+					</li>
+				</thresholds>
+			</li>
+		</terrainPatchMakers>
+		<baseWeatherCommonalities>
+			<Clear>12</Clear>
+			<Fog>1</Fog>
+			<Rain>0</Rain>
+			<DryThunderstorm>0</DryThunderstorm>
+			<RainyThunderstorm>0</RainyThunderstorm>
+			<FoggyRain>0</FoggyRain>
+			<SnowGentle>10</SnowGentle>
+			<SnowHard>15</SnowHard>
+			<GrayPall MayRequire="Ludeon.RimWorld.Anomaly">1</GrayPall>
+			<Windy MayRequire="Ludeon.RimWorld.Odyssey">1</Windy>
+			<Overcast MayRequire="Ludeon.RimWorld.Odyssey">1</Overcast>
+			<Blizzard MayRequire="Ludeon.RimWorld.Odyssey">2</Blizzard>
+		</baseWeatherCommonalities>
+		<wildPlants>
+			<Plant_Grass>0.8</Plant_Grass>
+			<Plant_Moss>2</Plant_Moss>
+			<Plant_Bush>0.05</Plant_Bush>
+			<Plant_Dandelion>0.05</Plant_Dandelion>
+			<Plant_TreePine>0.01</Plant_TreePine>
+			<Plant_Berry>0.01</Plant_Berry>
+			<Plant_HealrootWild>0.03</Plant_HealrootWild>
+			<Plant_Ambrosia>0.001</Plant_Ambrosia>
+			<Plant_GrayGrass MayRequire="Ludeon.RimWorld.Biotech">2</Plant_GrayGrass>
+		</wildPlants>
+		<wildAnimals>
+			<Hare>0.2</Hare>
+			<Snowhare>0.3</Snowhare>
+			<Fox_Arctic>0.05</Fox_Arctic>
+			<Wolf_Arctic>0.05</Wolf_Arctic>
+			<Caribou>0.2</Caribou>
+			<Muffalo>0.1</Muffalo>
+			<Megasloth>0.01</Megasloth>
+			<Ibex>0.1</Ibex>
+			<Lynx>0.02</Lynx>
+			<Bear_Polar>0.02</Bear_Polar>
+			<Elk>0.05</Elk>
+			<Yak>0.02</Yak>
+			<Moose MayRequire="Ludeon.RimWorld.Odyssey">0.2</Moose>
+			<Wolf_Great MayRequire="Ludeon.RimWorld.Odyssey">0.02</Wolf_Great>
+			<Badger MayRequire="Ludeon.RimWorld.Odyssey">0.2</Badger>
+			<Wolverine MayRequire="Ludeon.RimWorld.Odyssey">0.07</Wolverine>
+			<Mink MayRequire="Ludeon.RimWorld.Odyssey">0.2</Mink>
+			<Sparrow MayRequire="Ludeon.RimWorld.Odyssey">0.5</Sparrow>
+			<Muskox MayRequire="Ludeon.RimWorld.Odyssey">0.25</Muskox>
+			<Cat_Scimitar MayRequire="Ludeon.RimWorld.Odyssey">0.1</Cat_Scimitar>
+			<Mastodon MayRequire="Ludeon.RimWorld.Odyssey">0.1</Mastodon>
+			<Bluebird MayRequire="Ludeon.RimWorld.Odyssey">0.1</Bluebird>
+		</wildAnimals>
+		<pollutionWildAnimals MayRequire="Ludeon.RimWorld.Biotech">
+			<WasteRat MayRequire="Ludeon.RimWorld.Biotech">1</WasteRat>
+			<Warg>0.05</Warg>
+		</pollutionWildAnimals>
+		<coastalWildAnimals>
+			<Walrus MayRequire="Ludeon.RimWorld.Odyssey">0.1</Walrus>
+			<Penguin MayRequire="Ludeon.RimWorld.Odyssey">0.1</Penguin>
+		</coastalWildAnimals>
+		<maxFishPopulation>300</maxFishPopulation>
+		<fishTypes MayRequire="Ludeon.RimWorld.Odyssey">
+			<freshwater_Common>
+				<Fish_Salmon MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Salmon>
+			</freshwater_Common>
+			<freshwater_Uncommon>
+				<Fish_Frostfish MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Frostfish>
+			</freshwater_Uncommon>
+			<saltwater_Common>
+				<Fish_Salmon MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Salmon>
+				<Fish_Cod MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Cod>
+			</saltwater_Common>
+			<saltwater_Uncommon>
+				<Fish_Dogfish MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Dogfish>
+			</saltwater_Uncommon>
+			<rareCatchesSetMaker MayRequire="Ludeon.RimWorld.Odyssey">RareFishingCatches_Cold</rareCatchesSetMaker>
+		</fishTypes>
+		<allowedPackAnimals>
+			<li>Muffalo</li>
+		</allowedPackAnimals>
+	</BiomeDef>
+</Defs>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+	<!-- General / UI -->
+	<Planets.Advanced>Avanzado</Planets.Advanced>
+	<Planets.Description>Descripción:</Planets.Description>
+	<Planets.MiscSettings>Otras opciones</Planets.MiscSettings>
+	<Planets.ModName>Realistic Planets 2</Planets.ModName>
+	<Planets.Mods>Mods</Planets.Mods>
+
+	<!-- Map Mode Framework (MMF) - Core & UI -->
+	<MMF.Commonality>Comunalidad</MMF.Commonality>
+	<MMF.CurrentMapMode>Modo de mapa actual</MMF.CurrentMapMode>
+	<MMF.Overlay.Off>Desactivado</MMF.Overlay.Off>
+	<MMF.Overlay.On>Activado</MMF.Overlay.On>
+	<MMF.Settings.CacheData>Datos en caché</MMF.Settings.CacheData>
+	<MMF.Settings.CacheOnStart>Cachear al iniciar</MMF.Settings.CacheOnStart>
+	<MMF.Settings.EnableCaching>Activar caché</MMF.Settings.EnableCaching>
+	<MMF.Type>Tipo</MMF.Type>
+	<MMF.UI.Caching>Caché</MMF.UI.Caching>
+	<MMF.UI.LoadProgress>Preparadas {0} de {1} casillas</MMF.UI.LoadProgress>
+	<MMF.UI.Tooltip.Category>Modos de mapa: {0}</MMF.UI.Tooltip.Category>
+	<MMF.UI.Category.Mods>Mods</MMF.UI.Category.Mods>
+	<MMF.UI.Category.Options>Opciones</MMF.UI.Category.Options>
+	<MMF.UI.TryCache>Activa la caché para este modo de mapa si quieres acortar el tiempo de regeneración.</MMF.UI.TryCache>
+
+	<!-- Map Mode Framework (MMF) - Draw Settings -->
+	<MMF.DrawSettings>Opciones de dibujo</MMF.DrawSettings>
+	<MMF.DrawSettings.ShowLabel>Mostrar etiqueta</MMF.DrawSettings.ShowLabel>
+	<MMF.DrawSettings.ShowTooltip>Mostrar tooltip</MMF.DrawSettings.ShowTooltip>
+	<MMF.DrawSettings.ShowFeaturesText>Mostrar texto de características</MMF.DrawSettings.ShowFeaturesText>
+	<MMF.DrawSettings.DrawHills>Dibujar colinas</MMF.DrawSettings.DrawHills>
+	<MMF.DrawSettings.DrawMonsoonWind>Flechas de viento monzónico</MMF.DrawSettings.DrawMonsoonWind>
+	<MMF.DrawSettings.DrawOrographicUplift>Elevación orográfica (barlovento)</MMF.DrawSettings.DrawOrographicUplift>
+	<MMF.DrawSettings.DrawPollution>Dibujar contaminación</MMF.DrawSettings.DrawPollution>
+	<MMF.DrawSettings.DrawRainShadow>Sombra pluviométrica (sotavento)</MMF.DrawSettings.DrawRainShadow>
+	<MMF.DrawSettings.DrawRidgeNormal>Flechas de normal de crestas</MMF.DrawSettings.DrawRidgeNormal>
+	<MMF.DrawSettings.DrawRidges>Resaltar crestas</MMF.DrawSettings.DrawRidges>
+	<MMF.DrawSettings.DrawRivers>Dibujar ríos</MMF.DrawSettings.DrawRivers>
+	<MMF.DrawSettings.DrawRoads>Dibujar carreteras</MMF.DrawSettings.DrawRoads>
+	<MMF.DrawSettings.DrawWindDirection>Flechas de dirección del viento</MMF.DrawSettings.DrawWindDirection>
+  <MMF.DrawSettings.WindDirection.Tooltip>Las flechas apuntan hacia donde sopla el viento. El color indica la dirección (Rojo=Este, Cian=Oeste, Amarillo-Verde=Norte, Azul-Púrpura=Sur). La intensidad del color (saturación) indica la velocidad.</MMF.DrawSettings.WindDirection.Tooltip>
+	<MMF.DrawSettings.DrawWorldObjects>Dibujar objetos del mundo</MMF.DrawSettings.DrawWorldObjects>
+	<MMF.DrawSettings.IncludeWater>Incluir agua</MMF.DrawSettings.IncludeWater>
+
+	<!-- Map Mode Framework (MMF) - World Features -->
+	<MMF.WorldFeatures.Archipelago>Archipiélago</MMF.WorldFeatures.Archipelago>
+	<MMF.WorldFeatures.AridShrubland>Matorral árido</MMF.WorldFeatures.AridShrubland>
+	<MMF.WorldFeatures.Bay>Bahía</MMF.WorldFeatures.Bay>
+	<MMF.WorldFeatures.BorealForest>Bosque boreal</MMF.WorldFeatures.BorealForest>
+	<MMF.WorldFeatures.ColdBog>Pantano frío</MMF.WorldFeatures.ColdBog>
+	<MMF.WorldFeatures.Desert>Desierto</MMF.WorldFeatures.Desert>
+	<MMF.WorldFeatures.IceSheet>Indlandsis</MMF.WorldFeatures.IceSheet>
+	<MMF.WorldFeatures.Island>Isla</MMF.WorldFeatures.Island>
+	<MMF.WorldFeatures.Lake>Lago</MMF.WorldFeatures.Lake>
+	<MMF.WorldFeatures.MountainRange>Cordillera</MMF.WorldFeatures.MountainRange>
+	<MMF.WorldFeatures.Ocean>Océano</MMF.WorldFeatures.Ocean>
+	<MMF.WorldFeatures.OceanBay>Bahía oceánica</MMF.WorldFeatures.OceanBay>
+	<MMF.WorldFeatures.OuterOcean>Océano exterior</MMF.WorldFeatures.OuterOcean>
+	<MMF.WorldFeatures.Peninsula>Península</MMF.WorldFeatures.Peninsula>
+	<MMF.WorldFeatures.Sea>Mar</MMF.WorldFeatures.Sea>
+	<MMF.WorldFeatures.TemperateForest>Bosque templado</MMF.WorldFeatures.TemperateForest>
+	<MMF.WorldFeatures.TemperateSwamp>Pantano templado</MMF.WorldFeatures.TemperateSwamp>
+	<MMF.WorldFeatures.TropicalRainforest>Selva tropical</MMF.WorldFeatures.TropicalRainforest>
+	<MMF.WorldFeatures.TropicalSwamp>Pantano tropical</MMF.WorldFeatures.TropicalSwamp>
+	<MMF.WorldFeatures.Tundra>Tundra</MMF.WorldFeatures.Tundra>
+
+	<!-- World Generation - Core -->
+	<Planets.PlanetName>Nombre del planeta</Planets.PlanetName>
+	<Planets.PlanetScale>Escala del planeta</Planets.PlanetScale>
+	<Planets.PlanetScaleTip>Controla el tamaño de las casillas del planeta (número de subdivisiones). Valores más bajos significan menos casillas más grandes (como Mi Pequeño Planeta). El RimWorld estándar es 10.</Planets.PlanetScaleTip>
+	<Planets.Random>Planeta aleatorio</Planets.Random>
+	<Planets.Randomize>Aleatorizar</Planets.Randomize>
+	<Planets.WorldPresets>Presets</Planets.WorldPresets>
+
+	<!-- World Generation - Sea Level -->
+	<Planets.SeaLevel>Nivel del mar</Planets.SeaLevel>
+	<Planets.SeaLevelTip>Controla cuánto del planeta está cubierto por océano. Niveles más bajos exponen más tierra y crean continentes más grandes. Niveles más altos inundan zonas bajas y crean mundos de islas.</Planets.SeaLevelTip>
+	<Planets.SeaLevel_High>Alto</Planets.SeaLevel_High>
+	<Planets.SeaLevel_High_Desc>Un planeta de islas. La mayor parte es océano, y la tierra son islas y continentes pequeños.</Planets.SeaLevel_High_Desc>
+	<Planets.SeaLevel_Low>Bajo</Planets.SeaLevel_Low>
+	<Planets.SeaLevel_Low_Desc>Menos cobertura oceánica con mares pequeños. Los continentes son más grandes que en la Tierra.</Planets.SeaLevel_Low_Desc>
+	<Planets.SeaLevel_Normal>Vanilla</Planets.SeaLevel_Normal>
+	<Planets.SeaLevel_Normal_Desc>La proporción de océano de RimWorld sin mods. Más tierra que la Tierra.</Planets.SeaLevel_Normal_Desc>
+	<Planets.SeaLevel_SlightlyHigh>Como la Tierra</Planets.SeaLevel_SlightlyHigh>
+	<Planets.SeaLevel_SlightlyHigh_Desc>Aproximadamente la proporción de océano de la Tierra. Más océano que vanilla y continentes más pequeños.</Planets.SeaLevel_SlightlyHigh_Desc>
+	<Planets.SeaLevel_SlightlyLow>Ligeramente bajo</Planets.SeaLevel_SlightlyLow>
+	<Planets.SeaLevel_SlightlyLow_Desc>Cobertura oceánica algo reducida. Más superficie terrestre disponible para colonias.</Planets.SeaLevel_SlightlyLow_Desc>
+
+	<!-- World Generation - Rivers & Roads -->
+	<Planets.AncientRoadDensity>Densidad de caminos antiguos</Planets.AncientRoadDensity>
+	<Planets.AncientRoadDensityTip>Controla la densidad de caminos antiguos generados en el mapa del mundo.</Planets.AncientRoadDensityTip>
+	<Planets.FactionRoadDensity>Densidad de caminos entre facciones</Planets.FactionRoadDensity>
+	<Planets.FactionRoadDensityTip>Controla la densidad de caminos generados entre asentamientos de facciones.</Planets.FactionRoadDensityTip>
+	<Planets.RiverDensity>Densidad de ríos</Planets.RiverDensity>
+	<Planets.RiverDensityTip>Controla cuántos ríos se forman durante la generación del mundo. Valores más altos crean más ríos, que pueden proporcionar agua dulce, transporte y barreras naturales.</Planets.RiverDensityTip>
+
+	<!-- World Generation - Climate & Weather -->
+	<Planets.AxialTilt>Inclinación axial</Planets.AxialTilt>
+	<Planets.AxialTilt_High>Alta (33,75°)</Planets.AxialTilt_High>
+	<Planets.AxialTilt_Low>Baja (11,25°)</Planets.AxialTilt_Low>
+	<Planets.AxialTilt_Normal>Normal (22,5°)</Planets.AxialTilt_Normal>
+	<Planets.AxialTilt_VeryHigh>Extrema (45°)</Planets.AxialTilt_VeryHigh>
+	<Planets.AxialTilt_VeryLow>Nula (0°)</Planets.AxialTilt_VeryLow>
+	<Planets.OrographicSettings>Orográfico (Montaña)</Planets.OrographicSettings>
+	<!-- Advanced Climate dialog - section headers -->
+	<Planets.ClimateSection.ManualTempTargets>Objetivos de temperatura manual</Planets.ClimateSection.ManualTempTargets>
+	<Planets.ClimateSection.LatTempCurve>Curva de temperatura por latitud</Planets.ClimateSection.LatTempCurve>
+	<Planets.ClimateSection.Continentality>Continentalidad (influencia oceánica)</Planets.ClimateSection.Continentality>
+	<Planets.ClimateSection.CoastalModeration>Moderación costera</Planets.ClimateSection.CoastalModeration>
+	<Planets.ClimateSection.OceanCurrents>Corrientes oceánicas</Planets.ClimateSection.OceanCurrents>
+	<Planets.ClimateSection.BaseRainfallOverride>Anulación de precipitación base</Planets.ClimateSection.BaseRainfallOverride>
+	<Planets.ClimateSection.ColdLimitation>Limitación por frío</Planets.ClimateSection.ColdLimitation>
+	<Planets.ClimateSection.RandomVariation>Variación aleatoria</Planets.ClimateSection.RandomVariation>
+	<Planets.ClimateSection.MoistureTransport>Transporte de humedad (advección)</Planets.ClimateSection.MoistureTransport>
+	<Planets.ClimateSection.RainfallConversion>Dónde la humedad se convierte en lluvia</Planets.ClimateSection.RainfallConversion>
+	<Planets.ClimateSection.Monsoon>Monzón</Planets.ClimateSection.Monsoon>
+	<Planets.ClimateSection.HydrologyScale>Escala hidrológica</Planets.ClimateSection.HydrologyScale>
+	<Planets.ClimateSection.BasinThresholds>Umbrales climáticos de cuencas</Planets.ClimateSection.BasinThresholds>
+	<Planets.ClimateSection.EvaporationModel>Modelo de evaporación</Planets.ClimateSection.EvaporationModel>
+	<Planets.ClimateSection.HydrologyTier2Note>Los interruptores de evaporación por aridez, lagos y ríos están en Opciones de mod &gt; Características.</Planets.ClimateSection.HydrologyTier2Note>
+	<!-- Advanced Climate dialog - tab names -->
+	<Planets.ClimateTab.RainfallTerrain>Precipitación: efectos del terreno</Planets.ClimateTab.RainfallTerrain>
+	<Planets.ClimateTab.RainfallMoisture>Precipitación: transporte de humedad</Planets.ClimateTab.RainfallMoisture>
+	<Planets.Rainfall_High>Alta</Planets.Rainfall_High>
+	<Planets.Rainfall_Low>Baja</Planets.Rainfall_Low>
+	<Planets.Rainfall_Normal>Normal</Planets.Rainfall_Normal>
+	<Planets.Rainfall_SlightlyHigh>Ligeramente alta</Planets.Rainfall_SlightlyHigh>
+	<Planets.Rainfall_SlightlyLow>Ligeramente baja</Planets.Rainfall_SlightlyLow>
+	<Planets.Rainfall_VeryHigh>Muy alta</Planets.Rainfall_VeryHigh>
+	<Planets.Rainfall_VeryLow>Muy baja</Planets.Rainfall_VeryLow>
+	<Planets.TempControlledByAdvanced>Controlado por Clima Avanzado</Planets.TempControlledByAdvanced>
+	<Planets.TempManualModeTip>La temperatura se establece manualmente en Clima Avanzado. Activa "Usar objetivos polares y ecuatoriales manuales" en la pestaña Temperatura para establecer las temperaturas medias polar y ecuatorial directamente.</Planets.TempManualModeTip>
+	<Planets.RainfallControlledByAdvanced>Controlado por Clima Avanzado</Planets.RainfallControlledByAdvanced>
+	<Planets.RainfallManualModeTip>La precipitación se establece manualmente en Clima Avanzado. Activa "Usar precipitación base manual" en la pestaña Precipitación para establecer la precipitación base (mm/año) directamente.</Planets.RainfallManualModeTip>
+	<Planets.Temperature_High>Alta</Planets.Temperature_High>
+	<Planets.Temperature_Low>Baja</Planets.Temperature_Low>
+	<Planets.Temperature_Normal>Normal</Planets.Temperature_Normal>
+	<Planets.Temperature_SlightlyHigh>Ligeramente alta</Planets.Temperature_SlightlyHigh>
+	<Planets.Temperature_SlightlyLow>Ligeramente baja</Planets.Temperature_SlightlyLow>
+	<Planets.Temperature_VeryHigh>Muy alta</Planets.Temperature_VeryHigh>
+	<Planets.Temperature_VeryLow>Muy baja</Planets.Temperature_VeryLow>
+
+	<!-- World Generation - Population & Landmarks -->
+	<PlanetLandmarkDensity>Densidad de hitos</PlanetLandmarkDensity>
+	<PlanetLandmarkDensity_Crowded>Muy concurrido</PlanetLandmarkDensity_Crowded>
+	<PlanetLandmarkDensity_Normal>Normal</PlanetLandmarkDensity_Normal>
+	<PlanetLandmarkDensity_SlightlyCrowded>Ligeramente concurrido</PlanetLandmarkDensity_SlightlyCrowded>
+	<PlanetLandmarkDensity_SlightlyMoreCrowded>Concurrido</PlanetLandmarkDensity_SlightlyMoreCrowded>
+	<PlanetLandmarkDensity_SlightlyMoreSparse>Disperso</PlanetLandmarkDensity_SlightlyMoreSparse>
+	<PlanetLandmarkDensity_SlightlySparse>Ligeramente disperso</PlanetLandmarkDensity_SlightlySparse>
+	<PlanetLandmarkDensity_Sparse>Muy disperso</PlanetLandmarkDensity_Sparse>
+	<Planets.Population_High>Alta</Planets.Population_High>
+	<Planets.Population_Low>Baja</Planets.Population_Low>
+	<Planets.Population_Normal>Normal</Planets.Population_Normal>
+	<Planets.Population_SlightlyHigh>Ligeramente alta</Planets.Population_SlightlyHigh>
+	<Planets.Population_SlightlyLow>Ligeramente baja</Planets.Population_SlightlyLow>
+	<Planets.Population_VeryHigh>Muy alta</Planets.Population_VeryHigh>
+	<Planets.Population_VeryLow>Muy baja</Planets.Population_VeryLow>
+
+	<!-- Presets & Profiles -->
+	<Planets.ConfirmDeletePreset>¿Eliminar el preset de facción "{0}"? No se puede deshacer.</Planets.ConfirmDeletePreset>
+	<Planets.ConfirmDeleteWorldGenPreset>¿Eliminar el preset de mundo "{0}"? No se puede deshacer.</Planets.ConfirmDeleteWorldGenPreset>
+	<Planets.ConfirmOverwritePreset>Ya existe un preset llamado "{0}". ¿Sobrescribir?</Planets.ConfirmOverwritePreset>
+	<Planets.CurrentPreset>Cargado: {0}</Planets.CurrentPreset>
+	<Planets.DeletePreset>Eliminar</Planets.DeletePreset>
+	<Planets.FactionPresetInfo>Este preset guardará {0} facción(es)</Planets.FactionPresetInfo>
+	<Planets.FactionPresetInfoDetailed>Este preset guardará {0} facción(es) ({1} tipos únicos)</Planets.FactionPresetInfoDetailed>
+	<Planets.LoadFactions>Cargar</Planets.LoadFactions>
+	<Planets.MissingFactions>Facciones faltantes de mods eliminados:</Planets.MissingFactions>
+	<Planets.NoPresetsFound>No se encontraron presets de facción</Planets.NoPresetsFound>
+	<Planets.NoWorldGenPresetsFound>No se encontraron presets de mundo</Planets.NoWorldGenPresetsFound>
+	<Planets.PresetDeleteFailed>Error al eliminar preset de facción</Planets.PresetDeleteFailed>
+	<Planets.PresetDeleted>Preset de facción "{0}" eliminado</Planets.PresetDeleted>
+	<Planets.PresetDeletedAndDefaultCleared>Perfil "{0}" eliminado y predeterminado borrado.</Planets.PresetDeletedAndDefaultCleared>
+	<Planets.PresetHasMissingMods>(mods faltantes)</Planets.PresetHasMissingMods>
+	<Planets.PresetLoaded>Preset "{0}" cargado con {1} facciones</Planets.PresetLoaded>
+	<Planets.PresetName>Nombre:</Planets.PresetName>
+	<Planets.PresetNameExists>Ya existe un preset con este nombre</Planets.PresetNameExists>
+	<Planets.PresetNameRequired>Introduce un nombre para el preset</Planets.PresetNameRequired>
+	<Planets.PresetSaveFailed>Error al guardar preset de facción</Planets.PresetSaveFailed>
+	<Planets.PresetSaved>Preset de facción "{0}" guardado correctamente</Planets.PresetSaved>
+	<Planets.PresetSetAsDefault>Establecer "{0}" como perfil de facción predeterminado.</Planets.PresetSetAsDefault>
+	<Planets.SaveFactionPreset>Guardar preset de facción</Planets.SaveFactionPreset>
+	<Planets.SaveFactions>Guardar</Planets.SaveFactions>
+	<Planets.SavedOn>Guardado: {0}</Planets.SavedOn>
+	<Planets.WorldGenPresetDeleted>Preset de mundo "{0}" eliminado</Planets.WorldGenPresetDeleted>
+	<Planets.WorldGenPresetDeletedAndDefaultCleared>Preset de mundo "{0}" eliminado y predeterminado borrado.</Planets.WorldGenPresetDeletedAndDefaultCleared>
+	<Planets.WorldGenPresetLoaded>Preset de mundo "{0}" cargado</Planets.WorldGenPresetLoaded>
+	<Planets.WorldGenPresetSaveFailed>Error al guardar preset de mundo</Planets.WorldGenPresetSaveFailed>
+	<Planets.WorldGenPresetSaved>Preset de mundo "{0}" guardado</Planets.WorldGenPresetSaved>
+	<Planets.WorldGenPresetSetAsDefault>Establecer "{0}" como preset de mundo predeterminado.</Planets.WorldGenPresetSetAsDefault>
+
+	<!-- Integrations (Other Mods) -->
+	<VFEI_InsectTerritoryScaleTip>Controla cuánto territorio reclamará la facción Colmena. Valores más altos significan regiones controladas por insectos más grandes. Por defecto es 100%.</VFEI_InsectTerritoryScaleTip>
+
+	<!-- Messages & Warnings -->
+	<MessageMaxPlanetCoveragePerformanceWarning>Advertencia: generar un planeta con cobertura alta puede tardar mucho y usar mucha memoria.</MessageMaxPlanetCoveragePerformanceWarning>
+	<Planets.MessageLowPlanetCoverageWarning>Advertencia: con cobertura muy baja puede no haber suficiente tierra para todos los asentamientos de facciones que el juego intenta generar.</Planets.MessageLowPlanetCoverageWarning>
+
+	<!-- Vanilla Keys Overridden by Mod -->
+	<Planets.LoadAgainToSetDefault>Carga de nuevo para establecer como predeterminado.</Planets.LoadAgainToSetDefault>
+
+	<!-- World preset names (English placeholder) -->
+	<Planets.Vanilla>Vanilla</Planets.Vanilla>
+	<Planets.Desert>Desert</Planets.Desert>
+	<Planets.Frozen>Frozen</Planets.Frozen>
+	<Planets.Earthlike>Earthlike</Planets.Earthlike>
+	<Planets.Boreal>Boreal</Planets.Boreal>
+	<Planets.Iceball>Iceball</Planets.Iceball>
+	<Planets.Jungle>Jungle</Planets.Jungle>
+	<Planets.Ocean>Ocean</Planets.Ocean>
+	<Planets.AlienDiversity>Alien diversity</Planets.AlienDiversity>
+	<Planets.ExoticWetlands>Exotic wetlands</Planets.ExoticWetlands>
+	<Planets.AlienBadlands>Alien badlands</Planets.AlienBadlands>
+	<Planets.Custom>Custom</Planets.Custom>
+	<Planets.IncludeSeedAndName>Include seed and planet name</Planets.IncludeSeedAndName>
+	<Planets.PopulationFactionControl>Faction Control sets population. This slider shows the value Realistic Planets will use and cannot be edited here.</Planets.PopulationFactionControl>
+	<Planets.SparseSettlements>Factions will get about {0} settlements in total (about 1 each). Increase planet scale, coverage or population.</Planets.SparseSettlements>
+
+	<!-- WS18-1 UI Buttons, Dialogs & Sliders (English placeholder) -->
+	<Planets.ResetClear>Reset/Clear</Planets.ResetClear>
+	<Planets.ResetAll>Reset All</Planets.ResetAll>
+	<Planets.SetAsDefaultMenu>Set as Default...</Planets.SetAsDefaultMenu>
+	<Planets.ClearDefault>Clear Default</Planets.ClearDefault>
+	<Planets.SetAsDefaultWorldPreset>Set as Default (World Preset)...</Planets.SetAsDefaultWorldPreset>
+	<Planets.ClearDefaultWorldPreset>Clear Default (World Preset)</Planets.ClearDefaultWorldPreset>
+	<Planets.ClearMapPreview>Clear Map Preview</Planets.ClearMapPreview>
+	<Planets.NewSave>(New Save)</Planets.NewSave>
+	<Planets.Climate>Climate</Planets.Climate>
+	<Planets.Biomes>Biomes</Planets.Biomes>
+	<Planets.MountainHeight>Mountain height</Planets.MountainHeight>
+	<Planets.MountainHeightTip>How tall mountains rise; affects temperature, rain shadows and biomes.</Planets.MountainHeightTip>
+	<Planets.MountainFrequency>Mountain frequency</Planets.MountainFrequency>
+	<Planets.MountainFrequencyTip>How much land is hilly or mountainous; keeps ranges connected.</Planets.MountainFrequencyTip>
+	<Planets.SavePresetAs>Save Preset As...</Planets.SavePresetAs>
+	<Planets.SaveWorldPreset>Save World Preset</Planets.SaveWorldPreset>
+	<Planets.SetAsDefaultAutoLoad>Set as default (auto-load on world creation)</Planets.SetAsDefaultAutoLoad>
+	<Planets.SaveNameAlreadyExists>A save with this name already exists.</Planets.SaveNameAlreadyExists>
+	<Planets.SaveWorldPresetHelp>Saves coverage, climate, hydrology, and world creation parameters. Seed and planet name are saved only when that box is checked. A default preset still does not apply them on a new world. Does not include factions.</Planets.SaveWorldPresetHelp>
+	<Planets.AdvancedBiomeConfigTitle>Advanced Biome Configuration</Planets.AdvancedBiomeConfigTitle>
+	<Planets.SearchBiomes>Search biomes...</Planets.SearchBiomes>
+	<Planets.SaveProfile>Save Profile</Planets.SaveProfile>
+	<Planets.LoadProfile>Load Profile</Planets.LoadProfile>
+	<Planets.DeleteProfile>Delete Profile</Planets.DeleteProfile>
+	<Planets.SavePresetBtn>Save Preset</Planets.SavePresetBtn>
+	<Planets.LoadPresetBtn>Load Preset</Planets.LoadPresetBtn>
+	<Planets.DeletePresetBtn>Delete Preset</Planets.DeletePresetBtn>
+	<Planets.AdvancedClimateTitle>Advanced Climate Settings</Planets.AdvancedClimateTitle>
+	<Planets.AdvancedClimateWarning>These are advanced settings. Extreme values may produce unrealistic climates.</Planets.AdvancedClimateWarning>
+	<Planets.ResetAllClimateConfirm>Reset all climate settings to default values?</Planets.ResetAllClimateConfirm>
+
+</LanguageData>

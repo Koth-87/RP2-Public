@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>Realistic Planets 2</name>
+	<author>Kothliim</author>
+	<supportedVersions>
+		<li>1.6</li>
+	</supportedVersions>
+	
+	<packageId>koth.RealisticPlanets2</packageId>
+		
+	<modDependenciesByVersion>
+		<v1.6>
+			<li>
+				<packageId>brrainz.harmony</packageId>
+				<displayName>Harmony</displayName>
+				<steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+				<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+			</li>
+		</v1.6>
+	</modDependenciesByVersion>
+	
+	<loadAfter>
+		<li>brrainz.harmony</li>
+		<li>Ludeon.RimWorld.Odyssey</li>
+		<li>astryl.DynamicPlanets</li>
+		<li>astryl.DynamicAtmosphere</li>
+		<li>dsweber.RealisticAxialTilt</li>
+		<li>ReGrowth.BOTR.Core</li>
+		<li>zal.wmbp</li>
+<!--
+		<li>sarg.alphabiomes</li>
+		<li>m00nl1ght.WorldTechLevel</li>
+-->
+	</loadAfter>
+
+	<loadBefore>
+		<li>koth.PlanetaryLighting</li>
+		<li>joof.celestiallighting</li>
+		<li>ferny.ProgressionStorytellers</li>
+		<li>jaeger972.factionterritories</li>
+		<li>ferny.ProgressionScenarios</li>
+		<li>ferny.Worldbuilder</li>
+		<li>TSA.WorldDomination</li>
+	</loadBefore>
+
+	<incompatibleWith>
+		<li>sjaandi.realtiltmod</li>
+		<li>Mlie.ReGrowthExpandedWorldGeneration</li>
+		<li>NozoMe.MapModeFramework</li>
+	</incompatibleWith>
+	
+	<description>Builds the planet's climate from the land. Elevation, wind, rainfall, temperature, and drainage decide the biomes, and rivers follow that drainage. The axial tilt you choose sets the seasons, the yearly temperature, and when plants rest.
+
+Includes a built-in fork of Map Mode Framework.
+
+Inspired by Realistic Planets Continued. Credit for earlier releases, and for other mods, belongs to their authors.</description>
+</ModMetaData>

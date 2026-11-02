@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <Default.label>По умолчанию</Default.label>
+
+  <Features.label>Рельеф</Features.label>
+
+  <Elevation.label>Высота</Elevation.label>
+  <Elevation.description>Показывает высоту. Цвета идут от уровня моря до 9000 м. Более высокая местность использует верхний цвет.</Elevation.description>
+
+  <RP_Hilliness.label>Пересечённость</RP_Hilliness.label>
+  <RP_Hilliness.description>Показывает пересечённость местности от равнины (зелёный) до непроходимых гор (тёмно-красный). Полезно для оценки затрат на передвижение и выбора поселения.</RP_Hilliness.description>
+
+  <Biome.label>Биом</Biome.label>
+  <Biome.description>Показывает распределение биомов с выпадающим списком выбора.</Biome.description>
+
+  <Temperature.label>Температура</Temperature.label>
+  <Temperature.description>Показывает среднегодовую температуру в земном масштабе (−50 °C — +50 °C) с расширенными климатическими данными.</Temperature.description>
+
+  <RP_SeasonalAmplitude.label>Сезонные колебания температуры</RP_SeasonalAmplitude.label>
+  <RP_SeasonalAmplitude.description>Показывает сезонную амплитуду температуры — насколько температура меняется между летом и зимой. В глубине континентов и на высоких широтах — крайние колебания.</RP_SeasonalAmplitude.description>
+
+  <RP_Continentality.label>Континентальность и морской климат</RP_Continentality.label>
+  <RP_Continentality.description>Показывает удалённость от океана и континентальную/морскую классификацию климата. Прибрежные зоны — синие, глубинные районы континентов — красно-коричневые.</RP_Continentality.description>
+
+  <RP_Monsoon.label>Интенсивность муссонов</RP_Monsoon.label>
+  <RP_Monsoon.description>Показывает сезонное муссонное увлажнение (доп. мм/год в муссонных зонах). Тропики и субтропики у океана с сезонной сменой ветра.</RP_Monsoon.description>
+
+  <Rainfall.label>Осадки</Rainfall.label>
+  <Rainfall.description>Показывает годовые осадки в земном масштабе (0 мм — 8000 мм) с улучшенной моделью осадков.</Rainfall.description>
+
+  <RP_AridityIndex.label>Индекс засушливости</RP_AridityIndex.label>
+  <RP_AridityIndex.description>Показывает индекс засушливости (соотношение осадков и испаряемости) — научный показатель доступности влаги. Ниже 0,2 — засушливые регионы, выше 1,0 — влажные.</RP_AridityIndex.description>
+
+  <RP_InitialBasins.label>Начальные бассейны (отладка)</RP_InitialBasins.label>
+  <RP_InitialBasins.description>Показывает топографические бассейны до заполнения/слива по начальным стокам. Красные клетки — места стоков.</RP_InitialBasins.description>
+
+  <RP_MergedBasins.label>Объединённые бассейны (отладка)</RP_MergedBasins.label>
+  <RP_MergedBasins.description>Показывает объединённые бассейны после симуляции заполнения и слива. Терминальные озёра — красные, проточные озёра/истоки — зелёные.</RP_MergedBasins.description>
+
+  <RP_RiverSystems.label>Речные системы</RP_RiverSystems.label>
+  <RP_RiverSystems.description>Показывает объединённые речные системы (основные водосборы) после слияния малых бассейнов. Каждый цвет — основная дренажная система из нескольких элементарных бассейнов.</RP_RiverSystems.description>
+
+  <RP_DrainageType.label>Тип стока (отладка)</RP_DrainageType.label>
+  <RP_DrainageType.description>Классифицирует клетки: экзореические (синий), эндореические (оранжевый), терминальное озеро (красный), проточное озеро (зелёный).</RP_DrainageType.description>
+
+  <RP_FlowAccumulation.label>Накопление стока (топология)</RP_FlowAccumulation.label>
+  <RP_FlowAccumulation.description>Показывает площади водосбора по топологическому расчёту (равномерный сток). Чем темнее синий — тем больше клеток выше по течению; выявляет русла рек и заболоченные места.</RP_FlowAccumulation.description>
+
+  <RP_FlowAccumulationHydrology.label>Накопление стока (климат)</RP_FlowAccumulationHydrology.label>
+  <RP_FlowAccumulationHydrology.description>Уровень 2: показывает климатический сток (осадки × площадь). Данные есть только при включённой расширенной гидрологии.</RP_FlowAccumulationHydrology.description>
+
+  <RP_Wetlands.label>Заболоченность</RP_Wetlands.label>
+  <RP_Wetlands.description>Показывает показатель заболоченности по дренажу, климату и рельефу. Зелёные зоны — болота, марши и влажные земли.</RP_Wetlands.description>
+
+  <GrowingPeriod.label>Период роста</GrowingPeriod.label>
+
+  <AnimalCommonality.label>Распространённость животных</AnimalCommonality.label>
+
+  <PlantCommonality.label>Распространённость растений</PlantCommonality.label>
+
+</LanguageData>

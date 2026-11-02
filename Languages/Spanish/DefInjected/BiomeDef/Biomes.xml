@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <RP_Prairie.label>Pradera</RP_Prairie.label>
+  <RP_Prairie.description>Las praderas son extensos pastizales secos con árboles dispersos. El suelo es fértil a pesar de las bajas precipitaciones, sosteniendo pastos resistentes y flores silvestres. Los espacios abiertos ofrecen poca protección contra los extremos climáticos, con veranos calurosos e inviernos fríos. La vida silvestre de la pradera se ha adaptado a estas condiciones, con muchos animales de pastoreo y sus depredadores llamando hogar a estas llanuras azotadas por el viento.</RP_Prairie.description>
+
+  <RP_Savanna.label>Sabana</RP_Savanna.label>
+  <RP_Savanna.description>Las sabanas son ecosistemas mixtos de bosque/pastizal que se encuentran típicamente entre las selvas tropicales y los desiertos. Árboles dispersos salpican el paisaje dominado por pastos resistentes a la sequía. La vida silvestre es abundante y diversa, adaptada tanto a las estaciones húmedas como secas. El clima es cálido durante todo el año con períodos lluviosos y secos distintivos.</RP_Savanna.description>
+
+  <RP_Steppe.label>Estepa</RP_Steppe.label>
+  <RP_Steppe.description>Las estepas son regiones de pastizales de gran altitud donde los inviernos duros y las condiciones secas crean un entorno desafiante. Estas llanuras frías y azotadas por el viento tienen suelo delgado y vegetación escasa, pero sustentan pastos resistentes y vida silvestre resiliente. Las variaciones extremas de temperatura entre estaciones hacen que la supervivencia sea difícil, pero el paisaje abierto ofrece excelente visibilidad y movimiento.</RP_Steppe.description>
+
+  <RP_TemperateDesert.label>Desierto templado</RP_TemperateDesert.label>
+  <RP_TemperateDesert.description>Los desiertos templados son más fríos pero a menudo incluso más secos que los desiertos subtropicales. La vegetación es escasa y el suelo suele ser más rocoso que arenoso.</RP_TemperateDesert.description>
+
+  <RP_Permafrost.label>Permafrost</RP_Permafrost.label>
+  <RP_Permafrost.description>El permafrost existe en el límite entre la tundra y las capas de hielo. El suelo está permanentemente congelado, y gran parte está cubierto de hielo, pero el hielo tiene como máximo unos pocos metros, en lugar de kilómetros, de espesor. Hay poca vegetación más allá del matorral duro y pocos animales.</RP_Permafrost.description>
+
+  <RP_Oasis.label>Oasis</RP_Oasis.label>
+  <RP_Oasis.description>Un oasis es un lugar en el desierto donde el nivel freático está cerca de la superficie, por lo que las plantas pueden crecer y los animales pueden pastar.</RP_Oasis.description>
+
+</LanguageData>

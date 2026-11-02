@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<BiomeDef>
+		<defName>RP_Savanna</defName>
+		<label>savanna</label>
+		<description>Savannas are mixed woodland/grassland ecosystems typically found between rainforests and deserts. Scattered trees dot the landscape dominated by drought-resistant grasses. Wildlife is abundant and diverse, adapted to both wet and dry seasons. The climate is warm year-round with distinct rainy and dry periods.</description>
+		<workerClass>Planets.Biomes.Custom.Savanna</workerClass>
+		<animalDensity>3.5</animalDensity>
+		<plantDensity>0.55</plantDensity>
+		<settlementSelectionWeight>0.85</settlementSelectionWeight>
+		<movementDifficulty>1</movementDifficulty>
+		<texture>Savanna</texture>
+		<forageability>0.75</forageability>
+		<foragedFood>RawBerries</foragedFood>
+		<wildPlantRegrowDays>20</wildPlantRegrowDays>
+		<soundsAmbient>
+			<li>Ambient_NightInsects_Jungle</li>
+			<li>Ambient_DayInsects_Jungle</li>
+		</soundsAmbient>
+		<diseaseMtbDays>60</diseaseMtbDays>
+		<diseases>
+			<li>
+				<diseaseInc>Disease_Malaria</diseaseInc>
+				<commonality>140</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_SleepingSickness</diseaseInc>
+				<commonality>120</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_Flu</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_Plague</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_GutWorms</diseaseInc>
+				<commonality>80</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_MuscleParasites</diseaseInc>
+				<commonality>80</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_FibrousMechanites</diseaseInc>
+				<commonality>30</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_SensoryMechanites</diseaseInc>
+				<commonality>30</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_AnimalFlu</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+			<li>
+				<diseaseInc>Disease_AnimalPlague</diseaseInc>
+				<commonality>100</commonality>
+			</li>
+		</diseases>
+		<!-- New 1.6/Odyssey terrain fields -->
+		<coastalBeachTerrain>Sand</coastalBeachTerrain>
+		<lakeBeachTerrain>Sand</lakeBeachTerrain>
+		<riverbankTerrain>Riverbank</riverbankTerrain>
+		<riverbankSizeRange>6~10</riverbankSizeRange>
+		<terrainsByFertility>
+			<li>
+				<terrain>Sand</terrain>
+				<min>-999</min>
+				<max>0.1</max>
+			</li>
+			<li>
+				<terrain>Gravel</terrain>
+				<min>0.1</min>
+				<max>0.4</max>
+			</li>
+			<li>
+				<terrain>Soil</terrain>
+				<min>0.4</min>
+				<max>0.8</max>
+			</li>
+			<li>
+				<terrain>SoilRich</terrain>
+				<min>0.8</min>
+				<max>999</max>
+			</li>
+		</terrainsByFertility>
+		<terrainPatchMakers>
+			<li>
+				<perlinFrequency>0.035</perlinFrequency>
+				<thresholds>
+					<li>
+						<terrain>SoilRich</terrain>
+						<min>0.38</min>
+						<max>999</max>
+					</li>
+				</thresholds>
+			</li>
+		</terrainPatchMakers>
+		<baseWeatherCommonalities>
+			<Clear>20</Clear>
+			<Fog>0.5</Fog>
+			<Rain>2</Rain>
+			<DryThunderstorm>3</DryThunderstorm>
+			<RainyThunderstorm>2</RainyThunderstorm>
+			<FoggyRain>0.5</FoggyRain>
+			<SnowGentle>0</SnowGentle>
+			<SnowHard>0</SnowHard>
+			<GrayPall MayRequire="Ludeon.RimWorld.Anomaly">1</GrayPall>
+			<Overcast MayRequire="Ludeon.RimWorld.Odyssey">2</Overcast>
+		</baseWeatherCommonalities>
+		<wildPlants>
+			<Plant_Grass>10.5</Plant_Grass>
+			<Plant_TallGrass>3</Plant_TallGrass>
+			<Plant_TreeDrago>0.12</Plant_TreeDrago>
+			<Plant_TreePalm>0.1</Plant_TreePalm>
+			<Plant_ShrubLow>1.5</Plant_ShrubLow>
+			<Plant_Alocasia>0.8</Plant_Alocasia>
+			<Plant_Bush>0.75</Plant_Bush>
+			<Plant_Clivia>0.7</Plant_Clivia>
+			<Plant_Berry>0.05</Plant_Berry>
+			<Plant_Rafflesia>0.02</Plant_Rafflesia>
+			<Plant_HealrootWild>0.05</Plant_HealrootWild>
+			<Plant_Ambrosia>0.0075</Plant_Ambrosia>
+			<Plant_GrayGrass MayRequire="Ludeon.RimWorld.Biotech">5</Plant_GrayGrass>
+			<Plant_Reeds MayRequire="Ludeon.RimWorld.Odyssey">1</Plant_Reeds>
+		</wildPlants>
+		<wildAnimals>
+			<Rat>1</Rat>
+			<Hare>0.5</Hare>
+			<GuineaPig>0.5</GuineaPig>
+			<WildBoar>0.5</WildBoar>
+			<Rhinoceros>0.1</Rhinoceros>
+			<Elephant>0.4</Elephant>
+			<Dromedary>0.2</Dromedary>
+			<Muffalo>0.2</Muffalo>
+			<Cobra>0.2</Cobra>
+			<Gazelle>0.3</Gazelle>
+			<Iguana>0.2</Iguana>
+			<Emu>0.3</Emu>
+			<Ostrich>0.5</Ostrich>
+			<Tortoise>0.2</Tortoise>
+			<Boomalope>0.2</Boomalope>
+			<Alpaca>0.1</Alpaca>
+			<Capybara>0.2</Capybara>
+			<Chinchilla>0.2</Chinchilla>
+			<Megasloth>0.2</Megasloth>
+			<Monkey>0.2</Monkey>
+			<Ibex>0.3</Ibex>
+			<Squirrel>0.5</Squirrel>
+			<Fox_Fennec>0.05</Fox_Fennec>
+			<Turkey>0.1</Turkey>
+			<Bison>0.4</Bison>
+			<Horse>0.1</Horse>
+			<Donkey>0.3</Donkey>
+			<MonitorLizard MayRequire="Ludeon.RimWorld.Odyssey">0.5</MonitorLizard>
+			<Flamingo MayRequire="Ludeon.RimWorld.Odyssey">0.5</Flamingo>
+			<Sparrow MayRequire="Ludeon.RimWorld.Odyssey">0.5</Sparrow>
+			<Quail MayRequire="Ludeon.RimWorld.Odyssey">0.5</Quail>
+			<Vulture MayRequire="Ludeon.RimWorld.Odyssey">0.5</Vulture>
+			<Hippo MayRequire="Ludeon.RimWorld.Odyssey">0.25</Hippo>
+			<Armadillo MayRequire="Ludeon.RimWorld.Odyssey">0.2</Armadillo>
+		</wildAnimals>
+		<pollutionWildAnimals MayRequire="Ludeon.RimWorld.Biotech">
+			<Toxalope MayRequire="Ludeon.RimWorld.Biotech">0.1</Toxalope>
+			<WasteRat MayRequire="Ludeon.RimWorld.Biotech">0.1</WasteRat>
+			<Iguana>1</Iguana>
+			<Rat>0.6</Rat>
+			<Boomalope>0.4</Boomalope>
+			<Boomrat>0.4</Boomrat>
+			<Megascarab>0.2</Megascarab>
+		</pollutionWildAnimals>
+		<coastalWildAnimals>
+			<HermitCrab MayRequire="Ludeon.RimWorld.Odyssey">0.1</HermitCrab>
+			<StoneCrab MayRequire="Ludeon.RimWorld.Odyssey">0.1</StoneCrab>
+			<SeaTurtle MayRequire="Ludeon.RimWorld.Odyssey">0.1</SeaTurtle>
+		</coastalWildAnimals>
+		<maxFishPopulation>600</maxFishPopulation>
+		<fishTypes MayRequire="Ludeon.RimWorld.Odyssey">
+			<freshwater_Common>
+				<Fish_Tilapia MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Tilapia>
+			</freshwater_Common>
+			<freshwater_Uncommon>
+				<Fish_Catfish MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Catfish>
+			</freshwater_Uncommon>
+			<saltwater_Common>
+				<Fish_Bluefish MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Bluefish>
+			</saltwater_Common>
+			<saltwater_Uncommon>
+				<Fish_Tuna MayRequire="Ludeon.RimWorld.Odyssey">1</Fish_Tuna>
+			</saltwater_Uncommon>
+			<rareCatchesSetMaker MayRequire="Ludeon.RimWorld.Odyssey">RareFishingCatches_Hot</rareCatchesSetMaker>
+		</fishTypes>
+		<allowedPackAnimals>
+			<li>Muffalo</li>
+			<li>Elephant</li>
+			<li>Alpaca</li>
+		</allowedPackAnimals>
+	</BiomeDef>
+</Defs>
