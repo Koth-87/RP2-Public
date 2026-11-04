@@ -36,11 +36,15 @@ namespace Planets.Core.Configuration
             list.ColumnWidth = viewWidth;
             list.Begin(viewRect);
 
-            list.Label("Compatibility status");
-            list.Gap(4f);
-            foreach (var module in ModCompatibilityRegistry.GetModules())
-                list.Label(module.ModName + ": " + (module.IsActive ? "active" : "inactive"));
-            list.Gap(12f);
+            var active = ModCompatibilityRegistry.GetActiveModules();
+            if (active.Count > 0)
+            {
+                list.Label("Compatibility status");
+                list.Gap(4f);
+                for (int i = 0; i < active.Count; i++)
+                    list.Label(active[i].ModName + ": active");
+                list.Gap(12f);
+            }
 
             ModCompatibilityRegistry.RenderAllIntegrationUI(list);
 

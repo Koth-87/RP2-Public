@@ -159,7 +159,9 @@ namespace Planets.Patches.Climate
 
         static float WeatherCloudiness(WeatherManager weather)
         {
-            if (weather == null)
+            // Gravship landing asks for outdoor temperature while choosing the first weather.
+            // RainRate and SnowRate read lastWeather and curWeather, which are still null then.
+            if (weather?.curWeather == null || weather.lastWeather == null)
                 return 0f;
 
             float precip = Mathf.Max(Mathf.Clamp01(weather.RainRate), Mathf.Clamp01(weather.SnowRate));

@@ -369,13 +369,18 @@ namespace Planets.Core.Configuration
             }
         }
 
-        /// <summary>True if any user-facing parameter differs from its default value.</summary>
+        /// <summary>
+        /// True if an Advanced Climate or hydrology-dialog value differs from its default.
+        /// Mountain height and frequency are create-world sliders, so they do not count.
+        /// </summary>
         public bool HasModifications()
         {
             for (int i = 0; i < entries.Count; i++)
             {
                 IConfigValue entry = entries[i];
                 if (entry.IsDebugOnly)
+                    continue;
+                if (entry == mountainHeight || entry == mountainousness)
                     continue;
                 if (entry.IsModified)
                     return true;
