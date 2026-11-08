@@ -78,16 +78,16 @@
 	<!-- World Generation - Sea Level -->
 	<Planets.SeaLevel>Sea level</Planets.SeaLevel>
 	<Planets.SeaLevelTip>Controls how much of the planet is covered by ocean. Lower sea levels expose more land, creating larger continents. Higher sea levels flood low-lying areas, creating island worlds.</Planets.SeaLevelTip>
-	<Planets.SeaLevel_High>High</Planets.SeaLevel_High>
-	<Planets.SeaLevel_High_Desc>An island planet. Most of the world is ocean, and land is islands and small continents.</Planets.SeaLevel_High_Desc>
+	<Planets.SeaLevel_High>Very high</Planets.SeaLevel_High>
+	<Planets.SeaLevel_High_Desc>Most of the world is ocean, and land is islands and small continents.</Planets.SeaLevel_High_Desc>
 	<Planets.SeaLevel_Low>Low</Planets.SeaLevel_Low>
-	<Planets.SeaLevel_Low_Desc>Reduced ocean coverage with small seas. Continents are larger than Earth-like.</Planets.SeaLevel_Low_Desc>
+	<Planets.SeaLevel_Low_Desc>Reduced ocean coverage with small seas. Continents are larger than vanilla.</Planets.SeaLevel_Low_Desc>
 	<Planets.SeaLevel_Normal>Vanilla</Planets.SeaLevel_Normal>
 	<Planets.SeaLevel_Normal_Desc>Vanilla RimWorld's ocean share. More land than Earth.</Planets.SeaLevel_Normal_Desc>
-	<Planets.SeaLevel_SlightlyHigh>Earth-like</Planets.SeaLevel_SlightlyHigh>
-	<Planets.SeaLevel_SlightlyHigh_Desc>About Earth's ocean share. More ocean than vanilla, with smaller continents.</Planets.SeaLevel_SlightlyHigh_Desc>
-	<Planets.SeaLevel_SlightlyLow>Slightly low</Planets.SeaLevel_SlightlyLow>
-	<Planets.SeaLevel_SlightlyLow_Desc>Somewhat reduced ocean coverage. More land area available for colonies.</Planets.SeaLevel_SlightlyLow_Desc>
+	<Planets.SeaLevel_SlightlyHigh>Slightly high</Planets.SeaLevel_SlightlyHigh>
+	<Planets.SeaLevel_SlightlyHigh_Desc>More ocean than vanilla, with smaller continents.</Planets.SeaLevel_SlightlyHigh_Desc>
+	<Planets.SeaLevel_EarthLike>Earth-like</Planets.SeaLevel_EarthLike>
+	<Planets.SeaLevel_EarthLike_Desc>About Earth's ocean share.</Planets.SeaLevel_EarthLike_Desc>
 
 	<!-- World Generation - Rivers & Roads -->
 	<Planets.AncientRoadDensity>Ancient road density</Planets.AncientRoadDensity>

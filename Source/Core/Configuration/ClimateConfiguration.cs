@@ -65,12 +65,12 @@ namespace Planets.Core.Configuration
 
         /// <summary>E-fold distance (km) over which sea-level land temperature blends toward the nearest ocean when the maritime layer is not used.</summary>
         public ConfigValue<float> coastBlendKm;
-
+        
         // ========== OCEAN CURRENTS ==========
-
+        
         /// <summary>Western boundary current warming anomaly (°C).</summary>
         public ConfigValue<float> warmWBCurrent;
-
+        
         /// <summary>Eastern boundary current cooling anomaly (°C).</summary>
         public ConfigValue<float> coolEBCurrent;
 
@@ -221,7 +221,7 @@ namespace Planets.Core.Configuration
 
         /// <summary>Include the high-latitude (>60°) factor in PET.</summary>
         public ConfigValue<bool> petPolarFactor;
-
+        
         // ========== MOUNTAINS ==========
 
         /// <summary>Scales land elevation above sea level (0.5 to 1.5).</summary>
@@ -368,7 +368,7 @@ namespace Planets.Core.Configuration
                     entry.Reset();
             }
         }
-
+        
         /// <summary>
         /// True if an Advanced Climate or hydrology-dialog value differs from its default.
         /// Mountain height and frequency are create-world sliders, so they do not count.

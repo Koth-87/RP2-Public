@@ -71,6 +71,8 @@ namespace Planets.WorldGen.Hydrology.Core
             // Step 3-6: Iterative Fresh-State Loop
             List<SpillInput> currentSpills = new List<SpillInput>();
             List<SpillChunk> finalChunks = new List<SpillChunk>();
+            List<SpillChunk> carriedMultiBasinChunks = new List<SpillChunk>();
+            HashSet<int> carriedBasins = new HashSet<int>();
             
             int hashOlder = 0;
             int hashPrevious = 0;
@@ -83,7 +85,7 @@ namespace Planets.WorldGen.Hydrology.Core
                     grid, elevation, oceanMask, flowDirections,
                     config.FlowInput, currentSpills, flowAccumulation, tileCount);
                 
-                // Step 4: Fill & Spill Analysis (treat each sink independently)
+                // Step 4: Fill & Spill Analysis (analyze unmerged sinks; carry forward already-merged multi-basin chunks)
                 List<SpillChunk> freshChunks = new List<SpillChunk>();
                 
                 bool useParallel = Controller.Settings.perfParallelHydrology.CurrentValue;
@@ -93,6 +95,9 @@ namespace Planets.WorldGen.Hydrology.Core
                     ConcurrentBag<SpillChunk> freshChunksBag = new ConcurrentBag<SpillChunk>();
                     Parallel.ForEach(sinkTiles, sinkID => 
                     {
+                        if (carriedBasins.Contains(sinkID))
+                            return;
+
                         SpillChunk chunk = spillAnalyzer.AnalyzeSink(
                             grid, elevation, oceanMask, flowAccumulation, initialBasinIDs,
                             sinkID, config.EvaporationInput, sinkID);
@@ -102,6 +107,14 @@ namespace Planets.WorldGen.Hydrology.Core
                             freshChunksBag.Add(chunk);
                         }
                     });
+                    for (int c = 0; c < carriedMultiBasinChunks.Count; c++)
+                    {
+                        SpillChunk carried = carriedMultiBasinChunks[c];
+                        chunkMerger.RefreshCarriedChunk(
+                            carried, grid, elevation, oceanMask, initialBasinIDs,
+                            config.EvaporationInput, baseBasinInflow, currentSpills);
+                        freshChunksBag.Add(carried);
+                    }
                     // Ensure deterministic order for subsequent steps (important for stable simulation)
                     freshChunks = freshChunksBag.OrderBy(c => c.ChunkID).ToList();
                 }
@@ -109,6 +122,9 @@ namespace Planets.WorldGen.Hydrology.Core
                 {
                     foreach (int sinkID in sinkTiles)
                     {
+                        if (carriedBasins.Contains(sinkID))
+                            continue;
+
                         SpillChunk chunk = spillAnalyzer.AnalyzeSink(
                             grid, elevation, oceanMask, flowAccumulation, initialBasinIDs,
                             sinkID, config.EvaporationInput, sinkID);
@@ -118,6 +134,15 @@ namespace Planets.WorldGen.Hydrology.Core
                             freshChunks.Add(chunk);
                         }
                     }
+                    for (int c = 0; c < carriedMultiBasinChunks.Count; c++)
+                    {
+                        SpillChunk carried = carriedMultiBasinChunks[c];
+                        chunkMerger.RefreshCarriedChunk(
+                            carried, grid, elevation, oceanMask, initialBasinIDs,
+                            config.EvaporationInput, baseBasinInflow, currentSpills);
+                        freshChunks.Add(carried);
+                    }
+                    freshChunks.Sort((a, b) => a.ChunkID.CompareTo(b.ChunkID));
                 }
                 
                 // Step 5: Adjacency Merging + Merge-and-Refill + Net Spill Calculation
@@ -135,6 +160,18 @@ namespace Planets.WorldGen.Hydrology.Core
                 }
                 
                 currentSpills = nextSpills;
+                carriedMultiBasinChunks.Clear();
+                carriedBasins.Clear();
+                for (int c = 0; c < finalChunks.Count; c++)
+                {
+                    SpillChunk chunk = finalChunks[c];
+                    if (chunk.OccupiedBasins.Count > 1)
+                    {
+                        carriedMultiBasinChunks.Add(chunk);
+                        foreach (int b in chunk.OccupiedBasins)
+                            carriedBasins.Add(b);
+                    }
+                }
                 
                 if (iteration == config.MaxIterations - 1)
                 {

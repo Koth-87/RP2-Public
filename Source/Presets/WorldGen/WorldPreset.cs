@@ -135,7 +135,7 @@ namespace Planets.Presets.WorldGen
 
         private static WorldPreset WorldPreset_Desert() => new WorldPresetBuilder()
             .Name("Planets.Desert")
-            .SeaLevel(SeaLevel.SlightlyLow)
+            .SeaLevel(SeaLevel.Low)
             .AxialTilt(AxialTilt.VeryLow)
             .Rainfall(OverallRainfall.LittleBitLess)
             .Temperature(OverallTemperature.LittleBitWarmer)
@@ -153,7 +153,7 @@ namespace Planets.Presets.WorldGen
 
         private static WorldPreset WorldPreset_Earthlike() => new WorldPresetBuilder()
             .Name("Planets.Earthlike")
-            .SeaLevel(SeaLevel.SlightlyHigh)
+            .SeaLevel(SeaLevel.EarthLike)
             .AxialTilt(AxialTilt.Normal)
             .Rainfall(OverallRainfall.LittleBitMore)
             .Temperature(OverallTemperature.Normal)
@@ -180,7 +180,7 @@ namespace Planets.Presets.WorldGen
 
         private static WorldPreset WorldPreset_Jungle() => new WorldPresetBuilder()
             .Name("Planets.Jungle")
-            .SeaLevel(SeaLevel.SlightlyHigh)
+            .SeaLevel(SeaLevel.EarthLike)
             .AxialTilt(AxialTilt.VeryLow)
             .Rainfall(OverallRainfall.High)
             .Temperature(OverallTemperature.LittleBitWarmer)
@@ -198,7 +198,7 @@ namespace Planets.Presets.WorldGen
 
         private static WorldPreset WorldPreset_AlienDiversity() => new WorldPresetBuilder()
             .Name("Planets.AlienDiversity")
-            .SeaLevel(SeaLevel.SlightlyHigh)
+            .SeaLevel(SeaLevel.EarthLike)
             .AxialTilt(AxialTilt.High)
             .Rainfall(OverallRainfall.High)
             .Temperature(OverallTemperature.LittleBitWarmer)

@@ -334,7 +334,7 @@ namespace Planets.UI.Dialogs
                         climateConfig.ResetModelConstants();
                     list.Gap(6f);
 
-                    DrawSectionHeader(list, "Circulation Model Constants (WS28)");
+                    DrawSectionHeader(list, "Circulation Model Constants");
                     list.Label($"Warm-land pressure response: {climateConfig.circHeatWarmHpaPerC.CurrentValue:F2} hPa/°C");
                     climateConfig.circHeatWarmHpaPerC.CurrentValue = list.Slider(climateConfig.circHeatWarmHpaPerC.CurrentValue, 0.5f, 5f);
 
@@ -381,8 +381,8 @@ namespace Planets.UI.Dialogs
                     climateConfig.circSurfaceLand.CurrentValue = list.Slider(climateConfig.circSurfaceLand.CurrentValue, 0.2f, 1f);
                     list.Gap(12f);
 
-                    DrawSectionHeader(list, "Two-Layer Moisture Budget Constants (WS30/WS31)");
-                    list.CheckboxLabeled("Enable upper-troposphere moisture layer (WS31)", ref climateConfig.twoLayerMoisture.CurrentValue);
+                    DrawSectionHeader(list, "Two-Layer Moisture Budget Constants");
+                    list.CheckboxLabeled("Enable upper-troposphere moisture layer", ref climateConfig.twoLayerMoisture.CurrentValue);
 
                     list.Label($"Baseline trade-wind eddy diffusivity K (10⁵ m²/s): {climateConfig.moistEddyK.CurrentValue * 1e-5f:F2}");
                     climateConfig.moistEddyK.CurrentValue = list.Slider(climateConfig.moistEddyK.CurrentValue * 1e-5f, 0.5f, 10f) * 1e5f;
@@ -444,7 +444,6 @@ namespace Planets.UI.Dialogs
             list.Begin(viewRect);
 
             GUI.color = new Color(0.7f, 0.9f, 1f);
-            list.Label("These settings apply when Tier 2 Advanced Hydrology is enabled (Features menu).");
             list.Label("Planets.ClimateSection.HydrologyTier2Note".Translate());
             GUI.color = Color.white;
             list.Gap(12f);

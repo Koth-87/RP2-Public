@@ -82,7 +82,10 @@ namespace Planets.WorldGen.Climate.Layers
 
             const int MAX_ITERATIONS = 500;
 
-            var flowInput = new ClimateFlowInput(climate.AnnualRainfall, climate.LandEvaporationMm);
+            // Runoff uses the rain the moisture solve produced. AnnualRainfall may include
+            // a few millimetres added afterwards on dry land, and that must not become river water.
+            float[] rainForFlow = climate.AdvectedCondensationMm ?? climate.AnnualRainfall;
+            var flowInput = new ClimateFlowInput(rainForFlow, climate.LandEvaporationMm);
             var evaporationInput = new ClimateEvaporationInput(
                 climate.PotentialEvapotranspiration,
                 Controller.Settings?.hydrologyConfig,
@@ -121,8 +124,8 @@ namespace Planets.WorldGen.Climate.Layers
         /// <summary>
         /// Populate RiverPresence, RiverMagnitude, WaterBodyType from Tier 2 flow and lake data (WS21).
         /// Fill-and-spill water balance is the sole lake classifier:
-        /// - 2+ flooded tiles in a lake chunk -> WaterBodyType = 2 (Lake biome when LakeBiomeConversionEnabled is on).
-        /// - 1 flooded tile in a lake chunk -> WaterBodyType = 3 (stays land biome; eligible for single-tile mutator).
+        /// - 2+ flooded tiles in a lake chunk -> WaterBodyType = 2 (Lake biome when LakeConversionEnabled is on).
+        /// - 1-tile basins remain normal land tiles (not converted to Lake biome).
         /// </summary>
         private void ClassifyTier2RiversAndLakes()
         {
@@ -156,10 +159,9 @@ namespace Planets.WorldGen.Climate.Layers
                 float flowVolume = climate.FlowAccumulationHydrology[i];
                 int lakeId = climate.MergedLakeIDHydrology[i];
 
-                if (lakeId >= 0)
+                if (lakeId >= 0 && lakeTileCount.TryGetValue(lakeId, out int count) && count >= 2)
                 {
-                    lakeTileCount.TryGetValue(lakeId, out int count);
-                    climate.WaterBodyType[i] = count >= 2 ? (byte)2 : (byte)3;
+                    climate.WaterBodyType[i] = 2;
                     climate.RiverPresence[i] = 0f;
                     climate.RiverMagnitude[i] = 0;
                     continue;

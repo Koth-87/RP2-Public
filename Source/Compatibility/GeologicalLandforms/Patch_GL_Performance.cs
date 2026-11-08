@@ -21,9 +21,12 @@ namespace Planets.Compatibility.GeologicalLandforms
     [HarmonyPatch]
     public static class Patch_GL_Performance
     {
-        private static bool IsActive => 
-            ModsConfig.IsActive("m00nl1ght.GeologicalLandforms") && 
-            Controller.Settings.perfOptimizeGL.CurrentValue;
+        // Lunar loads GeologicalLandforms.dll from its own mod constructor, which can run after ours.
+        // Prepare must fail closed until that assembly exists, or Harmony reports a null target.
+        private static bool IsActive =>
+            ModsConfig.IsActive("m00nl1ght.GeologicalLandforms") &&
+            Controller.Settings.perfOptimizeGL.CurrentValue &&
+            AccessTools.TypeByName("GeologicalLandforms.Patches.Patch_RimWorld_WorldGenStep_Terrain") != null;
 
         [HarmonyPrepare]
         public static bool Prepare(MethodBase original)

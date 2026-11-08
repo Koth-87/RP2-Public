@@ -37,25 +37,6 @@ namespace Planets.Patches.WorldGen
 
             int tileCount = Mathf.Min(Find.WorldGrid.TilesCount, climate.WaterBodyType.Length);
 
-            if (hydroConfig.LakeMutatorsEnabled.CurrentValue && hydroConfig.LakeConversionEnabled.CurrentValue)
-            {
-                for (int i = 0; i < layer.Tiles.Count; i++)
-                {
-                    var tile = layer.Tiles[i];
-                    if (tile == null) continue;
-
-                    int tileId = tile.tile.tileId;
-                    if (tileId < 0 || tileId >= tileCount) continue;
-
-                    // Strictly skip any water-covered, ocean, or Lake biome tiles
-                    if (climate.OceanMask[tileId] || tile.WaterCovered || tile.biome == BiomeDefOf.Ocean || tile.biome == BiomeDefOf.Lake)
-                        continue;
-
-                    // Single-tile lake mutators: Pond, Oasis, HotSprings (WS21: 1-tile flooded pools only)
-                    TryAddSingleTileLakeMutator(tile, layer, climate, tileId);
-                }
-            }
-
             // Wetland and Marshy mutators: at most one tile per connected wet patch (the wettest tile whose biome accepts it)
             if (hydroConfig.WetlandMutatorsEnabled.CurrentValue)
             {
@@ -122,42 +103,6 @@ namespace Planets.Patches.WorldGen
                     if (chosen != null && TryAddMutator(t, layer, chosen))
                         break;
                 }
-            }
-        }
-
-        private static void TryAddSingleTileLakeMutator(Tile tile, PlanetLayer layer, ClimateData climate, int tileId)
-        {
-            byte waterBodyType = climate.WaterBodyType[tileId];
-            if (waterBodyType != 3) return; // WS21: only single-tile flooded pools (WaterBodyType == 3)
-
-            int lakeId = climate.MergedLakeIDHydrology != null && tileId < climate.MergedLakeIDHydrology.Length
-                ? climate.MergedLakeIDHydrology[tileId] : -1;
-            if (lakeId < 0) return;
-
-            // Single-tile filled basin: choose mutator by climate
-            float temp = climate.AnnualMeanTemp != null && tileId < climate.AnnualMeanTemp.Length
-                ? climate.AnnualMeanTemp[tileId] : 15f;
-
-            TileMutatorDef mutatorDef;
-            if (temp >= 35f)
-            {
-                mutatorDef = DefDatabase<TileMutatorDef>.GetNamedSilentFail("Oasis");
-            }
-            else if (tile.hilliness == Hilliness.Mountainous || tile.hilliness == Hilliness.Impassable)
-            {
-                mutatorDef = DefDatabase<TileMutatorDef>.GetNamedSilentFail("HotSprings");
-            }
-            else
-            {
-                // WS21: Skip Pond when the tile has rivers so Pond never replaces Headwater on river endpoints.
-                if (tile is SurfaceTile st && !st.Rivers.NullOrEmpty())
-                    return;
-                mutatorDef = DefDatabase<TileMutatorDef>.GetNamedSilentFail("Pond");
-            }
-
-            if (mutatorDef != null)
-            {
-                TryAddMutator(tile, layer, mutatorDef);
             }
         }
 

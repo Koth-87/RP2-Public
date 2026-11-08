@@ -32,6 +32,7 @@ namespace Planets.WorldGen.Climate.Moisture
     {
         private readonly ClimateData climate;
         private readonly ClimateConfiguration config;
+        private readonly CirculationLayer circulation;
         private readonly int tileCount;
         private float tileAreaM2;
         private float meanEdgeLengthM;
@@ -59,6 +60,7 @@ namespace Planets.WorldGen.Climate.Moisture
         // Least-squares surface elevation gradient (m/m)
         private float[] slopeEast;
         private float[] slopeNorth;
+        private bool[] coastLowMask;
 
         // Barycentric interpolation from CoarseMesh cells to tiles, and Poisson return-flow operators
         private CoarseMesh mesh;
@@ -127,10 +129,11 @@ namespace Planets.WorldGen.Climate.Moisture
             public TransportSystem SuperSystem;
         }
 
-        public MoistureBudgetLayer(ClimateData climateData, ClimateConfiguration configuration)
+        public MoistureBudgetLayer(ClimateData climateData, ClimateConfiguration configuration, CirculationLayer circulationLayer = null)
         {
             climate = climateData ?? throw new ArgumentNullException(nameof(climateData));
             config = configuration ?? new ClimateConfiguration();
+            circulation = circulationLayer;
             tileCount = climate.Latitude.Length;
             tileAreaM2 = (float)(4.0 * Math.PI * (double)MoistureMath.RadiusM * MoistureMath.RadiusM / tileCount);
             meanEdgeLengthM = Mathf.Sqrt(tileAreaM2 * 2f / Mathf.Sqrt(3f)) / Mathf.Sqrt(3f);
@@ -164,24 +167,18 @@ namespace Planets.WorldGen.Climate.Moisture
             for (int i = 0; i < tileCount; i++)
                 petEq[i] = 0.5f * (petApr[i] + petOct[i]);
 
-            // Overall rainfall slider scaling on ocean evaporation C_E (WS30 step 4 / step 13; Normal = 1000 mm/year)
+            // Overall rainfall slider scaling on ocean evaporation C_E, condensation threshold rc0, and final rainfall
             float baseCe = config.oceanEvapCoeff.CurrentValue;
-            float rainScale = climate.BaseRain > 0f ? climate.BaseRain / 1000f : 1f;
-            float ce = baseCe * Mathf.Clamp(rainScale, 0.20f, 2.5f);
+            float rainScale = climate.BaseRain > 0f ? Mathf.Clamp(climate.BaseRain / 1000f, 0.15f, 3.0f) : 1f;
+            float ce = baseCe * rainScale;
 
-            // Snapshot temperatures
+            // Snapshot boundary-layer temperatures (include dry-land Bowen sensible surface heating
+            // so desert saturation capacity W_sat(T) reflects the hot boundary layer, while climate.AnnualMeanTemp
+            // stays at the deep column temperature until circulation finishes).
             var tJune = new float[tileCount];
             var tDec = new float[tileCount];
             var tEq = new float[tileCount];
-            for (int i = 0; i < tileCount; i++)
-            {
-                float ann = climate.AnnualMeanTemp[i];
-                float half = 0.5f * climate.SeasonalAmp[i];
-                float sign = climate.LatitudeSigned[i] >= 0f ? 1f : -1f;
-                tJune[i] = ann + sign * half;
-                tDec[i] = ann - sign * half;
-                tEq[i] = ann;
-            }
+            FillBoundaryLayerSnapshotTemperatures(null, null, tiltDeg, tJune, tDec, tEq);
 
             // Prepare the 3 snapshots in parallel (June weight 0.25, December weight 0.25, Equinox weight 0.50)
             float coverage = Find.World?.info?.planetCoverage ?? 1f;
@@ -198,6 +195,99 @@ namespace Planets.WorldGen.Climate.Moisture
 
             bool twoLayer = config.twoLayerMoisture.CurrentValue;
             UpperMoistureLayer upperLayer = twoLayer ? new UpperMoistureLayer(climate, tileAreaM2) : null;
+
+            float[][] petBySnap = { petJul, petJan, petEq };
+            float budykoW = config.budykoW.CurrentValue;
+            float tauDays = config.EffectiveRainTimescaleDays;
+            float rainThresh = config.rainThreshold.CurrentValue;
+
+            // Step 4 coupled monsoon latent-heat pre-pass: 2 fast rounds supply continental condensation
+            // to deepen the monsoon trough in CirculationLayer before the 4-round main moisture solve.
+            if (circulation != null)
+            {
+                var preEt = new float[tileCount];
+                var preRain = new float[tileCount];
+                var preGuesses = new float[3][];
+                var preDown = new float[3][];
+                var preSnapRain = new float[3][];
+                for (int s = 0; s < 3; s++)
+                {
+                    preGuesses[s] = new float[tileCount];
+                    preDown[s] = new float[tileCount];
+                    preSnapRain[s] = new float[tileCount];
+                    for (int i = 0; i < tileCount; i++)
+                        preGuesses[s][i] = climate.OceanMask[i] ? 0.5f * snapshots[s].Threshold[i] * snapshots[s].Capacity[i] : 0f;
+                }
+
+                for (int preRound = 0; preRound < 2; preRound++)
+                {
+                    var landEvapRate = SplitLandEvap(preEt, petBySnap);
+                    Parallel.For(0, 3, s =>
+                    {
+                        SnapshotPrep prep = snapshots[s];
+                        SolveSnapshot(
+                            prep,
+                            landEvapRate[s],
+                            preGuesses[s],
+                            preDown[s],
+                            upperLayer != null,
+                            out float[] col,
+                            out float[] humidRate,
+                            out float[] riseRate,
+                            out float[] liftedRate,
+                            out float[] _,
+                            out float[] moistShare);
+
+                        preGuesses[s] = col;
+                        var upperRainRate = new float[tileCount];
+                        if (upperLayer != null)
+                        {
+                            upperLayer.Exchange(s, s, prep.Divergence, liftedRate, tauDays, rainThresh, moistShare, upperRainRate, preDown[s]);
+                        }
+                        for (int i = 0; i < tileCount; i++)
+                            preSnapRain[s][i] = (humidRate[i] + riseRate[i] + upperRainRate[i]) * MoistureMath.YearSeconds;
+                    });
+
+                    for (int i = 0; i < tileCount; i++)
+                    {
+                        preRain[i] = 0.25f * preSnapRain[0][i] + 0.25f * preSnapRain[1][i] + 0.50f * preSnapRain[2][i];
+                        aridity[i] = preRain[i] / Mathf.Max(climate.PotentialEvapotranspiration[i], 1f);
+                    }
+
+                    PotentialEvaporation.ComputeFourSnapshots(
+                        climate, aridity, tiltDeg, useContStress, usePolar,
+                        climate.PotentialEvapotranspiration, climate.DailyRangeC,
+                        petJul, petJan, petApr, petOct);
+                    for (int i = 0; i < tileCount; i++)
+                        petEq[i] = 0.5f * (petApr[i] + petOct[i]);
+
+                    var nextPreEt = new float[tileCount];
+                    MoistureMath.BudykoMm(preRain, climate.PotentialEvapotranspiration, climate.OceanMask, budykoW, nextPreEt);
+                    preEt = nextPreEt;
+                }
+
+                circulation.SetRainHeating(preSnapRain[0], preSnapRain[1], 0.45f, 1000f);
+                circulation.Execute(climate);
+
+                // Reset PET to round-0 humid state and update snapshot boundary-layer temperatures from pre-pass ET
+                for (int i = 0; i < tileCount; i++)
+                    aridity[i] = 1f;
+                PotentialEvaporation.ComputeFourSnapshots(
+                    climate, aridity, tiltDeg, useContStress, usePolar,
+                    climate.PotentialEvapotranspiration, climate.DailyRangeC,
+                    petJul, petJan, petApr, petOct);
+                for (int i = 0; i < tileCount; i++)
+                    petEq[i] = 0.5f * (petApr[i] + petOct[i]);
+
+                FillBoundaryLayerSnapshotTemperatures(preEt, preRain, tiltDeg, tJune, tDec, tEq);
+                snapSurfWinds = new[] { climate.SummerWind, climate.WinterWind, climate.EquinoxWind };
+                snapTransWinds = new[] { climate.TransportJune, climate.TransportDecember, climate.TransportEquinox };
+                Parallel.For(0, 3, s =>
+                {
+                    snapshots[s] = PrepareSnapshot(snapNames[s], s, snapWeights[s], snapTemps[s], snapSurfWinds[s], snapTransWinds[s], ce, coverage);
+                });
+                upperLayer = twoLayer ? new UpperMoistureLayer(climate, tileAreaM2) : null;
+            }
 
             int rounds = 4;
             var etMm = new float[tileCount];
@@ -224,11 +314,6 @@ namespace Planets.WorldGen.Climate.Moisture
                 for (int i = 0; i < tileCount; i++)
                     guesses[s][i] = climate.OceanMask[i] ? 0.5f * snapshots[s].Threshold[i] * snapshots[s].Capacity[i] : 0f;
             }
-
-            float[][] petBySnap = { petJul, petJan, petEq };
-            float budykoW = config.budykoW.CurrentValue;
-            float tauDays = config.EffectiveRainTimescaleDays;
-            float rainThresh = config.rainThreshold.CurrentValue;
 
             for (int round = 0; round < rounds; round++)
             {
@@ -300,6 +385,30 @@ namespace Planets.WorldGen.Climate.Moisture
                 var nextEt = new float[tileCount];
                 MoistureMath.BudykoMm(rainMm, climate.PotentialEvapotranspiration, climate.OceanMask, budykoW, nextEt);
                 etMm = nextEt;
+            }
+
+            if (Mathf.Abs(rainScale - 1f) > 0.01f)
+            {
+                float postScale = Mathf.Pow(rainScale, 0.35f);
+                for (int i = 0; i < tileCount; i++)
+                {
+                    for (int s = 0; s < 3; s++)
+                    {
+                        snapRainMm[s][i] *= postScale;
+                        snapHumidMm[s][i] *= postScale;
+                        snapRiseMm[s][i] *= postScale;
+                        snapUpperMm[s][i] *= postScale;
+                    }
+                    rainMm[i] *= postScale;
+                    aridity[i] = rainMm[i] / Mathf.Max(climate.PotentialEvapotranspiration[i], 1f);
+                }
+                PotentialEvaporation.ComputeFourSnapshots(
+                    climate, aridity, tiltDeg, useContStress, usePolar,
+                    climate.PotentialEvapotranspiration, climate.DailyRangeC,
+                    petJul, petJan, petApr, petOct);
+                var scaledEt = new float[tileCount];
+                MoistureMath.BudykoMm(rainMm, climate.PotentialEvapotranspiration, climate.OceanMask, budykoW, scaledEt);
+                etMm = scaledEt;
             }
 
             WriteOutputs(snapshots, rainMm, etMm, snapRainMm, snapHumidMm, snapRiseMm, snapUpperMm, snapOceanEvapMm, snapW, upperLayer);
@@ -465,6 +574,30 @@ namespace Planets.WorldGen.Climate.Moisture
                     slopeNorth[i] = (float)((see[i] * snz[i] - sen[i] * sez[i]) / det);
                 }
             }
+
+            // Lowland coastal mask (< 500 m and within 2 neighbor hops of true ocean) for --coast-clock
+            var nearOcean = new bool[tileCount];
+            for (int i = 0; i < tileCount; i++)
+            {
+                nearOcean[i] = climate.TrueOceanMask != null && i < climate.TrueOceanMask.Length
+                    ? climate.TrueOceanMask[i]
+                    : climate.OceanMask[i];
+            }
+            for (int hop = 0; hop < 2; hop++)
+            {
+                var nextNear = (bool[])nearOcean.Clone();
+                for (int e = 0; e < totalEdges; e++)
+                {
+                    int s = edgeSrc[e];
+                    int d = edgeDst[e];
+                    if (nearOcean[s]) nextNear[d] = true;
+                    if (nearOcean[d]) nextNear[s] = true;
+                }
+                nearOcean = nextNear;
+            }
+            coastLowMask = new bool[tileCount];
+            for (int i = 0; i < tileCount; i++)
+                coastLowMask[i] = !climate.OceanMask[i] && nearOcean[i] && climate.ElevationKm[i] < 0.50f;
         }
 
         private void BuildCoarseMappingAndPoisson()
@@ -712,11 +845,12 @@ namespace Planets.WorldGen.Climate.Moisture
                 d95 = triggerD95;
             }
 
-            // Directional slope term using surface wind (--surf-slope)
+            // Directional slope term using surface wind (--surf-slope) and rainfall preset threshold shift
             var climb = new float[tileCount];
             var threshold = new float[tileCount];
             var cRise = new float[tileCount];
-            float rc0 = config.rainThreshold.CurrentValue;
+            float rainScale = climate.BaseRain > 0f ? Mathf.Clamp(climate.BaseRain / 1000f, 0.15f, 3.0f) : 1f;
+            float rc0 = Mathf.Clamp(config.rainThreshold.CurrentValue - 0.08f * (rainScale - 1f), 0.58f, 0.88f);
             float beta = config.EffectiveRainThresholdSink;
             float gamma = config.EffectiveSlopeThreshold;
             float wRef = Mathf.Max(config.slopeRefVelocity.CurrentValue, 1e-4f);
@@ -1297,6 +1431,7 @@ namespace Planets.WorldGen.Climate.Moisture
 
             var deep = new float[tileCount];
             var rampCoeff = new float[tileCount];
+            var capScale = new float[tileCount];
             var diag = new float[tileCount];
             var rhs = new float[tileCount];
             float eps = config.rainEfficiency.CurrentValue;
@@ -1305,7 +1440,11 @@ namespace Planets.WorldGen.Climate.Moisture
             {
                 for (int i = 0; i < tileCount; i++)
                 {
-                    float hum = column[i] / prep.Capacity[i];
+                    float cap = prep.Capacity[i];
+                    float hum = column[i] / cap;
+                    float tCap = Mathf.Min(1f, cap / Mathf.Max(column[i], 1e-6f));
+                    capScale[i] = picard == 0 ? tCap : 0.5f * (capScale[i] + tCap);
+
                     if (twoLayer)
                     {
                         float s = Mathf.Clamp01((hum - 0.45f) / 0.35f);
@@ -1317,18 +1456,28 @@ namespace Planets.WorldGen.Climate.Moisture
                         deep[i] = 1f;
                     }
 
-                    float vent = twoLayer ? prep.CRise[i] * deep[i] : eps * prep.CRise[i];
                     bool capped = prep.Evaporates[i] && hum >= MoistureMath.RCap;
                     float ke = capped ? 0f : prep.KLinear[i];
                     float e0 = capped ? prep.ECapped[i] : prep.ELinear[i];
-                    float transDiag = prep.FOut[i] + prep.DiffDiag[i] + tileAreaM2 * vent;
-                    bool calmSource = transDiag < 1f && (e0 + landEvap[i]) > 0f;
 
                     float x = Mathf.Clamp01((hum - prep.RampShift[i] - prep.RampLo[i]) / prep.RampSpan[i]);
-                    float targetCoeff = prep.RampRate[i] * x * x * (3f - 2f * x);
-                    if (calmSource && targetCoeff < prep.RampRate[i])
-                        targetCoeff = prep.RampRate[i];
+                    float targetCoeff = prep.RampRate[i] * x * x * (3f - 2f * x) * capScale[i];
                     rampCoeff[i] = picard == 0 ? targetCoeff : 0.5f * (rampCoeff[i] + targetCoeff);
+
+                    float riseShare = eps * prep.CRise[i] * deep[i] * capScale[i];
+                    if (coastLowMask != null && coastLowMask[i])
+                    {
+                        float allowed = Mathf.Max(0f, prep.RampRate[i] * capScale[i] - rampCoeff[i]);
+                        if (riseShare > allowed)
+                            riseShare = allowed;
+                    }
+                    float liftShare = twoLayer ? (1f - eps) * prep.CRise[i] * deep[i] : 0f;
+                    float vent = riseShare + liftShare;
+
+                    float transDiag = prep.FOut[i] + prep.DiffDiag[i] + tileAreaM2 * vent;
+                    bool calmSource = transDiag < 1f && (e0 + landEvap[i]) > 0f;
+                    if (calmSource && rampCoeff[i] < prep.RampRate[i] * capScale[i])
+                        rampCoeff[i] = prep.RampRate[i] * capScale[i];
 
                     float d = transDiag + tileAreaM2 * (ke + rampCoeff[i]);
                     float r = tileAreaM2 * (e0 + landEvap[i] + (subsidence != null ? subsidence[i] : 0f)) + prep.EdgeInflowSource[i];
@@ -1355,7 +1504,14 @@ namespace Planets.WorldGen.Climate.Moisture
                 float w = column[i];
                 humidRate[i] = Mathf.Max(rampCoeff[i] * w, 0f);
                 float export = deep[i];
-                riseRain[i] = eps * export * prep.CRise[i] * w;
+                float rise = eps * export * prep.CRise[i] * capScale[i] * w;
+                if (coastLowMask != null && coastLowMask[i])
+                {
+                    float riseCap = Mathf.Max(0f, prep.RampRate[i] * capScale[i] - rampCoeff[i]) * w;
+                    if (rise > riseCap)
+                        rise = riseCap;
+                }
+                riseRain[i] = rise;
                 lifted[i] = twoLayer ? (1f - eps) * export * prep.CRise[i] * w : 0f;
 
                 if (prep.Evaporates[i])
@@ -1552,6 +1708,41 @@ namespace Planets.WorldGen.Climate.Moisture
             return rates;
         }
 
+        // A steady season that stays under the rain line publishes 0 mm. Real dry land still
+        // records a few millimetres from rare wet days. Just under the line is about 15 mm.
+        // A step of 0.20 of the column's capacity is already down at 3 mm, and anything drier stays there.
+        private const float DryPublishCeilingMm = 15f;
+        private const float DryResidualNearMm = 15f;
+        private const float DryResidualFarMm = 3f;
+        private const float DryGapAtFloor = 0.20f;
+
+        private static float PublishedRainMm(
+            int i,
+            float physical,
+            ClimateData climate,
+            SnapshotPrep[] snapshots,
+            float[][] snapW)
+        {
+            if (physical >= DryPublishCeilingMm)
+                return physical;
+            if (climate.OceanMask != null && i < climate.OceanMask.Length && climate.OceanMask[i])
+                return physical;
+
+            float gap = 0f;
+            for (int s = 0; s < snapshots.Length; s++)
+            {
+                SnapshotPrep prep = snapshots[s];
+                float cap = prep.Capacity[i];
+                if (cap < 1e-3f)
+                    continue;
+                float below = prep.RampLo[i] + prep.RampShift[i] - snapW[s][i] / cap;
+                gap += prep.Weight * Mathf.Max(0f, below);
+            }
+
+            float t = Mathf.Clamp01(gap / DryGapAtFloor);
+            return Mathf.Max(physical, Mathf.Lerp(DryResidualNearMm, DryResidualFarMm, t));
+        }
+
         private void WriteOutputs(
             SnapshotPrep[] snapshots,
             float[] rainMm,
@@ -1589,9 +1780,10 @@ namespace Planets.WorldGen.Climate.Moisture
                 float rDec = snapRainMm[1][i];
                 float rEq = snapRainMm[2][i];
 
-                climate.AdvectedCondensationMm[i] = rAnn;
-                climate.AnnualRainfall[i] = Mathf.Max(0f, rAnn);
-                climate.AridityIndex[i] = Mathf.Max(0.01f, climate.AnnualRainfall[i] / Mathf.Max(climate.PotentialEvapotranspiration[i], 50f));
+                float physical = Mathf.Max(0f, rAnn);
+                climate.AdvectedCondensationMm[i] = physical;
+                climate.AridityIndex[i] = Mathf.Max(0.01f, physical / Mathf.Max(climate.PotentialEvapotranspiration[i], 50f));
+                climate.AnnualRainfall[i] = PublishedRainMm(i, physical, climate, snapshots, snapW);
                 climate.SummerCondensationMm[i] = rJun;
                 climate.WinterCondensationMm[i] = rDec;
                 climate.EquinoxCondensationMm[i] = rEq;
@@ -1654,6 +1846,106 @@ namespace Planets.WorldGen.Climate.Moisture
             }
 
             ComputeDistanceAlongWind(snapshots);
+            ApplySurfaceMoistureFeedback(etMm);
+        }
+
+        /// <summary>
+        /// Populate snapshot boundary-layer temperatures (June, December, Equinox) for the moisture solver,
+        /// including Bowen surface sensible heating on dry land without mutating the deep column temperature
+        /// stored in <see cref="ClimateData.AnnualMeanTemp"/> while circulation runs.
+        /// </summary>
+        private void FillBoundaryLayerSnapshotTemperatures(float[] etMm, float[] rainMm, float tiltDeg, float[] tJune, float[] tDec, float[] tEq)
+        {
+            const float sensibleGain = 3.2f;
+            float qEq0 = SolarGeometry.SolsticeInsolation.EquatorEquinoxReference;
+
+            for (int i = 0; i < tileCount; i++)
+            {
+                float ann = climate.AnnualMeanTemp[i];
+                float amp = climate.SeasonalAmp[i];
+
+                if (!climate.OceanMask[i] && etMm != null && rainMm != null)
+                {
+                    float absLat = Mathf.Abs(climate.LatitudeSigned[i] * Mathf.Rad2Deg);
+                    var sol = SolarGeometry.GetSolsticeInsolation(absLat, tiltDeg);
+                    float subtropicalSun = Mathf.Clamp(
+                        (sol.SummerDailyQ * sol.SummerNoonSin - 0.85f * qEq0) / (0.26f * qEq0),
+                        0f,
+                        1.25f);
+                    if (subtropicalSun > 0f)
+                    {
+                        float pet = Mathf.Max(climate.PotentialEvapotranspiration[i], 50f);
+                        float et = etMm[i];
+                        float aridity = Mathf.Max(et, rainMm[i]) / pet;
+                        float dryFrac = Mathf.Clamp01(1f - et / pet);
+
+                        float cLand = Mathf.Clamp01(climate.Continentality[i]);
+                        float aridCore = Mathf.Clamp01((0.28f - aridity) / 0.22f);
+                        float marDamped = (1f - cLand) * (dryFrac * dryFrac);
+                        float dHotSum = sensibleGain * (0.40f * Mathf.Pow(dryFrac, 2.4f) + 0.45f * aridCore + 1.25f * marDamped) * subtropicalSun;
+                        float dHotAnn = 0.55f * dHotSum;
+                        float wetCool = Mathf.Clamp01((aridity - 1.1f) / 1.2f) * subtropicalSun;
+
+                        ann += dHotAnn - 0.8f * wetCool;
+                        amp = Mathf.Max(0f, amp + 1.15f * dHotSum - 2.2f * wetCool);
+                    }
+                }
+
+                float half = 0.5f * amp;
+                float sign = climate.LatitudeSigned[i] >= 0f ? 1f : -1f;
+                tJune[i] = ann + sign * half;
+                tDec[i] = ann - sign * half;
+                tEq[i] = ann;
+            }
+        }
+
+        /// <summary>
+        /// Surface sensible heating from unused evaporative demand (Bowen feedback) and wet-monsoon cloud cooling,
+        /// driven by spherical summer solstice insolation and noon solar altitude (<see cref="SolarGeometry.GetSolsticeInsolation"/>).
+        /// </summary>
+        private void ApplySurfaceMoistureFeedback(float[] etMm)
+        {
+            const float sensibleGain = 3.2f;
+            float tiltDeg = AxialTiltCurves.GetTiltDegrees(Planets_GameComponent.ActiveAxialTilt);
+            float qEq0 = SolarGeometry.SolsticeInsolation.EquatorEquinoxReference;
+
+            for (int i = 0; i < tileCount; i++)
+            {
+                if (climate.OceanMask[i])
+                    continue;
+
+                float absLat = Mathf.Abs(climate.LatitudeSigned[i] * Mathf.Rad2Deg);
+                var sol = SolarGeometry.GetSolsticeInsolation(absLat, tiltDeg);
+                float subtropicalSun = Mathf.Clamp(
+                    (sol.SummerDailyQ * sol.SummerNoonSin - 0.85f * qEq0) / (0.26f * qEq0),
+                    0f,
+                    1.25f);
+                if (subtropicalSun <= 0f)
+                    continue;
+
+                float pet = Mathf.Max(climate.PotentialEvapotranspiration[i], 50f);
+                float physicalRain = climate.AdvectedCondensationMm[i];
+                float et = etMm[i];
+                float aridity = Mathf.Max(et, physicalRain) / pet;
+                float dryFrac = Mathf.Clamp01(1f - et / pet);
+                float cLand = Mathf.Clamp01(climate.Continentality[i]);
+
+                float aridCore = Mathf.Clamp01((0.28f - aridity) / 0.22f);
+                float marDamped = (1f - cLand) * (dryFrac * dryFrac);
+                float dHotSum = sensibleGain * (0.40f * Mathf.Pow(dryFrac, 2.4f) + 0.45f * aridCore + 1.25f * marDamped) * subtropicalSun;
+                float dHotAnn = 0.55f * dHotSum;
+
+                float wetCool = Mathf.Clamp01((aridity - 1.1f) / 1.2f) * subtropicalSun;
+
+                float dAnn = dHotAnn - 0.8f * wetCool;
+                float dAmp = 1.15f * dHotSum - 2.2f * wetCool;
+
+                climate.AnnualMeanTemp[i] += dAnn;
+                climate.SeasonalAmp[i] = Mathf.Max(0f, climate.SeasonalAmp[i] + dAmp);
+                float half = 0.5f * climate.SeasonalAmp[i];
+                climate.MaxSummerTemp[i] = climate.AnnualMeanTemp[i] + half;
+                climate.MinWinterTemp[i] = climate.AnnualMeanTemp[i] - half;
+            }
         }
 
         private void ComputeDistanceAlongWind(SnapshotPrep[] snapshots)

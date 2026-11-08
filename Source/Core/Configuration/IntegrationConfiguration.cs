@@ -39,7 +39,9 @@ namespace Planets.Core.Configuration
             var active = ModCompatibilityRegistry.GetActiveModules();
             if (active.Count > 0)
             {
-                list.Label("Compatibility status");
+                GUI.color = Color.cyan;
+                list.Label("Compatibility Status");
+                GUI.color = Color.white;
                 list.Gap(4f);
                 for (int i = 0; i < active.Count; i++)
                     list.Label(active[i].ModName + ": active");

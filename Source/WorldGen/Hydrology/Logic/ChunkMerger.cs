@@ -160,14 +160,13 @@ namespace Planets.WorldGen.Hydrology.Logic
             if (iteration > 1)
             {
                 RPLog.D($"[ChunkMerger] Merge converged after {iteration} iterations");
-            }
-
-            if (Controller.DebugEnabled)
-            {
-                RPLog.D($"[ChunkMerger] Performance:");
-                RPLog.D($"  BuildAdjacency: {_buildAdjacencyTimer.ElapsedMilliseconds}ms");
-                RPLog.D($"  MergeGroups: {_mergeGroupsTimer.ElapsedMilliseconds}ms");
-                RPLog.D($"  RefillMergedChunk: {_refillTimer.ElapsedMilliseconds}ms ({_totalRefillCalls} calls, avg {(_totalRefillCalls > 0 ? _refillTimer.ElapsedMilliseconds / _totalRefillCalls : 0)}ms)");
+                if (Controller.DebugEnabled)
+                {
+                    RPLog.D($"[ChunkMerger] Performance:");
+                    RPLog.D($"  BuildAdjacency: {_buildAdjacencyTimer.ElapsedMilliseconds}ms");
+                    RPLog.D($"  MergeGroups: {_mergeGroupsTimer.ElapsedMilliseconds}ms");
+                    RPLog.D($"  RefillMergedChunk: {_refillTimer.ElapsedMilliseconds}ms ({_totalRefillCalls} calls, avg {(_totalRefillCalls > 0 ? _refillTimer.ElapsedMilliseconds / _totalRefillCalls : 0)}ms)");
+                }
             }
             
             // 4. Final processing - calculate spills from converged chunks (inflow minus lake evaporation)
@@ -406,15 +405,44 @@ namespace Planets.WorldGen.Hydrology.Logic
             HashSet<int> tiles = new HashSet<int>();
             foreach (var component in group)
             {
+                foreach (int b in component.OccupiedBasins)
+                    merged.OccupiedBasins.Add(b);
                 foreach (int t in component.FilledTiles)
+                {
                     tiles.Add(t);
+                    if (initialBasinIDs != null && t >= 0 && t < initialBasinIDs.Length && initialBasinIDs[t] >= 0)
+                        merged.OccupiedBasins.Add(initialBasinIDs[t]);
+                }
             }
             
             merged.FilledTiles.Clear();
             merged.FilledTiles.AddRange(tiles);
+            merged.FilledTiles.Sort();
             merged.Inflow = ComputeCombinedInflow(tiles, group, initialBasinIDs, baseBasinInflow, activeSpills);
             
             return merged;
+        }
+
+        /// <summary>
+        /// Refreshes a carried-over multi-basin chunk with the current iteration's external spills.
+        /// If external spills into the merged basin group changed, re-runs RefillMergedChunk so the lake can expand.
+        /// </summary>
+        public void RefreshCarriedChunk(
+            SpillChunk chunk,
+            WorldGrid grid,
+            float[] elevation,
+            bool[] oceanMask,
+            int[] initialBasinIDs,
+            IEvaporationInput evaporationInput,
+            Dictionary<int, float> baseBasinInflow,
+            List<SpillInput> activeSpills)
+        {
+            var tiles = new HashSet<int>(chunk.FilledTiles);
+            float newInflow = ComputeCombinedInflow(tiles, null, initialBasinIDs, baseBasinInflow, activeSpills);
+            if (Mathf.Abs(newInflow - chunk.Inflow) <= 0.01f)
+                return;
+
+            RefillMergedChunk(chunk, grid, elevation, oceanMask, initialBasinIDs, evaporationInput, baseBasinInflow, activeSpills);
         }
 
         /// <summary>
@@ -503,13 +531,16 @@ namespace Planets.WorldGen.Hydrology.Logic
                 return mergedChunk; // Empty chunk, shouldn't happen
             
             // Get union of all initial basins currently occupied by the merged chunk
-            HashSet<int> occupiedBasins = new HashSet<int>();
+            HashSet<int> occupiedBasins = new HashSet<int>(mergedChunk.OccupiedBasins);
             foreach (int tile in mergedChunk.FilledTiles)
             {
-                occupiedBasins.Add(initialBasinIDs[tile]);
+                int b = initialBasinIDs[tile];
+                if (b >= 0)
+                    occupiedBasins.Add(b);
             }
             
             // Track filled tiles (start with existing merged tiles) and running evaporation sum
+            mergedChunk.FilledTiles.Sort();
             HashSet<int> filledTiles = new HashSet<int>(mergedChunk.FilledTiles);
             float combinedFlow = ComputeCombinedInflow(filledTiles, null, initialBasinIDs, baseBasinInflow, activeSpills);
             mergedChunk.Inflow = combinedFlow;
@@ -517,7 +548,7 @@ namespace Planets.WorldGen.Hydrology.Logic
             
             // Track highest filled tile elevation for comparison
             float highestFilledElevation = float.MinValue;
-            foreach (int tile in filledTiles)
+            foreach (int tile in mergedChunk.FilledTiles)
             {
                 totalEvaporation += evaporationInput.GetEvaporationRate(tile);
                 float tileElev = elevation[tile];
@@ -562,10 +593,10 @@ namespace Planets.WorldGen.Hydrology.Logic
                 }
             }
             
-            // Initialize frontier by adding neighbors of ALL existing tiles
-            foreach (int tile in filledTiles)
+            // Initialize frontier by adding neighbors of ALL existing tiles in deterministic sorted order
+            for (int i = 0; i < mergedChunk.FilledTiles.Count; i++)
             {
-                AddNeighbors(tile);
+                AddNeighbors(mergedChunk.FilledTiles[i]);
             }
             
             // Iteratively expand the filled area
@@ -609,10 +640,17 @@ namespace Planets.WorldGen.Hydrology.Logic
                     break;
                 }
                 
-                // Internal basin - fill it and continue
+                // Internal basin - verify inflow can cover this tile's open-water evaporation before flooding it
+                float nextEvap = evaporationInput.GetEvaporationRate(nextTileID);
+                if (combinedFlow <= totalEvaporation + nextEvap)
+                {
+                    mergedChunk.WaterSurfaceElevation = highestFilledElevation;
+                    break;
+                }
+
                 filledTiles.Add(nextTileID);
-                totalEvaporation += evaporationInput.GetEvaporationRate(nextTileID);
-                if (occupiedBasins.Add(nextBasinID))
+                totalEvaporation += nextEvap;
+                if (nextBasinID >= 0 && occupiedBasins.Add(nextBasinID))
                 {
                     // Newly absorbed internal basin: update combined inflow without double-counting internal spills
                     combinedFlow = ComputeCombinedInflow(filledTiles, null, initialBasinIDs, baseBasinInflow, activeSpills);
@@ -633,6 +671,10 @@ namespace Planets.WorldGen.Hydrology.Logic
             // Update merged chunk with expanded geometry
             mergedChunk.FilledTiles.Clear();
             mergedChunk.FilledTiles.AddRange(filledTiles);
+            mergedChunk.FilledTiles.Sort();
+            mergedChunk.OccupiedBasins.Clear();
+            foreach (int b in occupiedBasins)
+                mergedChunk.OccupiedBasins.Add(b);
             
             return mergedChunk;
         }

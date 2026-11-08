@@ -177,7 +177,7 @@ namespace Planets.Core
 
             SyncEarthScaleFromSurface();
             DynamicAtmosphereCompat.PushTilt();
-            Planets.Api.RealisticPlanetsApi.LogContract();
+            Planets.API.RealisticPlanetsAPI.LogContract();
         }
 
         /// <summary>

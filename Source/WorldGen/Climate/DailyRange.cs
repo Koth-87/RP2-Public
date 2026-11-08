@@ -1,4 +1,5 @@
 using UnityEngine;
+using Planets.WorldGen.Astronomy;
 
 namespace Planets.WorldGen.Climate
 {
@@ -23,12 +24,27 @@ namespace Planets.WorldGen.Climate
         }
 
         /// <summary>
-        /// Pass-1 aridity: rainfall over Hargreaves evaporation at a 10 C daily range, with continental stress.
-        /// Same formula the aridity layer uses before it substitutes the real daily range.
+        /// Snapshot daily temperature range modulated by spherical solar altitude span (collapses in polar night
+        /// and narrows under continuous midnight sun where the sun circles near constant altitude).
+        /// </summary>
+        public static float EstimateForSnapshot(float baseDailyRangeC, float latDeg, float declinationDeg)
+        {
+            float span = SolarGeometry.DiurnalAltitudeSpanFactor(latDeg, declinationDeg);
+            // Even when the sun does not rise or sets briefly, synoptic weather keeps a small ~1.5 C baseline variation.
+            return Mathf.Clamp(1.5f + (baseDailyRangeC - 1.5f) * Mathf.Sqrt(span), 1.5f, 20f);
+        }
+
+        /// <summary>
+        /// Pass-1 aridity: rainfall over Hargreaves evaporation at a 10 C daily range, with continental stress,
+        /// using the planet's axial-tilt annual insolation at this latitude.
         /// </summary>
         public static float ProvisionalAridity(float rainfallMm, float meanTempC, float latRad, float continentality)
         {
-            float extraterrestrial = 5f + 10f * Mathf.Cos(latRad);
+            float latDeg = latRad * Mathf.Rad2Deg;
+            float tiltDeg = AxialTiltCurves.GetTiltDegrees(Planets.Core.Planets_GameComponent.ActiveAxialTilt);
+            var sol = SolarGeometry.GetSolsticeInsolation(Mathf.Abs(latDeg), tiltDeg);
+            float qAnn = 0.25f * sol.SummerDailyQ + 0.25f * sol.WinterDailyQ + 0.50f * sol.EquinoxDailyQ;
+            float extraterrestrial = 15f * (qAnn / SolarGeometry.SolsticeInsolation.EquatorEquinoxReference);
             float temperature = Mathf.Max(meanTempC + 17.8f, 0.1f);
             float pet = 0.0023f * extraterrestrial * temperature * Mathf.Sqrt(10f) * 365f;
             float stress = 1f + continentality * 0.15f;

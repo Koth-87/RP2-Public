@@ -337,10 +337,10 @@ namespace Planets.Compatibility.FernyMods
             return level switch
             {
                 SeaLevel.Low => 0.5f,
-                SeaLevel.SlightlyLow => 0.75f,
                 SeaLevel.Normal => 1f,
                 SeaLevel.SlightlyHigh => 1.25f,
-                SeaLevel.High => 1.5f,
+                SeaLevel.EarthLike => 1.5f,
+                SeaLevel.High => 1.75f,
                 _ => 1f
             };
         }

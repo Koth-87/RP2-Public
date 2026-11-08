@@ -337,23 +337,23 @@ namespace Planets.Patches.WorldGen
             
             switch (Planets_GameComponent.seaLevel)
             {
-                case SeaLevel.High:  // Island planet. Start here; raise the floor if 30% coverage cannot place settlements.
-                    newRange = new FloatRange(-3000f, 9000f);
+                case SeaLevel.High:  // Water world.
+                    newRange = new FloatRange(-2000f, 9000f);
                     break;
 
-                case SeaLevel.SlightlyHigh:  // About Earth's ocean share. Confirm with the geography ocean-share log.
-                    newRange = new FloatRange(-1900f, 9000f);
+                case SeaLevel.EarthLike:
+                    newRange = new FloatRange(-1500f, 9000f);
+                    break;
+
+                case SeaLevel.SlightlyHigh:
+                    newRange = new FloatRange(-1200f, 9000f);
                     break;
                     
                 case SeaLevel.Normal:  // Vanilla-like
                     newRange = new FloatRange(-900f, 9000f);
                     break;
                     
-                case SeaLevel.SlightlyLow:  // Reduced oceans
-                    newRange = new FloatRange(-750f, 9000f);
-                    break;
-                    
-                case SeaLevel.Low:  // Minimal seas (performance cap - prevents excessive sinks)
+                case SeaLevel.Low:
                     newRange = new FloatRange(-600f, 9000f);
                     break;
                     

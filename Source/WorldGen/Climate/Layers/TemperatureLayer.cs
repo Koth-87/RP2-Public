@@ -29,9 +29,9 @@ namespace Planets.WorldGen.Climate.Layers
         private ClimateData climate;
         private int tileCount;
         private ClimateConfiguration settings;
-
-        // Removed class-level buffers to allow thread-safety
-        // Buffers are now allocated per-thread in ComputeOceanCurrents
+        private int[] cachedWestHops;
+        private int[] cachedEastHops;
+        private int cachedMaxCoastHops;
 
         /// <summary>
         /// Layer name for logging and debugging
@@ -122,15 +122,6 @@ namespace Planets.WorldGen.Climate.Layers
                 float oceanPole = climate.PoleMean + ClimateReferenceData.OceanPoleOffset;
                 float oceanTemp = Mathf.Lerp(oceanPole, oceanEquator, cOcean);
 
-                // Ocean polar cooling: much less severe than land
-                // Above 70°N/S, add extra cooling but only 30% of land extreme
-                // Using perturbed latitude for consistent boundaries
-                if (perturbedLatDeg > 70f)
-                {
-                    float polarFactor = (perturbedLatDeg - 70f) / 20f; // 0 at 70°, 1 at 90°
-                    oceanTemp += (settings.polarColdExtra.CurrentValue * 0.3f) * polarFactor;
-                }
-
                 climate.LatitudinalSeaLevelTemp[i] = oceanTemp;
             }
             else
@@ -139,17 +130,7 @@ namespace Planets.WorldGen.Climate.Layers
                 // Land cools more aggressively due to:
                 // - Lower heat capacity
                 // - No ocean circulation moderating effect
-                // - Albedo feedback in polar polar regions (snow/ice coverage)
                 float landTemp = Mathf.Lerp(climate.PoleMean, climate.EquatorMean, c);
-
-                // Land polar cooling: severe above 70°N/S
-                // Accounts for continental ice sheets and extreme polar climates
-                // Using perturbed latitude for consistent boundaries
-                if (perturbedLatDeg > 70f)
-                {
-                    float polarFactor = (perturbedLatDeg - 70f) / 20f; // 0 at 70°, 1 at 90°
-                    landTemp += settings.polarColdExtra.CurrentValue * polarFactor;
-                }
 
                 climate.LatitudinalSeaLevelTemp[i] = landTemp;
             }
@@ -171,18 +152,71 @@ namespace Planets.WorldGen.Climate.Layers
         /// </summary>
         private void ComputeOceanCurrents(bool parallel)
         {
+            EnsureCoastHops(parallel);
+
+            bool haveWind = climate.SummerWind != null && climate.SummerWind.Length >= tileCount
+                && climate.WinterWind != null && climate.WinterWind.Length >= tileCount
+                && climate.EquinoxWind != null && climate.EquinoxWind.Length >= tileCount;
+
+            if (haveWind)
+            {
+                ComputeWindDrivenCurrents(parallel);
+                return;
+            }
+
+            int legacyMaxCoast = Mathf.Clamp(Mathf.RoundToInt(225f / EarthScaleConstants.KM_PER_TILE), 1, 14);
             if (parallel)
             {
-                // Allocate buffers per thread
-                Parallel.For(0, tileCount, 
-                    () => new { 
-                        Visited = new HashSet<int>(), 
-                        Queue = new Queue<(int, int)>(), 
-                        Neighbors = new List<PlanetTile>() 
-                    },
-                    (i, loopState, localState) => 
+                Parallel.For(0, tileCount, i => ComputeInitialOceanCurrentsForTile(i, legacyMaxCoast));
+            }
+            else
+            {
+                for (int i = 0; i < tileCount; i++)
+                    ComputeInitialOceanCurrentsForTile(i, legacyMaxCoast);
+            }
+        }
+
+        /// <summary>
+        /// Recompute sea-surface current anomalies from the circulation wind at the start of a coupling round,
+        /// before the maritime layer carries UpwindSST onto the continents.
+        /// </summary>
+        public void RefreshCurrentsFromWind()
+        {
+            ComputeOceanCurrents(Controller.Settings.perfParallelTemperature.CurrentValue);
+        }
+
+        private void EnsureCoastHops(bool parallel)
+        {
+            if (cachedWestHops != null && cachedEastHops != null)
+                return;
+
+            float kmPerTile = Mathf.Max(1f, EarthScaleConstants.KM_PER_TILE);
+            cachedMaxCoastHops = Mathf.Clamp(Mathf.RoundToInt(500f / kmPerTile), 1, 20);
+            int maxSearchHops = Mathf.Max(cachedMaxCoastHops + 6, 16);
+            cachedWestHops = new int[tileCount];
+            cachedEastHops = new int[tileCount];
+
+            if (parallel)
+            {
+                Parallel.For(0, tileCount,
+                    () => new
                     {
-                        ComputeOceanCurrentsForTile(i, localState.Visited, localState.Queue, localState.Neighbors);
+                        Visited = new HashSet<int>(),
+                        Queue = new Queue<(int, int)>(),
+                        Neighbors = new List<PlanetTile>()
+                    },
+                    (i, loopState, localState) =>
+                    {
+                        if (!climate.OceanMask[i] || !IsOpenOcean(i))
+                        {
+                            cachedWestHops[i] = -1;
+                            cachedEastHops[i] = -1;
+                        }
+                        else
+                        {
+                            cachedWestHops[i] = HopsToLand(i, -1f, maxSearchHops, localState.Visited, localState.Queue, localState.Neighbors);
+                            cachedEastHops[i] = HopsToLand(i, 1f, maxSearchHops, localState.Visited, localState.Queue, localState.Neighbors);
+                        }
                         return localState;
                     },
                     (localState) => { }
@@ -190,19 +224,26 @@ namespace Planets.WorldGen.Climate.Layers
             }
             else
             {
-                // Allocate single set of buffers for main thread
-                HashSet<int> visited = new HashSet<int>();
-                Queue<(int, int)> queue = new Queue<(int, int)>();
-                List<PlanetTile> neighbors = new List<PlanetTile>();
-
+                var visited = new HashSet<int>();
+                var queue = new Queue<(int, int)>();
+                var neighbors = new List<PlanetTile>();
                 for (int i = 0; i < tileCount; i++)
                 {
-                    ComputeOceanCurrentsForTile(i, visited, queue, neighbors);
+                    if (!climate.OceanMask[i] || !IsOpenOcean(i))
+                    {
+                        cachedWestHops[i] = -1;
+                        cachedEastHops[i] = -1;
+                    }
+                    else
+                    {
+                        cachedWestHops[i] = HopsToLand(i, -1f, maxSearchHops, visited, queue, neighbors);
+                        cachedEastHops[i] = HopsToLand(i, 1f, maxSearchHops, visited, queue, neighbors);
+                    }
                 }
             }
         }
 
-        private void ComputeOceanCurrentsForTile(int i, HashSet<int> visited, Queue<(int, int)> queue, List<PlanetTile> neighbors)
+        private void ComputeInitialOceanCurrentsForTile(int i, int maxCoastHops)
         {
             if (!climate.OceanMask[i])
                 return;
@@ -214,24 +255,18 @@ namespace Planets.WorldGen.Climate.Layers
             }
 
             float latDegSigned = climate.LatitudeSigned[i] * Mathf.Rad2Deg;
-            
-            // Add planetary wave perturbation (Rossby waves) to break up perfectly linear currents
             float lonRad = climate.Longitude[i];
             float latRadSigned = climate.LatitudeSigned[i];
-            
+
             float perturbedLatDegSigned = climate.ClimateLatitudeDeg(latDegSigned, lonRad, latRadSigned);
             float perturbedLatDeg = Mathf.Abs(perturbedLatDegSigned);
 
             float subtropicsWeight = CurrentLatWeight(perturbedLatDeg);
-
-            // Storm-track warming peaks at 50°N/S and has no coast side.
             float latDiffStorms = (perturbedLatDeg - 50f) / 12f;
             float stormTrackWeight = Mathf.Exp(-(latDiffStorms * latDiffStorms));
 
-            int maxCoastHops = Mathf.Clamp(Mathf.RoundToInt(225f / EarthScaleConstants.KM_PER_TILE), 1, 14);
-            int maxSearchHops = Mathf.Max(maxCoastHops + 4, 6);
-            int westHops = HopsToLand(i, -1f, maxSearchHops, visited, queue, neighbors);
-            int eastHops = HopsToLand(i, 1f, maxSearchHops, visited, queue, neighbors);
+            int westHops = cachedWestHops[i];
+            int eastHops = cachedEastHops[i];
             bool warmWest = westHops >= 0 && westHops <= maxCoastHops;
             bool coolEast = eastHops >= 0 && eastHops <= maxCoastHops;
             if (warmWest && coolEast)
@@ -252,11 +287,164 @@ namespace Planets.WorldGen.Climate.Layers
                 anomaly += settings.EffectiveWarmWBCurrent * subtropicsWeight;
             if (coolEast)
                 anomaly += settings.EffectiveCoolEBCurrent * subtropicsWeight;
-                
+
             anomaly += settings.EffectiveStormWarmCurrent * stormTrackWeight;
 
             climate.CurrentsAnomalySST[i] = anomaly;
             climate.SST[i] = climate.LatitudinalSeaLevelTemp[i] + anomaly;
+        }
+
+        /// <summary>
+        /// Wind-driven subtropical and subpolar ocean gyre currents, eastern-boundary Ekman upwelling,
+        /// and equatorial cold tongue driven by the circulation's surface wind field.
+        /// </summary>
+        private void ComputeWindDrivenCurrents(bool parallel)
+        {
+            const int bands = 90;
+            var uTile = new float[tileCount];
+            var vTile = new float[tileCount];
+            var uBandSum = new double[bands];
+            var nBandCount = new int[bands];
+
+            for (int i = 0; i < tileCount; i++)
+            {
+                if (!climate.OceanMask[i] || !IsOpenOcean(i))
+                    continue;
+
+                Vector3 w = 0.25f * climate.SummerWind[i] + 0.25f * climate.WinterWind[i] + 0.50f * climate.EquinoxWind[i];
+                Vector3 up = climate.TileCenters[i].normalized;
+                Vector3 east = Vector3.Cross(Vector3.up, up);
+                if (east.sqrMagnitude < 1e-8f)
+                    east = Vector3.right;
+                else
+                    east.Normalize();
+                Vector3 north = Vector3.Cross(up, east).normalized;
+
+                float u = Vector3.Dot(w, east);
+                float v = Vector3.Dot(w, north);
+                uTile[i] = u;
+                vTile[i] = v;
+
+                float latDeg = climate.LatitudeSigned[i] * Mathf.Rad2Deg;
+                int bIdx = Mathf.Clamp(Mathf.FloorToInt((latDeg + 90f) / 2f), 0, bands - 1);
+                uBandSum[bIdx] += u;
+                nBandCount[bIdx]++;
+            }
+
+            var uBandRaw = new float[bands];
+            for (int b = 0; b < bands; b++)
+                uBandRaw[b] = nBandCount[b] > 0 ? (float)(uBandSum[b] / nBandCount[b]) : 0f;
+
+            float[] kernel = { 0.15f, 0.20f, 0.30f, 0.20f, 0.15f };
+            var uBandSmooth = new float[bands];
+            for (int b = 0; b < bands; b++)
+            {
+                float s = 0f;
+                for (int k = -2; k <= 2; k++)
+                {
+                    int idx = Mathf.Clamp(b + k, 0, bands - 1);
+                    s += kernel[k + 2] * uBandRaw[idx];
+                }
+                uBandSmooth[b] = s;
+            }
+
+            float kmPerTile = Mathf.Max(1f, EarthScaleConstants.KM_PER_TILE);
+            int maxCoast = cachedMaxCoastHops;
+
+            // Scale the wind-driven gyre amplitudes by the user's sea-current settings relative to default (2.5 / -2.0 / 0.8)
+            float warmScale = settings.EffectiveWarmWBCurrent / 2.5f;
+            float coolScale = settings.EffectiveCoolEBCurrent / -2.0f;
+            float stormScale = settings.EffectiveStormWarmCurrent / 0.8f;
+
+            float warmWb = 2.8f * warmScale;
+            float coolEb = -2.6f * coolScale;
+            float subpolarEastWarm = 5.0f * warmScale;
+            float subpolarWestCool = -3.2f * coolScale;
+            float eqUpwell = -1.8f * coolScale;
+            float stormWarm = 0.8f * stormScale;
+
+            void EvalTile(int i)
+            {
+                if (!climate.OceanMask[i])
+                    return;
+                if (!IsOpenOcean(i))
+                {
+                    climate.CurrentsAnomalySST[i] = 0f;
+                    climate.SST[i] = climate.LatitudinalSeaLevelTemp[i];
+                    return;
+                }
+
+                float latDeg = climate.LatitudeSigned[i] * Mathf.Rad2Deg;
+                float absLat = Mathf.Abs(latDeg);
+                float hemi = latDeg >= 0f ? 1f : -1f;
+                int bIdx = Mathf.Clamp(Mathf.FloorToInt((latDeg + 90f) / 2f), 0, bands - 1);
+                float uBand = uBandSmooth[bIdx];
+                float u = uTile[i];
+                float v = vTile[i];
+
+                float subtropRegime = Mathf.Clamp01((40f - absLat) / 10f) * Mathf.Clamp(absLat / 10f, 0.25f, 1f);
+                float westerlyDrive = Mathf.Clamp(uBand / 2.2f, 0f, 1.25f);
+                float subpolarRegime = Mathf.Clamp01((absLat - 42f) / 10f)
+                    * Mathf.Clamp01((74f - absLat) / 10f)
+                    * (0.4f + 0.6f * westerlyDrive);
+
+                int westHops = cachedWestHops[i];
+                int eastHops = cachedEastHops[i];
+                float westSubDecay = westHops > 0 ? Mathf.Exp(-((westHops - 1) * kmPerTile) / 180f) : 0f;
+                float eastSubDecay = eastHops > 0 ? Mathf.Exp(-((eastHops - 1) * kmPerTile) / 240f) : 0f;
+                float westPolDecay = westHops > 0 ? Mathf.Exp(-((westHops - 1) * kmPerTile) / 280f) : 0f;
+                float eastPolDecay = eastHops > 0 ? Mathf.Exp(-((eastHops - 1) * kmPerTile) / 450f) : 0f;
+
+                if (westHops > 0 && eastHops > 0 && westHops <= maxCoast && eastHops <= maxCoast)
+                {
+                    if (westHops < eastHops)
+                    {
+                        eastSubDecay = 0f;
+                        eastPolDecay = 0f;
+                    }
+                    else if (eastHops < westHops)
+                    {
+                        westSubDecay = 0f;
+                        westPolDecay = 0f;
+                    }
+                    else
+                    {
+                        westSubDecay = 0f;
+                        westPolDecay = 0f;
+                        eastSubDecay = 0f;
+                        eastPolDecay = 0f;
+                    }
+                }
+
+                float equatorward = Mathf.Clamp((-v * hemi + 1.5f) / 3.5f, 0.35f, 1.35f);
+
+                float eqLatNorm = latDeg / 6.0f;
+                float eqBand = Mathf.Exp(-(eqLatNorm * eqLatNorm));
+                float easterly = Mathf.Clamp(-u / 3.5f, 0f, 1.3f);
+                float eastBasin = eastHops > 0 ? Mathf.Exp(-(eastHops * kmPerTile) / 2500f) : 0.3f;
+                float eqCool = eqUpwell * eqBand * easterly * (0.35f + 0.85f * eastBasin);
+
+                float stormLatDiff = (absLat - 50f) / 12f;
+                float stormW = Mathf.Clamp01(uBand / 4.5f) * Mathf.Exp(-(stormLatDiff * stormLatDiff));
+
+                float anomaly = warmWb * subtropRegime * westSubDecay
+                    + coolEb * subtropRegime * equatorward * eastSubDecay
+                    + subpolarEastWarm * subpolarRegime * eastPolDecay
+                    + subpolarWestCool * subpolarRegime * westPolDecay
+                    + eqCool
+                    + stormWarm * stormW;
+
+                climate.CurrentsAnomalySST[i] = anomaly;
+                climate.SST[i] = climate.LatitudinalSeaLevelTemp[i] + anomaly;
+            }
+
+            if (parallel)
+                Parallel.For(0, tileCount, EvalTile);
+            else
+            {
+                for (int i = 0; i < tileCount; i++)
+                    EvalTile(i);
+            }
         }
 
         // ========== COASTAL MODERATION ==========
@@ -326,9 +514,13 @@ namespace Planets.WorldGen.Climate.Layers
                 // Lapse rate and snow albedo then cool that result, so a coastal mountain stays cold.
                 // After the maritime layer, that is the sea the air came from, weighted by how much of the air came off it.
                 float temp = climate.LatitudinalSeaLevelTemp[i];
+                float elevKm = climate.ElevationKm[i];
                 if (climate.MaritimeAnnual != null && climate.UpwindSST != null)
                 {
                     float pull = Mathf.Clamp01(settings.maritimeBlendWeight.CurrentValue * climate.MaritimeAnnual[i]);
+                    // High elevated plateaus/ice domes (> 0.8 km) decouple from warm marine boundary-layer SST pull
+                    if (climate.UpwindSST[i] > temp)
+                        pull *= Mathf.Exp(-Mathf.Max(0f, elevKm - 0.8f) / 1.1f);
                     temp = Mathf.Lerp(temp, climate.UpwindSST[i], pull);
                 }
                 else if (climate.NearestOceanTile[i] >= 0 && climate.CoastalModerationStrength[i] > 0.01f)
@@ -337,7 +529,6 @@ namespace Planets.WorldGen.Climate.Layers
                     temp = Mathf.Lerp(temp, sstNear, climate.CoastalModerationStrength[i]);
                 }
 
-                float elevKm = climate.ElevationKm[i];
                 temp -= ClimateReferenceData.LandSurfaceLapsePerKm * elevKm;
 
                 // Snow and ice above 3 km: 1°C extra cooling per km.

@@ -76,16 +76,16 @@
 	<!-- World Generation - Sea Level -->
 	<Planets.SeaLevel>海平面</Planets.SeaLevel>
 	<Planets.SeaLevelTip>控制星球被海洋覆盖的比例。海平面越低陆地越多、大陆越大；越高则低地淹没，形成岛屿世界。</Planets.SeaLevelTip>
-	<Planets.SeaLevel_High>高</Planets.SeaLevel_High>
-	<Planets.SeaLevel_High_Desc>岛屿星球。大部分是海洋，陆地是岛屿和小洲。</Planets.SeaLevel_High_Desc>
+	<Planets.SeaLevel_High>很高</Planets.SeaLevel_High>
+	<Planets.SeaLevel_High_Desc>大部分是海洋，陆地是岛屿和小洲。</Planets.SeaLevel_High_Desc>
 	<Planets.SeaLevel_Low>低</Planets.SeaLevel_Low>
-	<Planets.SeaLevel_Low_Desc>海洋较少、多为小海。大陆比类地更大。</Planets.SeaLevel_Low_Desc>
+	<Planets.SeaLevel_Low_Desc>海洋较少、多为小海。大陆比原版更大。</Planets.SeaLevel_Low_Desc>
 	<Planets.SeaLevel_Normal>原版</Planets.SeaLevel_Normal>
 	<Planets.SeaLevel_Normal_Desc>原版 RimWorld 的海洋比例。陆地比地球更多。</Planets.SeaLevel_Normal_Desc>
-	<Planets.SeaLevel_SlightlyHigh>类地</Planets.SeaLevel_SlightlyHigh>
-	<Planets.SeaLevel_SlightlyHigh_Desc>接近地球的海洋比例。海洋比原版更多，大陆更小。</Planets.SeaLevel_SlightlyHigh_Desc>
-	<Planets.SeaLevel_SlightlyLow>略低</Planets.SeaLevel_SlightlyLow>
-	<Planets.SeaLevel_SlightlyLow_Desc>海洋略少。可供殖民的陆地更多。</Planets.SeaLevel_SlightlyLow_Desc>
+	<Planets.SeaLevel_SlightlyHigh>略高</Planets.SeaLevel_SlightlyHigh>
+	<Planets.SeaLevel_SlightlyHigh_Desc>海洋比原版更多，大陆更小。</Planets.SeaLevel_SlightlyHigh_Desc>
+	<Planets.SeaLevel_EarthLike>类地</Planets.SeaLevel_EarthLike>
+	<Planets.SeaLevel_EarthLike_Desc>接近地球的海洋比例。</Planets.SeaLevel_EarthLike_Desc>
 
 	<!-- World Generation - Rivers & Roads -->
 	<Planets.AncientRoadDensity>远古道路密度</Planets.AncientRoadDensity>

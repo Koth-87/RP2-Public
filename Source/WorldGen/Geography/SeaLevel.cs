@@ -9,9 +9,9 @@ namespace Planets.WorldGen.Geography
     public enum SeaLevel
     {
         Low,
-        SlightlyLow,
         Normal,
         SlightlyHigh,
+        EarthLike,
         High
     }
 

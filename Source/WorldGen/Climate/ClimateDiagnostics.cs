@@ -93,7 +93,7 @@ namespace Planets.WorldGen.Climate
                 BakeQuantizer.QuantizeGameplayPackArrays(scratch);
                 LogPackMismatch(target, scratch);
                 target.CopyDiagnosticsFrom(scratch);
-                Api.RealisticPlanetsApi.LogContract();
+                Planets.API.RealisticPlanetsAPI.LogContract();
             }
             finally
             {

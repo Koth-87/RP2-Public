@@ -31,6 +31,8 @@ namespace Planets.Core.Configuration
 
         /// <summary>Allow land draining into a Lake biome tile to start a river, in addition to true-ocean mouths.</summary>
         public ConfigValue<bool> riversIntoLakes;
+        /// <summary>Minimum number of land tiles a river system must span to be drawn (removes short 1–2 tile coastal rivers).</summary>
+        public ConfigValue<int> minRiverLengthTiles;
         public ConfigValue<bool> WetlandMutatorsEnabled;
 
         public HydrologyConfiguration()
@@ -41,10 +43,11 @@ namespace Planets.Core.Configuration
             minEvaporationMmDay = new ConfigValue<float>(1f, "minEvaporationMmDay", entries);
 
             LakeConversionEnabled = new ConfigValue<bool>(true, "LakeConversionEnabled", entries, isFeatureToggle: true);
-            LakeBiomeConversionEnabled = new ConfigValue<bool>(true, "LakeBiomeConversionEnabled", entries, isFeatureToggle: true);
+            LakeBiomeConversionEnabled = new ConfigValue<bool>(false, "LakeBiomeConversionEnabled", entries, isFeatureToggle: true);
             LakeMutatorsEnabled = new ConfigValue<bool>(true, "LakeMutatorsEnabled", entries, isFeatureToggle: true);
             CustomRiversEnabled = new ConfigValue<bool>(true, "CustomRiversEnabled", entries, isFeatureToggle: true);
             riversIntoLakes = new ConfigValue<bool>(true, "riversIntoLakes", entries, isFeatureToggle: true);
+            minRiverLengthTiles = new ConfigValue<int>(3, "minRiverLengthTiles", entries, isFeatureToggle: true);
             WetlandMutatorsEnabled = new ConfigValue<bool>(true, "WetlandMutatorsEnabled", entries, isFeatureToggle: true);
         }
 

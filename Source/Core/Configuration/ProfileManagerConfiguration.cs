@@ -28,9 +28,11 @@ namespace Planets.Core.Configuration
             list.ColumnWidth = viewWidth;
             list.Begin(viewRect);
 
+            GUI.color = Color.cyan;
             Text.Font = GameFont.Medium;
-            list.Label("Profile & Preset Manager");
+            list.Label("=== Profile & Preset Manager ===");
             Text.Font = GameFont.Small;
+            GUI.color = Color.white;
             list.GapLine();
             list.Gap();
 

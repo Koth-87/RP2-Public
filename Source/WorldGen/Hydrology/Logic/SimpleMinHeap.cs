@@ -68,13 +68,20 @@ namespace Planets.WorldGen.Hydrology.Logic
             count = 0;
         }
 
+        private static bool IsHigherPriority(in HeapEntry a, in HeapEntry b)
+        {
+            if (a.Elevation != b.Elevation)
+                return a.Elevation < b.Elevation;
+            return a.TileID < b.TileID;
+        }
+
         private void BubbleUp(int index)
         {
             while (index > 0)
             {
                 int parent = (index - 1) / 2;
                 
-                if (heap[index].Elevation < heap[parent].Elevation)
+                if (IsHigherPriority(in heap[index], in heap[parent]))
                 {
                     Swap(index, parent);
                     index = parent;
@@ -94,12 +101,12 @@ namespace Planets.WorldGen.Hydrology.Logic
                 int right = index * 2 + 2;
                 int smallest = index;
                 
-                if (left < count && heap[left].Elevation < heap[smallest].Elevation)
+                if (left < count && IsHigherPriority(in heap[left], in heap[smallest]))
                 {
                     smallest = left;
                 }
                 
-                if (right < count && heap[right].Elevation < heap[smallest].Elevation)
+                if (right < count && IsHigherPriority(in heap[right], in heap[smallest]))
                 {
                     smallest = right;
                 }

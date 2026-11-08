@@ -78,14 +78,18 @@ namespace Planets.WorldGen.Climate.Layers
         /// </summary>
         private void ComputeSeasonalAmplitude()
         {
+            float tiltDeg = AxialTiltCurves.GetTiltDegrees(Planets_GameComponent.ActiveAxialTilt);
+            float qEq0 = SolarGeometry.SolsticeInsolation.EquatorEquinoxReference;
+
             for (int i = 0; i < tileCount; i++)
             {
                 float latDegSigned = climate.LatitudeSigned[i] * Mathf.Rad2Deg;
-                
+                float absLat = Mathf.Abs(latDegSigned);
+
                 // Add planetary wave perturbation for consistent climate boundaries
                 float lonRad = climate.Longitude[i];
                 float latRadSigned = climate.LatitudeSigned[i];
-                
+
                 float perturbedLatDegSigned = climate.ClimateLatitudeDeg(latDegSigned, lonRad, latRadSigned);
                 float perturbedLatDeg = Mathf.Abs(perturbedLatDegSigned);
 
@@ -93,50 +97,79 @@ namespace Planets.WorldGen.Climate.Layers
                 // This is the fundamental seasonal amplitude driven by planetary obliquity
                 float baseAmp = AxialTiltCurves.SeasonalTempVariationCurve.Evaluate(perturbedLatDeg);
 
+                float oceanBaseAmp = ComputeOceanAmplitude(baseAmp, perturbedLatDeg);
+                float landFullAmp = ComputeLandAmplitude(baseAmp, perturbedLatDeg, i);
                 float amplitude;
 
                 // Step 2: Apply ocean vs land modifier
                 if (climate.OceanMask[i])
                 {
                     // ===== OCEAN SEASONALITY =====
-                    // Ocean has high thermal inertia that damps temperature swings
-                    // The effect varies with latitude due to ice dynamics
-                    amplitude = ComputeOceanAmplitude(baseAmp, perturbedLatDeg);
-                    // With the maritime layer, the swing depends on how much of the air over the water crossed land:
-                    // open ocean far from land barely swings, ocean downwind of a continent swings more.
+                    amplitude = oceanBaseAmp;
                     if (climate.ContinentalAir != null)
                         amplitude *= settings.oceanSwingOpenShare.CurrentValue + settings.oceanSwingContinentalGain.CurrentValue * climate.ContinentalAir[i];
                 }
                 else
                 {
                     // ===== LAND SEASONALITY =====
-                    // Land amplifies seasonal swings through continentality effect
-                    // Interior continents have larger amplitude than coastal regions
-                    amplitude = ComputeLandAmplitude(baseAmp, perturbedLatDeg, i);
+                    amplitude = landFullAmp;
                 }
 
                 // Step 3: Apply elevation damping
-                // High mountains have reduced seasonality due to:
-                // - Thin atmosphere (less heat capacity)
-                // - High albedo from snow/ice (reflects solar energy)
-                // - Lower absolute humidity (reduced greenhouse effect in winter)
-                float elevKm = climate.ElevationKm[i];
-                if (elevKm > 2.0f)
+                float elevKm = Mathf.Max(0f, climate.ElevationKm[i]);
+                float dampingFactor = elevKm > 2.0f ? ComputeElevationDamping(elevKm) : 1.0f;
+                amplitude *= dampingFactor;
+
+                // Step 4: Spherical solar geometry — polar night radiative loss, 24h midnight-sun tundra absorption,
+                // and permanent-ice summer co-albedo reflection (replaces hardcoded 70° polarColdExtra).
+                var sol = SolarGeometry.GetSolsticeInsolation(absLat, tiltDeg);
+                float polarNight = sol.PolarNightDepth;
+                float midnightSun = Mathf.Clamp01((sol.SummerDayFraction - 0.75f) / 0.25f);
+                float polarCold = settings.polarColdExtra.CurrentValue; // default -6.0 C
+
+                float winterRadLand = polarCold * polarNight;
+                float winterRadOcean = (polarCold * 0.3f) * polarNight;
+
+                if (climate.OceanMask[i])
                 {
-                    float dampingFactor = ComputeElevationDamping(elevKm);
-                    amplitude *= dampingFactor;
+                    climate.AnnualMeanTemp[i] += winterRadOcean;
+                }
+                else
+                {
+                    float thawedSummer = climate.AnnualMeanTemp[i] + 0.5f * amplitude;
+                    float snowThawHeadroom = Mathf.Clamp01((16.0f - thawedSummer) / 14.0f);
+                    float qRatio = Mathf.Min(sol.SummerDailyQ / qEq0, 1.25f);
+                    float lowTundra = Mathf.Clamp01(1.0f - elevKm / 0.9f) * midnightSun * snowThawHeadroom;
+                    float tundraSummerWarm = 12.0f * lowTundra * qRatio;
+
+                    float permIceSheet = Mathf.Clamp01((-8.0f - thawedSummer) / 10.0f) * Mathf.Clamp01((elevKm - 1.2f) / 1.0f);
+                    float contExcess = Mathf.Max(0f, (landFullAmp - oceanBaseAmp) * dampingFactor);
+
+                    float dWin = winterRadLand;
+                    float dSum = winterRadLand + tundraSummerWarm - permIceSheet * (0.95f * contExcess) * qRatio;
+                    climate.AnnualMeanTemp[i] += 0.5f * (dSum + dWin);
+                    amplitude = Mathf.Max(0f, amplitude + (dSum - dWin));
                 }
 
+                // Step 5: Baroclinic mid-latitude continental summer moderation & long-night winter basin inversion
                 if (!climate.OceanMask[i] && climate.MaritimeAnnual != null)
                 {
-                    // Moderate summer-only overheating in 40–62° continental interiors without altering winter minimums or coastal amplitudes.
                     float cont = Mathf.Clamp01(climate.Continentality[i]);
                     float contGate = Mathf.Clamp01((cont - 0.50f) / 0.35f);
-                    float absLat = Mathf.Abs(latDegSigned);
-                    float latRamp = Mathf.Clamp01((absLat - 36f) / 16f) * Mathf.Clamp01((65f - absLat) / 7f);
-                    float dSum = -4.5f * contGate * latRamp;
+                    float midBaroclinic = Mathf.Clamp01((sol.SummerDayFraction - 0.60f) / 0.12f)
+                        * Mathf.Clamp01((0.90f - sol.SummerDayFraction) / 0.12f);
+                    float dSum = -4.5f * contGate * midBaroclinic;
                     climate.AnnualMeanTemp[i] += 0.5f * dSum;
                     amplitude = Mathf.Max(0f, amplitude + dSum);
+
+                    float coldWin = climate.AnnualMeanTemp[i] - 0.5f * amplitude;
+                    float longNight = Mathf.Clamp01((0.42f - sol.WinterDayFraction) / 0.18f);
+                    float invGate = elevKm < 1.2f
+                        ? longNight * Mathf.Clamp01((-20.0f - coldWin) / 12.0f) * Mathf.Clamp01((cont - 0.55f) / 0.30f)
+                        : 0f;
+                    float dWinInv = -5.5f * invGate;
+                    climate.AnnualMeanTemp[i] += 0.5f * dWinInv;
+                    amplitude = Mathf.Max(0f, amplitude - dWinInv);
                 }
 
                 climate.SeasonalAmp[i] = amplitude;
@@ -214,35 +247,16 @@ namespace Planets.WorldGen.Climate.Layers
         }
 
         /// <summary>
-        /// Interpolate continental amplification multiplier from control points
-        /// Uses ClimateReferenceData.ContinentalAmplificationPoints for latitude-dependent values
+        /// Smooth baroclinic/radiative land-slab admittance envelope: 1.30x at the equator, peaking near 60°
+        /// where synoptic baroclinic exchange and snow transition maximize continental seasonality, and tapering
+        /// toward the pole as winter polar night caps longwave loss.
         /// </summary>
         private float InterpolateContinentalMultiplier(float latDeg)
         {
-            var points = ClimateReferenceData.ContinentalAmplificationPoints;
-
-            // Clamp to valid range
-            latDeg = Mathf.Abs(latDeg);
-            if (latDeg > 90f) latDeg = 90f;
-
-            // Find bracketing control points
-            for (int i = 0; i < points.Length - 1; i++)
-            {
-                if (latDeg <= points[i + 1].lat)
-                {
-                    float lat1 = points[i].lat;
-                    float lat2 = points[i + 1].lat;
-                    float mult1 = points[i].maxMult;
-                    float mult2 = points[i + 1].maxMult;
-
-                    // Linear interpolation between points
-                    float t = (latDeg - lat1) / (lat2 - lat1);
-                    return Mathf.Lerp(mult1, mult2, t);
-                }
-            }
-
-            // Beyond last point - return polar value
-            return points[points.Length - 1].maxMult;
+            float rad = Mathf.Clamp(Mathf.Abs(latDeg), 0f, 90f) * Mathf.Deg2Rad;
+            float sinLat = Mathf.Sin(rad);
+            float cosLat = Mathf.Max(Mathf.Cos(rad), 0.04f);
+            return 1.30f + 1.15f * Mathf.Pow(sinLat, 1.25f) * Mathf.Pow(cosLat, 0.45f);
         }
 
         /// <summary>

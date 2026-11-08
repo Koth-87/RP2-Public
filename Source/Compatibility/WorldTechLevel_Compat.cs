@@ -196,64 +196,44 @@ namespace Planets.Compatibility
             public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
             {
                 var codes = new List<CodeInstruction>(instructions);
-                bool found = false;
-                
-                // We're looking for this pattern in WTL's DoTechLevelSlider:
-                // var sliderRect = new Rect(200f, pos, width, 30f);
-                // WTL uses 'width' directly but our 'width' is already adjusted
-                
-                for (int i = 0; i < codes.Count - 4; i++)
+                bool foundSlider = false;
+                bool foundLabel = false;
+                const float labelWidth = 150f;
+
+                // RP sliders are Rect(150, y, width - 150, 30). WTL draws Rect(200, pos, width, 30)
+                // and a 200-wide label, so its track starts 50px later and is 50px shorter.
+                for (int i = 0; i < codes.Count - 3; i++)
                 {
-                    // Pattern: ldc.r4 200, [something], ldarg.3 (width), ldc.r4 30, newobj Rect
-                    // Note: In WTL method, width is the 4th argument (index 3 if static, but might vary)
-                    // The signature is static: DoTechLevelSlider(List<FactionDef> factions, ref float pollution, float pos, float width)
-                    // Arg indexes: 0=factions, 1=pollution, 2=pos, 3=width
-                    
-                    if (codes[i].opcode == OpCodes.Ldc_R4 && (float)codes[i].operand == 200f)
+                    if (!foundLabel
+                        && codes[i].opcode == OpCodes.Ldc_R4 && codes[i].operand is float zero && zero == 0f
+                        && (codes[i + 1].opcode == OpCodes.Ldarg_2 || codes[i + 1].IsLdloc())
+                        && codes[i + 2].opcode == OpCodes.Ldc_R4 && codes[i + 2].operand is float label && label == 200f
+                        && codes[i + 3].opcode == OpCodes.Ldc_R4 && codes[i + 3].operand is float labelHeight && labelHeight == 30f)
                     {
-                        // Check if this is followed by loading pos (ldarg.2), then width (ldarg.3), then 30f
-                        bool foundPattern = false;
-                        if (i + 3 < codes.Count &&
-                            codes[i + 1].opcode == OpCodes.Ldarg_2 && // pos parameter
-                            codes[i + 2].opcode == OpCodes.Ldarg_3 && // width parameter  
-                            codes[i + 3].opcode == OpCodes.Ldc_R4 && (float)codes[i + 3].operand == 30f)
-                        {
-                            foundPattern = true;
-                        }
-                        // Alternative pattern with locals (just in case compiler optimized diff)
-                        else if (i + 3 < codes.Count &&
-                            (codes[i + 1].opcode == OpCodes.Ldloc || codes[i + 1].opcode == OpCodes.Ldloc_S) && // pos local
-                            codes[i + 2].opcode == OpCodes.Ldarg_3 && // width parameter
-                            codes[i + 3].opcode == OpCodes.Ldc_R4 && (float)codes[i + 3].operand == 30f)
-                        {
-                            foundPattern = true;
-                        }
-                        
-                        if (foundPattern)
-                        {
-                            // The issue: WTL expects the full column width but we're passing adjusted width
-                            // We need to subtract 200f from the width for the slider
-                            // Insert after the width is loaded (at position i+3 in pattern relative to i)
-                            // But wait, the sequence is: 200f, pos, width, 30f.
-                            // We want to change 'width' to 'width - 200f'.
-                            // Width is at i+2. So we insert after i+2.
-                            
-                            // Insert "ldc.r4 200" and "sub" after "ldarg.3"
-                            codes.Insert(i + 3, new CodeInstruction(OpCodes.Ldc_R4, 200f));
-                            codes.Insert(i + 4, new CodeInstruction(OpCodes.Sub));
-                            found = true;
-                            
-                            if (Controller.DebugEnabled)
-                                RPLog.D($"[Compat] Patched WTL slider width at instruction {i}");
-                            
-                            break;
-                        }
+                        codes[i + 2].operand = labelWidth;
+                        foundLabel = true;
+                    }
+
+                    if (!foundSlider
+                        && codes[i].opcode == OpCodes.Ldc_R4 && codes[i].operand is float origin && origin == 200f
+                        && (codes[i + 1].opcode == OpCodes.Ldarg_2 || codes[i + 1].IsLdloc())
+                        && codes[i + 2].opcode == OpCodes.Ldarg_3
+                        && codes[i + 3].opcode == OpCodes.Ldc_R4 && codes[i + 3].operand is float sliderHeight && sliderHeight == 30f)
+                    {
+                        codes[i].operand = labelWidth;
+                        codes.Insert(i + 3, new CodeInstruction(OpCodes.Ldc_R4, labelWidth));
+                        codes.Insert(i + 4, new CodeInstruction(OpCodes.Sub));
+                        foundSlider = true;
+                        i += 2;
                     }
                 }
-                
-                if (!found && Controller.DebugEnabled)
+
+                if (Controller.DebugEnabled)
                 {
-                    RPLog.D("[Compat] WTL slider width pattern not found");
+                    if (foundSlider)
+                        RPLog.D("[Compat] Patched WTL slider to the 150px RP column.");
+                    else
+                        RPLog.D("[Compat] WTL slider width pattern not found");
                 }
                 
                 return codes;

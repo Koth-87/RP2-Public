@@ -60,6 +60,8 @@ namespace Planets.WorldGen.Hydrology.Logic
             
             // Create spill chunk starting with sink (sinkFlow > sinkEvap is already guaranteed)
             SpillChunk chunk = new SpillChunk(nextChunkID, sinkTileID);
+            if (sinkBasinID >= 0)
+                chunk.OccupiedBasins.Add(sinkBasinID);
             chunk.Inflow = sinkFlow;
             chunk.WaterSurfaceElevation = sinkElevation;
 
@@ -215,7 +217,7 @@ namespace Planets.WorldGen.Hydrology.Logic
                 
                 foreach (var kvp in candidates)
                 {
-                    if (kvp.Value.elev < nextElevation)
+                    if (kvp.Value.elev < nextElevation || (kvp.Value.elev == nextElevation && kvp.Key < nextTileID))
                     {
                         nextTileID = kvp.Key;
                         nextElevation = kvp.Value.elev;
@@ -262,10 +264,17 @@ namespace Planets.WorldGen.Hydrology.Logic
                     return true;
                 }
                 
-                // Same basin - fill it and continue
+                // Same basin - verify inflow can cover this tile's open-water evaporation before flooding it
+                float nextEvap = evaporationInput.GetEvaporationRate(nextTileID);
+                if (sinkFlow <= totalEvaporation + nextEvap)
+                {
+                    chunk.WaterSurfaceElevation = highestFilledElevation;
+                    return false;
+                }
+
                 filledTiles.Add(nextTileID);
                 chunk.AddTile(nextTileID);
-                totalEvaporation += evaporationInput.GetEvaporationRate(nextTileID);
+                totalEvaporation += nextEvap;
                 
                 // Update highest filled elevation
                 if (nextElevation > highestFilledElevation)

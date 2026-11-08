@@ -91,7 +91,7 @@ namespace Planets.WorldGen.Climate
             seasonality = new SeasonalityLayer(climateData, config);
             circulation = new CirculationLayer(climateData, config);
             maritime = new MaritimeLayer(climateData, config);
-            moistureBudget = new MoistureBudgetLayer(climateData, config);
+            moistureBudget = new MoistureBudgetLayer(climateData, config, circulation);
             hydrology = new HydrologyLayer(climateData, features);
         }
 
@@ -172,9 +172,11 @@ namespace Planets.WorldGen.Climate
         /// </summary>
         private void RunCoupledRounds()
         {
+            circulation.ClearRainHeating();
             for (int round = 1; round <= CouplingRounds; round++)
             {
                 ExecuteLayer(circulation);
+                temperature.RefreshCurrentsFromWind();
                 float[] continentalityBefore = (float[])climateData.Continentality.Clone();
                 float[] temperatureBefore = (float[])climateData.AnnualMeanTemp.Clone();
                 maritime.Round = round;
@@ -190,6 +192,10 @@ namespace Planets.WorldGen.Climate
                 if (Controller.DebugEnabled)
                     LogRoundChange(round, continentalityBefore, temperatureBefore);
             }
+
+            // Final circulation pass so the wind and ocean currents agree with the finished round-2 temperature and seasonality.
+            ExecuteLayer(circulation);
+            temperature.RefreshCurrentsFromWind();
         }
 
         /// <summary>Median and 99th percentile change on land. Round 1 starts from the nearest-coast continentality, so its change is large by design.</summary>

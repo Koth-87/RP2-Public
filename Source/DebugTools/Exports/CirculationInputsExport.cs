@@ -188,9 +188,9 @@ namespace Planets.DebugTools.Exports
             writer.WriteLine("# Value circOceanReference: " + G(config.circOceanReference.CurrentValue));
             writer.WriteLine("# Value circSurfaceOcean: " + G(config.circSurfaceOcean.CurrentValue));
             writer.WriteLine("# Value circSurfaceLand: " + G(config.circSurfaceLand.CurrentValue));
-            writer.WriteLine("# PressureProfile: " + Table(ClimateReferenceData.SeaLevelPressureProfile));
-            writer.WriteLine("# SeasonalDelta: " + Table(ClimateReferenceData.SeasonalPressureDelta));
-            writer.WriteLine("# OceanShareReference: " + Table(ClimateReferenceData.OceanShareReference));
+            writer.WriteLine("# PressureProfile: " + Table(ClimateReferenceData.SamplePressureProfile()));
+            writer.WriteLine("# SeasonalDelta: " + Table(ClimateReferenceData.SampleSeasonalPressureDelta()));
+            writer.WriteLine("# OceanShareReference: " + Table(ClimateReferenceData.SampleOceanShareReference()));
         }
 
         static string Table((float x, float y)[] table)

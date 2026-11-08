@@ -78,11 +78,15 @@ namespace Planets.Core.Configuration
             if (hydrologyConfig != null)
             {
                 list.CheckboxLabeled("Custom rivers (RP2)", ref hydrologyConfig.CustomRiversEnabled.CurrentValue,
-                    "Places rivers along RP2's drainage and basin-spill network instead of vanilla's river step. Off lets vanilla generate rivers.");
+                    "Places rivers along RP2's drainage. Where a lake spills into a river that gets drawn, that river continues up the streams that fed the lake. Off lets vanilla generate rivers.");
                 if (hydrologyConfig.CustomRiversEnabled.CurrentValue)
                 {
                     list.CheckboxLabeled("    Rivers can start at lakes", ref hydrologyConfig.riversIntoLakes.CurrentValue,
-                        "Allows rivers to flow into inland Lake biome tiles, not only into the ocean.");
+                        "Also draws rivers that end in a lake. A lake that already spills into a drawn river is followed from downstream instead of starting another one.");
+                    list.Label($"    Minimum river length: {hydrologyConfig.minRiverLengthTiles.CurrentValue} tiles", -1f,
+                        new TipSignal("Rivers spanning fewer than this many land tiles are not drawn. Default 3 removes 1–2 tile coastal rivers."));
+                    hydrologyConfig.minRiverLengthTiles.CurrentValue = Mathf.RoundToInt(
+                        list.Slider(hydrologyConfig.minRiverLengthTiles.CurrentValue, 1f, 10f));
                 }
             }
 
@@ -115,14 +119,7 @@ namespace Planets.Core.Configuration
                 if (IsTier2HydrologyEnabled && hydrologyConfig != null)
                 {
                     list.CheckboxLabeled("    Lake conversion (filled depressions)", ref hydrologyConfig.LakeConversionEnabled.CurrentValue,
-                        "Converts basins that flood in the fill-and-spill water balance into Lake biomes or single-tile water mutators.");
-                    if (hydrologyConfig.LakeConversionEnabled.CurrentValue)
-                    {
-                        list.CheckboxLabeled("        Lake biome (multi-tile)", ref hydrologyConfig.LakeBiomeConversionEnabled.CurrentValue,
-                            "Flooded basins covering 2 or more tiles become the Lake biome.");
-                        list.CheckboxLabeled("        Single-tile pool mutators (Pond, Oasis, Hot Springs)", ref hydrologyConfig.LakeMutatorsEnabled.CurrentValue,
-                            "Flooded basins covering a single tile remain land and receive an Odyssey Pond, Oasis, or Hot Springs mutator based on temperature and relief.");
-                    }
+                        "Converts multi-tile basins (2 or more tiles) that flood in the fill-and-spill water balance into Lake biomes.");
                     list.CheckboxLabeled("    Wetland & Marshy mutators", ref hydrologyConfig.WetlandMutatorsEnabled.CurrentValue,
                         "Places an Odyssey Wetland or Marshy mutator on the wettest tile of each connected high-swampiness patch.");
                 }

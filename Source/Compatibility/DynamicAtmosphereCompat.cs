@@ -5,7 +5,7 @@ using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
-using Planets.Api;
+using Planets.API;
 using Planets.Core;
 using Planets.Utilities.Logging;
 using Planets.Utilities.WorldGen;
@@ -92,7 +92,7 @@ namespace Planets.Compatibility
                 MethodInfo set = api == null ? null : AccessTools.Method(api, "SetAxialTilt");
                 if (set == null)
                     return;
-                set.Invoke(null, new object[] { RealisticPlanetsApi.TiltDegrees, "Realistic Planets" });
+                set.Invoke(null, new object[] { RealisticPlanetsAPI.TiltDegrees, "Realistic Planets" });
             }
             catch (Exception e)
             {
@@ -102,7 +102,7 @@ namespace Planets.Compatibility
 
         public static void Declination(long ticksAbs, ref float __result)
         {
-            __result = Mathf.Sin(2f * Mathf.PI * RealisticPlanetsApi.YearPhase(ticksAbs));
+            __result = Mathf.Sin(2f * Mathf.PI * RealisticPlanetsAPI.YearPhase(ticksAbs));
         }
 
         public static void Wind(object __instance, float lonDeg, float latDeg, float timeSec, float decl, ref float u, ref float v)
@@ -162,7 +162,7 @@ namespace Planets.Compatibility
                 return;
             }
 
-            Vector3 wind = RealisticPlanetsApi.WindAt(new PlanetTile(tileId, surface), phase);
+            Vector3 wind = RealisticPlanetsAPI.WindAt(new PlanetTile(tileId, surface), phase);
             Tangent(lonDeg, latDeg, wind, out float east, out float north);
             u = east + (theirU - zonal);
             v = north + theirV;
@@ -186,7 +186,7 @@ namespace Planets.Compatibility
         {
             long ticksGame = (long)(timeSec * 60f);
             long start = Current.Game != null ? Find.TickManager.gameStartAbsTick : 0L;
-            return RealisticPlanetsApi.YearPhase(ticksGame + start);
+            return RealisticPlanetsAPI.YearPhase(ticksGame + start);
         }
 
         static void EnsureTiles()

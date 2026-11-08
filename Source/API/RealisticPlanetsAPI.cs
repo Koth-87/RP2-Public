@@ -11,15 +11,15 @@ using Planets.Utilities.Logging;
 using Planets.WorldGen.Astronomy;
 using Planets.WorldGen.Climate;
 
-namespace Planets.Api
+namespace Planets.API
 {
     /// <summary>
     /// Stable entry point for other mods. Look this type up by name. Do not reference this assembly.
-    /// Bump <see cref="ApiVersion"/> only when a name or a meaning changes.
+    /// Bump <see cref="APIVersion"/> only when a name or a meaning changes.
     /// </summary>
-    public static class RealisticPlanetsApi
+    public static class RealisticPlanetsAPI
     {
-        public const int ApiVersion = 2;
+        public const int APIVersion = 2;
 
         /// <summary>
         /// Axial tilt in degrees for the loaded world, or the current setting before a world exists.
@@ -158,26 +158,26 @@ namespace Planets.Api
 
             try
             {
-                Type api = AccessTools.TypeByName("Planets.Api.RealisticPlanetsApi");
-                if (api == null)
+                Type API = AccessTools.TypeByName("Planets.API.RealisticPlanetsAPI");
+                if (API == null)
                 {
-                    RPLog.W("[API] RealisticPlanetsApi was not found by name.");
+                    RPLog.W("[API] RealisticPlanetsAPI was not found by name.");
                     return;
                 }
 
-                int version = (int)api.GetField(nameof(ApiVersion)).GetRawConstantValue();
-                float tilt = (float)api.GetProperty(nameof(TiltDegrees)).GetValue(null);
-                MethodInfo phaseMethod = api.GetMethod(nameof(YearPhase), new[] { typeof(long) });
+                int version = (int)API.GetField(nameof(APIVersion)).GetRawConstantValue();
+                float tilt = (float)API.GetProperty(nameof(TiltDegrees)).GetValue(null);
+                MethodInfo phaseMethod = API.GetMethod(nameof(YearPhase), new[] { typeof(long) });
                 long solsticeTick = 15L * GenDate.TicksPerDay;
                 float phase = (float)phaseMethod.Invoke(null, new object[] { solsticeTick });
-                bool sun = (bool)api.GetProperty(nameof(OwnsYearlySunBudget)).GetValue(null);
-                bool plants = (bool)api.GetProperty(nameof(OwnsPlantSeasons)).GetValue(null);
+                bool sun = (bool)API.GetProperty(nameof(OwnsYearlySunBudget)).GetValue(null);
+                bool plants = (bool)API.GetProperty(nameof(OwnsPlantSeasons)).GetValue(null);
 
                 string wind = "no world";
                 PlanetTile tile = FirstSurfaceTile();
                 if (tile.Valid)
                 {
-                    MethodInfo windMethod = api.GetMethod(nameof(WindAt));
+                    MethodInfo windMethod = API.GetMethod(nameof(WindAt));
                     Vector3 vector = (Vector3)windMethod.Invoke(null, new object[] { tile, phase });
                     wind = $"tile {tile.tileId} ({vector.x:0.00}, {vector.y:0.00}, {vector.z:0.00})";
                 }

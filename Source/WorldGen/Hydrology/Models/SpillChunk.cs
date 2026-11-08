@@ -12,6 +12,7 @@ namespace Planets.WorldGen.Hydrology.Models
         public int ChunkID { get; set; }
         public int SinkTileID { get; }
         public List<int> FilledTiles { get; } = new List<int>();
+        public HashSet<int> OccupiedBasins { get; } = new HashSet<int>();
         
         // Flow tracking
         public float Inflow { get; set; }

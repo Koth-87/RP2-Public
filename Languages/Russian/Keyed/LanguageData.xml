@@ -76,16 +76,16 @@
 	<!-- World Generation - Sea Level -->
 	<Planets.SeaLevel>Уровень моря</Planets.SeaLevel>
 	<Planets.SeaLevelTip>Доля планеты, покрытая океаном. Низкий уровень — больше суши и крупнее континенты. Высокий — затопление низменностей, мир островов.</Planets.SeaLevelTip>
-	<Planets.SeaLevel_High>Высокий</Planets.SeaLevel_High>
-	<Planets.SeaLevel_High_Desc>Планета островов. Большая часть мира — океан, суша — острова и малые континенты.</Planets.SeaLevel_High_Desc>
+	<Planets.SeaLevel_High>Очень высокий</Planets.SeaLevel_High>
+	<Planets.SeaLevel_High_Desc>Большая часть мира — океан, суша — острова и малые континенты.</Planets.SeaLevel_High_Desc>
 	<Planets.SeaLevel_Low>Низкий</Planets.SeaLevel_Low>
-	<Planets.SeaLevel_Low_Desc>Меньше океана, небольшие моря. Континенты крупнее земноподобных.</Planets.SeaLevel_Low_Desc>
+	<Planets.SeaLevel_Low_Desc>Меньше океана, небольшие моря. Континенты крупнее, чем в ванили.</Planets.SeaLevel_Low_Desc>
 	<Planets.SeaLevel_Normal>Ваниль</Planets.SeaLevel_Normal>
 	<Planets.SeaLevel_Normal_Desc>Доля океана ванильного RimWorld. Суши больше, чем на Земле.</Planets.SeaLevel_Normal_Desc>
-	<Planets.SeaLevel_SlightlyHigh>Земноподобный</Planets.SeaLevel_SlightlyHigh>
-	<Planets.SeaLevel_SlightlyHigh_Desc>Примерно земная доля океана. Океана больше, чем в ванили, континенты меньше.</Planets.SeaLevel_SlightlyHigh_Desc>
-	<Planets.SeaLevel_SlightlyLow>Немного низкий</Planets.SeaLevel_SlightlyLow>
-	<Planets.SeaLevel_SlightlyLow_Desc>Немного меньше океана. Больше суши для колоний.</Planets.SeaLevel_SlightlyLow_Desc>
+	<Planets.SeaLevel_SlightlyHigh>Немного высокий</Planets.SeaLevel_SlightlyHigh>
+	<Planets.SeaLevel_SlightlyHigh_Desc>Океана больше, чем в ванили, континенты меньше.</Planets.SeaLevel_SlightlyHigh_Desc>
+	<Planets.SeaLevel_EarthLike>Земноподобный</Planets.SeaLevel_EarthLike>
+	<Planets.SeaLevel_EarthLike_Desc>Примерно земная доля океана.</Planets.SeaLevel_EarthLike_Desc>
 
 	<!-- World Generation - Rivers & Roads -->
 	<Planets.AncientRoadDensity>Плотность древних дорог</Planets.AncientRoadDensity>

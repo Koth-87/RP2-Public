@@ -77,7 +77,10 @@ namespace Planets.WorldGen.Climate.Moisture
                 if (dtrOut != null && i < dtrOut.Length)
                     dtrOut[i] = dtr;
 
-                float sqrtDtr = Mathf.Sqrt(dtr);
+                float sqrtDtrJul = Mathf.Sqrt(DailyRange.EstimateForSnapshot(dtr, latDeg, declJul));
+                float sqrtDtrJan = Mathf.Sqrt(DailyRange.EstimateForSnapshot(dtr, latDeg, declJan));
+                float sqrtDtrApr = Mathf.Sqrt(DailyRange.EstimateForSnapshot(dtr, latDeg, declApr));
+                float sqrtDtrOct = Mathf.Sqrt(DailyRange.EstimateForSnapshot(dtr, latDeg, declOct));
                 float tAnn = climate.AnnualMeanTemp[i];
                 float halfAmp = 0.5f * climate.SeasonalAmp[i];
                 float sign = latDeg >= 0f ? 1f : -1f;
@@ -90,14 +93,18 @@ namespace Planets.WorldGen.Climate.Moisture
                 float raApr = ExtraterrestrialMmPerDay(latDeg, declApr);
                 float raOct = ExtraterrestrialMmPerDay(latDeg, declOct);
 
-                float pJul = 0.0023f * raJul * Mathf.Max(tJul + 17.8f, 0.1f) * sqrtDtr * 365f;
-                float pJan = 0.0023f * raJan * Mathf.Max(tJan + 17.8f, 0.1f) * sqrtDtr * 365f;
-                float pApr = 0.0023f * raApr * Mathf.Max(tEq + 17.8f, 0.1f) * sqrtDtr * 365f;
-                float pOct = 0.0023f * raOct * Mathf.Max(tEq + 17.8f, 0.1f) * sqrtDtr * 365f;
+                float pJul = 0.0023f * raJul * Mathf.Max(tJul + 17.8f, 0.1f) * sqrtDtrJul * 365f;
+                float pJan = 0.0023f * raJan * Mathf.Max(tJan + 17.8f, 0.1f) * sqrtDtrJan * 365f;
+                float pApr = 0.0023f * raApr * Mathf.Max(tEq + 17.8f, 0.1f) * sqrtDtrApr * 365f;
+                float pOct = 0.0023f * raOct * Mathf.Max(tEq + 17.8f, 0.1f) * sqrtDtrOct * 365f;
 
                 float factor = useContStress ? (1f + 0.15f * cont) : 1f;
-                if (usePolarFactor && absLat > 60f)
-                    factor *= 1.1f + (absLat - 60f) / 30f * 0.3f;
+                if (usePolarFactor && tiltDeg > 0.1f)
+                {
+                    var sol = SolarGeometry.GetSolsticeInsolation(absLat, tiltDeg);
+                    float midnightSun = Mathf.Clamp01((sol.SummerDayFraction - 0.67f) / 0.33f);
+                    factor *= 1f + 0.40f * midnightSun;
+                }
 
                 pJul *= factor;
                 pJan *= factor;

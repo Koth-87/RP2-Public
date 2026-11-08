@@ -4,7 +4,7 @@ using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
-using Planets.Api;
+using Planets.API;
 using Planets.Core;
 using Planets.Utilities.Logging;
 
@@ -76,7 +76,7 @@ namespace Planets.Compatibility
         /// <summary>Ring axis leans by the climate tilt. North stays +Y rotated about world +X.</summary>
         public static void RingPlane(ref Quaternion __result)
         {
-            __result = Quaternion.AngleAxis(RealisticPlanetsApi.TiltDegrees, Vector3.right);
+            __result = Quaternion.AngleAxis(RealisticPlanetsAPI.TiltDegrees, Vector3.right);
         }
 
         static void Unpatch(string typeName, string patchName, MethodInfo original)

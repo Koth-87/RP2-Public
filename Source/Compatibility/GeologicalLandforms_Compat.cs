@@ -8,6 +8,7 @@ using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 using Verse.Noise;
+using Planets.Compatibility.GeologicalLandforms;
 using Planets.Core;
 using Planets.Utilities.Logging;
 using Planets.Utilities.WorldGen;
@@ -115,6 +116,9 @@ namespace Planets.Compatibility
                 {
                     RPLog.Warning("[Compat] Geological Landforms: CalcCaveSystems method not found");
                 }
+
+                // The mod constructor skips these when Lunar has not loaded GL yet. Apply them now.
+                ApplyDeferredPatches();
                 
                 RPLog.Message("[Compat] Geological Landforms compatibility initialized successfully");
             }
@@ -122,6 +126,43 @@ namespace Planets.Compatibility
             {
                 RPLog.Error($"[Compat] Failed to initialize Geological Landforms compatibility: {e}");
                 IsActive = false;
+            }
+        }
+
+        /// <summary>
+        /// Applies the GL transpilers once Patch_RimWorld_WorldGenStep_Terrain is loaded.
+        /// A second call is a no-op when the constructor already patched them.
+        /// </summary>
+        private void ApplyDeferredPatches()
+        {
+            if (Controller.harmony == null || Controller.Settings?.perfOptimizeGL?.CurrentValue != true)
+                return;
+
+            ApplyDeferredPatch(typeof(Patch_GL_BiomeTransitions),
+                AccessTools.Method(patchTerrainType, "GenerateFresh_Postfix"));
+            ApplyDeferredPatch(typeof(Patch_GL_Performance), calcCaveSystemsMethod);
+        }
+
+        private static void ApplyDeferredPatch(Type patchType, MethodBase target)
+        {
+            if (target == null)
+            {
+                RPLog.Warning($"[Compat] {patchType.Name} skipped: target method was not found.");
+                return;
+            }
+
+            MethodInfo transpiler = AccessTools.Method(patchType, "Transpiler");
+            HarmonyLib.Patches existing = Harmony.GetPatchInfo(target);
+            if (transpiler != null && existing?.Transpilers?.Any(p => p.PatchMethod == transpiler) == true)
+                return;
+
+            try
+            {
+                Controller.harmony.CreateClassProcessor(patchType).Patch();
+            }
+            catch (Exception e)
+            {
+                RPLog.Error($"[Compat] Failed to patch {patchType.Name}: {e.InnerException?.Message ?? e.Message}");
             }
         }
         

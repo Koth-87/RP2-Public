@@ -53,6 +53,8 @@ namespace Planets.WorldGen.Climate.Circulation
         Vector3[] tileEast;
         Vector3[] tileNorth;
         bool[] isPlateau;
+        float[] seasonHeatJuneHpa;
+        float[] seasonHeatDecHpa;
 
         public string LayerName => "Circulation";
 
@@ -68,6 +70,9 @@ namespace Planets.WorldGen.Climate.Circulation
             public float[] Annual;
             public float[] Amp;
             public float[] Cont;
+            public float[] MarJune;
+            public float[] MarDec;
+            public bool HaveSeasonalMaritime;
             public float[] OceanDistKm;
             public int[] LandTiles;
             public int[] WallTiles;
@@ -99,6 +104,8 @@ namespace Planets.WorldGen.Climate.Circulation
             public float CurveOceanPower;
             public float SeasonalScale;
             public float TiltFactor;
+            public float TiltDeg;
+            public float OceanSpanScale;
             public float OceanReference;
             public float SurfaceOcean;
             public float SurfaceLand;
@@ -116,6 +123,100 @@ namespace Planets.WorldGen.Climate.Circulation
             tileCount = climate.Latitude.Length;
         }
 
+        /// <summary>Clear any monsoon condensation latent-heat pressure trough before a fresh climate run.</summary>
+        public void ClearRainHeating()
+        {
+            seasonHeatJuneHpa = null;
+            seasonHeatDecHpa = null;
+        }
+
+        /// <summary>
+        /// Convert June and December tile condensation rates (annualized mm/year or mm/day) into a smoothed
+        /// continental monsoon latent-heat pressure trough (hPa) on the coarse mesh.
+        /// </summary>
+        public void SetRainHeating(float[] tileRainJune, float[] tileRainDec, float hpaPerMmDay = 0.45f, float smoothKm = 1000f)
+        {
+            if (tileRainJune == null || tileRainDec == null || hpaPerMmDay <= 0f)
+            {
+                ClearRainHeating();
+                return;
+            }
+
+            MeshInputs inputs = BuildInputs();
+            CoarseMesh mesh = inputs.Mesh;
+            int cells = mesh.Count;
+            var rj = new float[cells];
+            var rd = new float[cells];
+            var counts = new int[cells];
+            float maxVal = 0f;
+
+            for (int t = 0; t < tileCount; t++)
+            {
+                float vj = tileRainJune[t];
+                float vd = tileRainDec[t];
+                if (vj > maxVal) maxVal = vj;
+                if (vd > maxVal) maxVal = vd;
+                int c = inputs.TileCell[t];
+                rj[c] += vj;
+                rd[c] += vd;
+                counts[c]++;
+            }
+
+            float scaleToMmDay = maxVal > 500f ? (1f / 365f) : 1f;
+            for (int c = 0; c < cells; c++)
+            {
+                if (counts[c] > 0)
+                {
+                    float inv = scaleToMmDay / counts[c];
+                    rj[c] = rj[c] * inv * inputs.LandFrac[c];
+                    rd[c] = rd[c] * inv * inputs.LandFrac[c];
+                }
+                else if (inputs.CellCoverTile != null && inputs.CellCoverTile[c] >= 0)
+                {
+                    int bt = inputs.CellCoverTile[c];
+                    rj[c] = tileRainJune[bt] * scaleToMmDay * inputs.LandFrac[c];
+                    rd[c] = tileRainDec[bt] * scaleToMmDay * inputs.LandFrac[c];
+                }
+            }
+
+            SubtractZonalMeanAndClampPositive(mesh, rj);
+            SubtractZonalMeanAndClampPositive(mesh, rd);
+
+            int steps = StepsForKm(smoothKm);
+            Smooth(mesh, rj, steps);
+            Smooth(mesh, rd, steps);
+
+            for (int c = 0; c < cells; c++)
+            {
+                rj[c] *= hpaPerMmDay;
+                rd[c] *= hpaPerMmDay;
+            }
+
+            seasonHeatJuneHpa = rj;
+            seasonHeatDecHpa = rd;
+        }
+
+        static void SubtractZonalMeanAndClampPositive(CoarseMesh mesh, float[] values)
+        {
+            const int bins = 36;
+            var sum = new double[bins];
+            var cnt = new int[bins];
+            for (int i = 0; i < mesh.Count; i++)
+            {
+                float lat = Mathf.Asin(Mathf.Clamp(mesh.Position[i].y, -1f, 1f)) * Mathf.Rad2Deg;
+                int bin = Mathf.Clamp(Mathf.FloorToInt((lat + 90f) / 5f), 0, bins - 1);
+                sum[bin] += values[i];
+                cnt[bin]++;
+            }
+            for (int i = 0; i < mesh.Count; i++)
+            {
+                float lat = Mathf.Asin(Mathf.Clamp(mesh.Position[i].y, -1f, 1f)) * Mathf.Rad2Deg;
+                int bin = Mathf.Clamp(Mathf.FloorToInt((lat + 90f) / 5f), 0, bins - 1);
+                float zMean = cnt[bin] > 0 ? (float)(sum[bin] / cnt[bin]) : 0f;
+                values[i] = Mathf.Max(0f, values[i] - zMean);
+            }
+        }
+
         public MeshInputs BuildInputs()
         {
             CoarseMesh mesh = CoarseMesh.Get();
@@ -123,7 +224,7 @@ namespace Planets.WorldGen.Climate.Circulation
             if (cachedInputs != null)
             {
                 Array.Clear(cachedInputs.TileCount, 0, cells);
-                AggregateTiles(mesh, cachedInputs.TileCell, cachedInputs.LandFrac, cachedInputs.ElevKm, cachedInputs.Annual, cachedInputs.Amp, cachedInputs.Cont, cachedInputs.TileCount);
+                AggregateTiles(mesh, cachedInputs.TileCell, cachedInputs.LandFrac, cachedInputs.ElevKm, cachedInputs.Annual, cachedInputs.Amp, cachedInputs.Cont, cachedInputs.MarJune, cachedInputs.MarDec, out cachedInputs.HaveSeasonalMaritime, cachedInputs.TileCount);
                 if (cachedInputs.CellCoverTile != null)
                 {
                     for (int c = 0; c < cells; c++)
@@ -143,6 +244,12 @@ namespace Planets.WorldGen.Climate.Circulation
                         cachedInputs.Cont[c] = land && climate.Continentality != null && bestTile < climate.Continentality.Length
                             ? climate.Continentality[bestTile]
                             : 0f;
+                        cachedInputs.MarJune[c] = land && cachedInputs.HaveSeasonalMaritime
+                            ? Mathf.Clamp01(climate.MaritimeJune[bestTile])
+                            : 1f;
+                        cachedInputs.MarDec[c] = land && cachedInputs.HaveSeasonalMaritime
+                            ? Mathf.Clamp01(climate.MaritimeDecember[bestTile])
+                            : 1f;
                     }
                 }
                 for (int c = 0; c < cells; c++)
@@ -168,10 +275,12 @@ namespace Planets.WorldGen.Climate.Circulation
                 Annual = new float[cells],
                 Amp = new float[cells],
                 Cont = new float[cells],
+                MarJune = new float[cells],
+                MarDec = new float[cells],
                 ItczShift = ItczShiftDegrees(),
                 TiltDeg = AxialTiltCurves.GetTiltDegrees(Planets_GameComponent.ActiveAxialTilt),
             };
-            AggregateTiles(mesh, inputs.TileCell, inputs.LandFrac, inputs.ElevKm, inputs.Annual, inputs.Amp, inputs.Cont, inputs.TileCount);
+            AggregateTiles(mesh, inputs.TileCell, inputs.LandFrac, inputs.ElevKm, inputs.Annual, inputs.Amp, inputs.Cont, inputs.MarJune, inputs.MarDec, out inputs.HaveSeasonalMaritime, inputs.TileCount);
             inputs.CellCoverTile = FillUncoveredVisibleCells(mesh, inputs);
 
             for (int c = 0; c < cells; c++)
@@ -253,6 +362,8 @@ namespace Planets.WorldGen.Climate.Circulation
                 CurveOceanPower = config.circCurveOceanPower.CurrentValue,
                 SeasonalScale = config.EffectiveCircSeasonalProfileScale,
                 TiltFactor = Mathf.Sin(inputs.TiltDeg * Mathf.Deg2Rad) / Mathf.Sin(22.5f * Mathf.Deg2Rad),
+                TiltDeg = inputs.TiltDeg,
+                OceanSpanScale = OceanThermalSpanScale(mesh, inputs.Annual, inputs.LandFrac),
                 OceanReference = config.circOceanReference.CurrentValue,
                 SurfaceOcean = config.circSurfaceOcean.CurrentValue,
                 SurfaceLand = config.circSurfaceLand.CurrentValue,
@@ -292,6 +403,7 @@ namespace Planets.WorldGen.Climate.Circulation
 
             float[] itczBySnap = { itcz, -itcz, 0f };
             float[] signBySnap = { 1f, -1f, 0f };
+            float[][] heatBySnap = { seasonHeatJuneHpa, seasonHeatDecHpa, null };
             float[][] lowU = { juneU, decU, eqU };
             float[][] lowV = { juneV, decV, eqV };
             float[][] upU = { juneUpperU, decUpperU, eqUpperU };
@@ -305,7 +417,7 @@ namespace Planets.WorldGen.Climate.Circulation
 
             Parallel.For(0, 3, s =>
             {
-                SolveSnapshot(mesh, inputs, settings, itczBySnap[s], signBySnap[s],
+                SolveSnapshot(mesh, inputs, settings, itczBySnap[s], signBySnap[s], heatBySnap[s],
                     lowU[s], lowV[s], upU[s], upV[s], divs[s], transU[s], transV[s]);
                 WriteSurface(mesh, tileCell, lowU[s], lowV[s], upU[s], upV[s], surfWinds[s], convs[s], divs[s]);
                 WriteTransport(mesh, tileCell, transU[s], transV[s], transWinds[s]);
@@ -326,7 +438,7 @@ namespace Planets.WorldGen.Climate.Circulation
         }
 
         /// <summary>June adds the seasonal swing in the north and subtracts it in the south. sign is +1 June, -1 December, 0 equinox. itczShift is the thermal equator in degrees north.</summary>
-        static void SolveSnapshot(CoarseMesh mesh, MeshInputs inputs, SolveSettings s, float itczShift, float seasonSign,
+        static void SolveSnapshot(CoarseMesh mesh, MeshInputs inputs, SolveSettings s, float itczShift, float seasonSign, float[] seasonHeatHpa,
             float[] lowerEast, float[] lowerNorth, float[] upperEast, float[] upperNorth, float[] divergence,
             float[] transportEast, float[] transportNorth)
         {
@@ -337,6 +449,7 @@ namespace Planets.WorldGen.Climate.Circulation
             float[] amp = inputs.Amp;
             float[] cont = inputs.Cont;
             float[] oceanDistKm = inputs.OceanDistKm;
+            float qEq0 = SolarGeometry.SolsticeInsolation.EquatorEquinoxReference;
             var star = new float[n];
             for (int i = 0; i < n; i++)
             {
@@ -345,10 +458,22 @@ namespace Planets.WorldGen.Climate.Circulation
                 float temp = annual[i] + seasonSign * hemi * 0.5f * amp[i];
                 if (seasonSign * hemi > 0f && landFrac[i] > 0f)
                 {
-                    float cSum = 1f - Mathf.Exp(-(oceanDistKm[i] + 1200f * Mathf.Max(0f, elevKm[i])) / 900f);
-                    float midLat = Mathf.Clamp01((Mathf.Abs(latDeg) - 26f) / 14f);
-                    float highLat = Mathf.Clamp01((Mathf.Abs(latDeg) - 35f) / 25f);
-                    float dSum = (12f * (cSum - cont[i]) * midLat - 5.5f * cSum * highLat) * landFrac[i];
+                    float cSum;
+                    float midLat;
+                    if (inputs.HaveSeasonalMaritime)
+                    {
+                        float marSum = seasonSign > 0f ? inputs.MarJune[i] : inputs.MarDec[i];
+                        cSum = Mathf.Clamp01((1f - marSum) + 0.35f * (1f - Mathf.Exp(-Mathf.Max(0f, elevKm[i]) / 0.75f)));
+                        var sol = SolarGeometry.GetSolsticeInsolation(Mathf.Abs(latDeg), s.TiltDeg);
+                        midLat = Mathf.Clamp01((sol.SummerDayFraction - 0.56f) / 0.08f)
+                            * Mathf.Clamp01((sol.SummerDailyQ / qEq0 - 0.95f) / 0.20f);
+                    }
+                    else
+                    {
+                        cSum = 1f - Mathf.Exp(-(oceanDistKm[i] + 1200f * Mathf.Max(0f, elevKm[i])) / 900f);
+                        midLat = Mathf.Clamp01((Mathf.Abs(latDeg) - 26f) / 14f);
+                    }
+                    float dSum = 12f * (cSum - cont[i]) * midLat * landFrac[i];
                     temp += dSum;
                 }
                 star[i] = temp + LapsePerKm * Mathf.Max(0f, elevKm[i]);
@@ -395,6 +520,8 @@ namespace Planets.WorldGen.Climate.Circulation
                     ? Mathf.Lerp(baseItcz, monsoonItcz, plateauMonsoon[i]) * seasonSign
                     : itczShift;
                 background[i] = SeasonalPressure(latDeg, itczHere, seasonSign, s, landMask);
+                if (seasonHeatHpa != null)
+                    background[i] -= seasonHeatHpa[i];
             }
             // Smooth the background pressure field on the mesh so 5° table knots and 10° longitude bins
             // do not produce second-derivative rings in divergence/convergence.
@@ -667,11 +794,11 @@ namespace Planets.WorldGen.Climate.Circulation
         /// </summary>
         static float SeasonalPressure(float latDeg, float itczShift, float seasonSign, SolveSettings s, float landMask = 1f)
         {
-            float pressure = ClimateReferenceData.SeaLevelPressureAnomaly(latDeg) * s.ProfileScale;
+            float pressure = ClimateReferenceData.SeaLevelPressureAnomaly(latDeg, s.OceanSpanScale) * s.ProfileScale;
             float dist = Mathf.Abs(latDeg - itczShift);
             if (dist < TroughHalfWidthDeg)
             {
-                float shifted = ClimateReferenceData.SeaLevelPressureAnomaly(latDeg - itczShift) * s.ProfileScale;
+                float shifted = ClimateReferenceData.SeaLevelPressureAnomaly(latDeg - itczShift, s.OceanSpanScale) * s.ProfileScale;
                 float weight = 0.5f * (1f + Mathf.Cos(Mathf.PI * dist / TroughHalfWidthDeg)) * landMask;
                 pressure = Mathf.Lerp(pressure, shifted, weight);
             }
@@ -684,9 +811,41 @@ namespace Planets.WorldGen.Climate.Circulation
             if (Mathf.Abs(s.SeasonalScale) > 1e-12f)
             {
                 float hemi = latDeg >= 0f ? 1f : -1f;
-                pressure -= seasonSign * hemi * s.SeasonalScale * s.TiltFactor * ClimateReferenceData.SeasonalPressureDeltaAt(latDeg) * landMask;
+                pressure -= seasonSign * hemi * s.SeasonalScale * s.TiltFactor * ClimateReferenceData.SeasonalPressureDeltaAt(latDeg, s.OceanSpanScale) * landMask;
             }
             return pressure;
+        }
+
+        /// <summary>Ratio of this planet's equator-to-pole ocean temperature drop (0–15° vs 70–90° ocean cells) to the 47.0°C Normal baseline.</summary>
+        static float OceanThermalSpanScale(CoarseMesh mesh, float[] annual, float[] landFrac)
+        {
+            double eqTempSum = 0.0, eqOceanArea = 0.0;
+            double poTempSum = 0.0, poOceanArea = 0.0;
+            for (int i = 0; i < mesh.Count; i++)
+            {
+                float absLat = Mathf.Abs(Mathf.Asin(Mathf.Clamp(mesh.Position[i].y, -1f, 1f)) * Mathf.Rad2Deg);
+                double oceanArea = Mathf.Clamp01(1f - landFrac[i]) * mesh.AreaM2[i];
+                if (oceanArea <= 0.0)
+                    continue;
+                if (absLat < 15f)
+                {
+                    eqTempSum += annual[i] * oceanArea;
+                    eqOceanArea += oceanArea;
+                }
+                else if (absLat > 70f)
+                {
+                    poTempSum += annual[i] * oceanArea;
+                    poOceanArea += oceanArea;
+                }
+            }
+            if (eqOceanArea > 0.0 && poOceanArea > 0.0)
+            {
+                float tEq = (float)(eqTempSum / eqOceanArea);
+                float tPo = (float)(poTempSum / poOceanArea);
+                float span = Mathf.Max(10f, tEq - tPo);
+                return Mathf.Clamp(span / ClimateReferenceData.ReferenceOceanThermalSpanC, 0.35f, 1.8f);
+            }
+            return 1f;
         }
 
         /// <summary>Normalized summer-hemisphere subtropical land fraction (10–40°) by 10° longitude sector, confining the seasonal trough shift and bump to land longitudes.</summary>
@@ -973,6 +1132,12 @@ namespace Planets.WorldGen.Climate.Circulation
                     inputs.Cont[c] = land && climate.Continentality != null && bestTile < climate.Continentality.Length
                         ? climate.Continentality[bestTile]
                         : 0f;
+                    inputs.MarJune[c] = land && inputs.HaveSeasonalMaritime
+                        ? Mathf.Clamp01(climate.MaritimeJune[bestTile])
+                        : 1f;
+                    inputs.MarDec[c] = land && inputs.HaveSeasonalMaritime
+                        ? Mathf.Clamp01(climate.MaritimeDecember[bestTile])
+                        : 1f;
                 }
             }
             return cover;
@@ -1079,7 +1244,7 @@ namespace Planets.WorldGen.Climate.Circulation
             return tileCell;
         }
 
-        void AggregateTiles(CoarseMesh mesh, int[] tileCell, float[] landFrac, float[] elevKm, float[] annual, float[] amp, float[] cont, int[] count)
+        void AggregateTiles(CoarseMesh mesh, int[] tileCell, float[] landFrac, float[] elevKm, float[] annual, float[] amp, float[] cont, float[] marJune, float[] marDec, out bool haveSeasonalMaritime, int[] count)
         {
             var landCount = new int[mesh.Count];
             var landTemp = new double[mesh.Count];
@@ -1087,7 +1252,11 @@ namespace Planets.WorldGen.Climate.Circulation
             var landAmp = new double[mesh.Count];
             var oceanAmp = new double[mesh.Count];
             var landCont = new double[mesh.Count];
+            var landMarJune = new double[mesh.Count];
+            var landMarDec = new double[mesh.Count];
             var elev = new double[mesh.Count];
+            haveSeasonalMaritime = climate.MaritimeJune != null && climate.MaritimeJune.Length >= tileCount
+                && climate.MaritimeDecember != null && climate.MaritimeDecember.Length >= tileCount;
             for (int t = 0; t < tileCount; t++)
             {
                 int c = tileCell[t];
@@ -1102,6 +1271,11 @@ namespace Planets.WorldGen.Climate.Circulation
                     landAmp[c] += climate.SeasonalAmp[t];
                     if (climate.Continentality != null && t < climate.Continentality.Length)
                         landCont[c] += climate.Continentality[t];
+                    if (haveSeasonalMaritime)
+                    {
+                        landMarJune[c] += Mathf.Clamp01(climate.MaritimeJune[t]);
+                        landMarDec[c] += Mathf.Clamp01(climate.MaritimeDecember[t]);
+                    }
                 }
                 else
                 {
@@ -1126,6 +1300,8 @@ namespace Planets.WorldGen.Climate.Circulation
                 annual[c] = landFrac[c] * tLand + (1f - landFrac[c]) * tOcean;
                 amp[c] = landFrac[c] * aLand + (1f - landFrac[c]) * aOcean;
                 cont[c] = landCount[c] > 0 ? (float)(landCont[c] / landCount[c]) : 0f;
+                marJune[c] = landCount[c] > 0 && haveSeasonalMaritime ? (float)(landMarJune[c] / landCount[c]) : 1f;
+                marDec[c] = landCount[c] > 0 && haveSeasonalMaritime ? (float)(landMarDec[c] / landCount[c]) : 1f;
             }
         }
 

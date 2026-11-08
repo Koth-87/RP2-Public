@@ -59,121 +59,105 @@ namespace Planets.WorldGen.Climate
         public const float LandSurfaceLapsePerKm = 4.5f;
 
         /// <summary>
-        /// Zonal-mean sea-level pressure anomaly from the equator, hPa, of the southern hemisphere:
-        /// ERA5 2025, every longitude, the 12-month mean. That hemisphere has almost no land in its
-        /// storm belt, so this is the curve of an ocean world. A world scales it by its own band ocean
-        /// share over <see cref="OceanShareReference"/>, and the heat terms add the land.
-        /// 70° to 90° keep the earlier hemisphere-averaged values, because ERA5 there is Antarctic ice.
-        /// Argument is degrees from the thermal equator. Calibration/Earth/prepare_ocean_profile.py writes the same numbers.
+        /// Reference equator-to-pole ocean temperature drop (0–15° minus 70–90° ocean mean, °C) on a Normal-preset planet.
         /// </summary>
-        public static readonly (float degreesFromEquator, float anomalyHpa)[] SeaLevelPressureProfile =
-        {
-            (0f, 0f),
-            (5f, 0.21f),
-            (10f, 1.03f),
-            (15f, 2.50f),
-            (20f, 4.30f),
-            (25f, 6.23f),
-            (30f, 7.62f),
-            (35f, 7.59f),
-            (40f, 5.18f),
-            (45f, 0.07f),
-            (50f, -7.59f),
-            (55f, -16.52f),
-            (60f, -24.25f),
-            (65f, -26.00f),
-            (70f, -23.00f),
-            (75f, -19.50f),
-            (80f, -16.50f),
-            (85f, -14.50f),
-            (90f, -13.50f)
-        };
+        public const float ReferenceOceanThermalSpanC = 47.0f;
 
         /// <summary>
-        /// Ocean share of Earth's southern hemisphere in 5° bands, keyed by band centre, where
-        /// <see cref="SeaLevelPressureProfile"/> was measured. Poleward of 70° it is 1, because the
-        /// curve there is not the southern measurement.
+        /// Analytical 3-cell sea-level pressure anomaly (hPa) from Held-Hou Hadley mechanics and Ferrel baroclinic
+        /// eddy momentum flux, scaled by the planet's ocean equator-to-pole thermal span (<paramref name="oceanSpanScale"/>)
+        /// and rotation rate ratio (<paramref name="omegaRatio"/> = EarthOmega / Omega).
+        /// Replaces the empirical 19-point ERA5 Southern Ocean pressure lookup table.
         /// </summary>
-        public static readonly (float degreesFromEquator, float share)[] OceanShareReference =
+        public static float SeaLevelPressureAnomaly(float degreesFromThermalEquator, float oceanSpanScale = 1f, float omegaRatio = 1f)
         {
-            (2.5f, 0.765f),
-            (7.5f, 0.771f),
-            (12.5f, 0.799f),
-            (17.5f, 0.764f),
-            (22.5f, 0.755f),
-            (27.5f, 0.783f),
-            (32.5f, 0.839f),
-            (37.5f, 0.933f),
-            (42.5f, 0.964f),
-            (47.5f, 0.974f),
-            (52.5f, 0.985f),
-            (57.5f, 0.999f),
-            (62.5f, 0.997f),
-            (67.5f, 0.794f),
-            (72.5f, 1f),
-            (77.5f, 1f),
-            (82.5f, 1f),
-            (87.5f, 1f)
-        };
+            float x = Mathf.Clamp(Mathf.Abs(degreesFromThermalEquator), 0f, 90f);
+            float dtScale = Mathf.Clamp(oceanSpanScale, 0.35f, 1.8f);
+            float rotRatio = Mathf.Max(omegaRatio, 0.1f);
 
-        /// <summary>
-        /// Winter minus summer sea-level pressure over the ocean, hPa, half the range, both
-        /// hemispheres averaged. ERA5 2025, June and December. Winter hemisphere adds it,
-        /// summer hemisphere subtracts it. Calibration/Earth/prepare_seasonal_pressure.py writes the same numbers.
-        /// </summary>
-        public static readonly (float degreesFromEquator, float deltaHpa)[] SeasonalPressureDelta =
-        {
-            (0f, 0f),
-            (5f, 0.12f),
-            (10f, 0.57f),
-            (15f, 1.15f),
-            (20f, 1.51f),
-            (25f, 1.50f),
-            (30f, 0.88f),
-            (35f, 0.13f),
-            (40f, -0.69f),
-            (45f, -1.12f),
-            (50f, -1.20f),
-            (55f, -0.69f),
-            (60f, -0.86f),
-            (65f, -1.49f),
-            (70f, -1.16f),
-            (75f, -1.51f)
-        };
+            float phiH = Mathf.Clamp(33.5f * Mathf.Sqrt(rotRatio) * Mathf.Pow(dtScale, 0.25f), 18f, 50f);
+            float phiS = Mathf.Clamp(64.5f * Mathf.Pow(rotRatio, 0.33f), phiH + 15f, 82f);
 
-        public static float SeaLevelPressureAnomaly(float degreesFromThermalEquator)
-        {
-            return Interpolate(SeaLevelPressureProfile, Mathf.Abs(degreesFromThermalEquator));
+            float pRidge = 7.72f * dtScale;
+            float pTrough = -27.53f * dtScale;
+            float pPole = -13.50f * dtScale;
+
+            if (x <= phiH)
+            {
+                float s1 = x / phiH;
+                return pRidge * Mathf.Pow(Mathf.Sin(0.5f * Mathf.PI * s1), 2.50f);
+            }
+            if (x <= phiS)
+            {
+                float s2 = (x - phiH) / (phiS - phiH);
+                float w2 = 0.5f * (1f - Mathf.Cos(Mathf.PI * Mathf.Pow(s2, 1.15f)));
+                return pRidge + (pTrough - pRidge) * w2;
+            }
+            float s3 = Mathf.Clamp01((x - phiS) / Mathf.Max(90f - phiS, 1f));
+            float w3 = 0.5f * (1f - Mathf.Cos(Mathf.PI * Mathf.Pow(s3, 0.72f)));
+            return pTrough + (pPole - pTrough) * w3;
         }
 
+        /// <summary>
+        /// Physical ocean-fetch reference by latitude: 0.77 in the Hadley basin belt (&lt;= 27.5°), rising smoothly
+        /// to 1.0 in the circumpolar Ferrel storm belt (&gt;= 47.5°) where an unobstructed ocean ring carries full
+        /// baroclinic eddy momentum. Replaces the empirical 17-point ERA5 ocean-share lookup table.
+        /// </summary>
         public static float OceanShareAt(float latDeg)
         {
-            return Interpolate(OceanShareReference, Mathf.Abs(latDeg));
+            float x = Mathf.Abs(latDeg);
+            return 0.77f + 0.23f * Mathf.Clamp01((x - 27.5f) / 20.0f);
         }
 
-        public static float SeasonalPressureDeltaAt(float latDeg)
+        /// <summary>
+        /// Analytical winter-minus-summer ocean pressure half-swing (hPa) from winter Hadley ridge intensification
+        /// (centered near 22.5°) and winter baroclinic storm-belt deepening (poleward of 42°), scaled by
+        /// <paramref name="oceanSpanScale"/>. Replaces the empirical 16-point ERA5 seasonal pressure table.
+        /// </summary>
+        public static float SeasonalPressureDeltaAt(float latDeg, float oceanSpanScale = 1f)
         {
-            return Interpolate(SeasonalPressureDelta, Mathf.Abs(latDeg));
+            float x = Mathf.Abs(latDeg);
+            float dtScale = Mathf.Clamp(oceanSpanScale, 0.35f, 1.8f);
+            float hDiff = (x - 22.5f) / 11.0f;
+            float hadleyWin = 1.55f * Mathf.Exp(-(hDiff * hDiff));
+            float stormWin = -1.30f * (0.5f * (1f + (float)System.Math.Tanh((x - 42.0f) / 8.0f)));
+            return dtScale * (hadleyWin + stormWin) * Mathf.Clamp01(x / 5.0f);
         }
 
-        /// <summary>Linear between points, held flat past either end.</summary>
-        static float Interpolate((float x, float y)[] table, float x)
+        /// <summary>Sample the analytical 3-cell pressure profile at 5° intervals for diagnostic header exports.</summary>
+        public static (float degreesFromEquator, float anomalyHpa)[] SamplePressureProfile(float oceanSpanScale = 1f)
         {
-            if (x <= table[0].x)
-                return table[0].y;
-            if (x >= table[table.Length - 1].x)
-                return table[table.Length - 1].y;
-            for (int i = 0; i < table.Length - 1; i++)
+            var pts = new (float, float)[19];
+            for (int i = 0; i < 19; i++)
             {
-                float a = table[i].x;
-                float b = table[i + 1].x;
-                if (x < a || x > b)
-                    continue;
-                float span = b - a;
-                float t = span <= 0f ? 0f : (x - a) / span;
-                return table[i].y + t * (table[i + 1].y - table[i].y);
+                float deg = i * 5f;
+                pts[i] = (deg, SeaLevelPressureAnomaly(deg, oceanSpanScale));
             }
-            return 0f;
+            return pts;
+        }
+
+        /// <summary>Sample the analytical seasonal pressure delta at 5° intervals for diagnostic header exports.</summary>
+        public static (float degreesFromEquator, float deltaHpa)[] SampleSeasonalPressureDelta(float oceanSpanScale = 1f)
+        {
+            var pts = new (float, float)[16];
+            for (int i = 0; i < 16; i++)
+            {
+                float deg = i * 5f;
+                pts[i] = (deg, SeasonalPressureDeltaAt(deg, oceanSpanScale));
+            }
+            return pts;
+        }
+
+        /// <summary>Sample the physical ocean-share reference at 5° band centers for diagnostic header exports.</summary>
+        public static (float degreesFromEquator, float share)[] SampleOceanShareReference()
+        {
+            var pts = new (float, float)[17];
+            for (int i = 0; i < 17; i++)
+            {
+                float deg = 2.5f + i * 5f;
+                pts[i] = (deg, OceanShareAt(deg));
+            }
+            return pts;
         }
     }
 }

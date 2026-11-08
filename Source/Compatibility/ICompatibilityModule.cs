@@ -8,12 +8,11 @@ namespace Planets.Compatibility
     /// Interface for mod compatibility modules.
     /// Allows centralized management of initialization, settings, and UI integration.
     ///
-    /// When another mod does work we also own, ship both a public flag or method they can
+    /// When another mod does work RP2 also owns, ship both a public flag or method they can
     /// check and a fallback for the build that does not know it yet. The fallback removes
     /// their patch, or writes our result back afterward, against the methods that version
     /// actually uses. Keep the fallback after they adopt the API, for installs that never
-    /// update. RealisticAxialTiltCompat is the fallback for yearly temperature and plants.
-    /// Their sky, shadows, and moon stay. Do not copy their source. Reimplement the behavior.
+    /// update.
     /// </summary>
     public interface ICompatibilityModule
     {

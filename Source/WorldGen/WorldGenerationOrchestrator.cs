@@ -633,7 +633,7 @@ namespace Planets.WorldGen
                 
                 // Execute all layers (orchestrator populates state.ClimateData directly)
                 orchestrator.Compute();
-                Planets.Api.RealisticPlanetsApi.LogContract();
+                Planets.API.RealisticPlanetsAPI.LogContract();
 
                 // Keep the meters this pass used. Round the tile afterwards so vanilla's save matches.
                 state.ClimateData.RememberExactElevations(state.Layer);
@@ -754,25 +754,25 @@ namespace Planets.WorldGen
             switch (rainfall)
             {
                 case OverallRainfall.AlmostNone:
-                    climateData.BaseRain = 250f;
+                    climateData.BaseRain = 200f;
                     break;
                 case OverallRainfall.Little:
-                    climateData.BaseRain = 500f;
+                    climateData.BaseRain = 400f;
                     break;
                 case OverallRainfall.LittleBitLess:
-                    climateData.BaseRain = 750f;
+                    climateData.BaseRain = 700f;
                     break;
                 case OverallRainfall.Normal:
                     climateData.BaseRain = 1000f;
                     break;
                 case OverallRainfall.LittleBitMore:
-                    climateData.BaseRain = 1250f;
+                    climateData.BaseRain = 1400f;
                     break;
                 case OverallRainfall.High:
-                    climateData.BaseRain = 1500f;
+                    climateData.BaseRain = 1900f;
                     break;
                 case OverallRainfall.VeryHigh:
-                    climateData.BaseRain = 1750f;
+                    climateData.BaseRain = 2600f;
                     break;
                 default:
                     // Fallback to Normal (Earth-like)
@@ -911,7 +911,6 @@ namespace Planets.WorldGen
 
                 bool tier2Lakes = state.Features?.IsTier2HydrologyEnabled == true
                     && state.HydroConfig?.LakeConversionEnabled?.CurrentValue != false
-                    && state.HydroConfig?.LakeBiomeConversionEnabled?.CurrentValue != false
                     && climateData.WaterBodyType != null;
 
                 for (int i = 0; i < state.TileCount; i++)

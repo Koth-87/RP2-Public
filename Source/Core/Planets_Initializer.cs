@@ -71,7 +71,7 @@ namespace Planets.Core
         {
             // Verify and initialize all registered compatibility modules
             ModCompatibilityRegistry.VerifyAndInitialize();
-            Planets.Api.RealisticPlanetsApi.LogContract();
+            Planets.API.RealisticPlanetsAPI.LogContract();
         }
         
         /// <summary>

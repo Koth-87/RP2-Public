@@ -76,16 +76,16 @@
 	<!-- World Generation - Sea Level -->
 	<Planets.SeaLevel>Nivel del mar</Planets.SeaLevel>
 	<Planets.SeaLevelTip>Controla cuánto del planeta está cubierto por océano. Niveles más bajos exponen más tierra y crean continentes más grandes. Niveles más altos inundan zonas bajas y crean mundos de islas.</Planets.SeaLevelTip>
-	<Planets.SeaLevel_High>Alto</Planets.SeaLevel_High>
-	<Planets.SeaLevel_High_Desc>Un planeta de islas. La mayor parte es océano, y la tierra son islas y continentes pequeños.</Planets.SeaLevel_High_Desc>
+	<Planets.SeaLevel_High>Muy alto</Planets.SeaLevel_High>
+	<Planets.SeaLevel_High_Desc>La mayor parte es océano, y la tierra son islas y continentes pequeños.</Planets.SeaLevel_High_Desc>
 	<Planets.SeaLevel_Low>Bajo</Planets.SeaLevel_Low>
-	<Planets.SeaLevel_Low_Desc>Menos cobertura oceánica con mares pequeños. Los continentes son más grandes que en la Tierra.</Planets.SeaLevel_Low_Desc>
+	<Planets.SeaLevel_Low_Desc>Menos cobertura oceánica con mares pequeños. Los continentes son más grandes que en vanilla.</Planets.SeaLevel_Low_Desc>
 	<Planets.SeaLevel_Normal>Vanilla</Planets.SeaLevel_Normal>
 	<Planets.SeaLevel_Normal_Desc>La proporción de océano de RimWorld sin mods. Más tierra que la Tierra.</Planets.SeaLevel_Normal_Desc>
-	<Planets.SeaLevel_SlightlyHigh>Como la Tierra</Planets.SeaLevel_SlightlyHigh>
-	<Planets.SeaLevel_SlightlyHigh_Desc>Aproximadamente la proporción de océano de la Tierra. Más océano que vanilla y continentes más pequeños.</Planets.SeaLevel_SlightlyHigh_Desc>
-	<Planets.SeaLevel_SlightlyLow>Ligeramente bajo</Planets.SeaLevel_SlightlyLow>
-	<Planets.SeaLevel_SlightlyLow_Desc>Cobertura oceánica algo reducida. Más superficie terrestre disponible para colonias.</Planets.SeaLevel_SlightlyLow_Desc>
+	<Planets.SeaLevel_SlightlyHigh>Ligeramente alto</Planets.SeaLevel_SlightlyHigh>
+	<Planets.SeaLevel_SlightlyHigh_Desc>Más océano que vanilla y continentes más pequeños.</Planets.SeaLevel_SlightlyHigh_Desc>
+	<Planets.SeaLevel_EarthLike>Como la Tierra</Planets.SeaLevel_EarthLike>
+	<Planets.SeaLevel_EarthLike_Desc>Aproximadamente la proporción de océano de la Tierra.</Planets.SeaLevel_EarthLike_Desc>
 
 	<!-- World Generation - Rivers & Roads -->
 	<Planets.AncientRoadDensity>Densidad de caminos antiguos</Planets.AncientRoadDensity>
