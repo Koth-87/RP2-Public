@@ -49,7 +49,7 @@ namespace Planets.Core
         /// Earth heightmap debug option in Mod Settings > Main (under Debug Mode).
         /// Off hides the toggle and prevents loading the external ETOPO heightmap until a revised heightmap is bundled.
         /// </summary>
-        public static bool EarthHeightmapAvailable = false;
+        public static bool EarthHeightmapAvailable = true;
         
         /// <summary>
         /// Harmony instance for patch management

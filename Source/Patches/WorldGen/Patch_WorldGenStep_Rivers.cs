@@ -101,7 +101,7 @@ namespace Planets.Patches.WorldGen
                 tier2 = Controller.Settings?.featureConfig?.IsTier2HydrologyEnabled == true
                     && climate.FlowDirectionHydrology != null && climate.SpillDirectionHydrology != null;
                 lakeMouths = Controller.Settings?.hydrologyConfig?.riversIntoLakes?.CurrentValue != false;
-                minRiverLengthTiles = Mathf.Clamp(Controller.Settings?.hydrologyConfig?.minRiverLengthTiles?.CurrentValue ?? 3, 1, 10);
+                minRiverLengthTiles = Mathf.Clamp(Controller.Settings?.hydrologyConfig?.minRiverLengthTiles?.CurrentValue ?? 5, 1, 10);
                 if (tier2)
                 {
                     lakeIds = climate.MergedLakeIDHydrology;
@@ -315,7 +315,7 @@ namespace Planets.Patches.WorldGen
                         ocean.Add((i, water, flow));
                         continue;
                     }
-                    if (lakeMouths && layer.Tiles[water]?.biome == BiomeDefOf.Lake)
+                    if (lakeMouths && IsStandingWater(layer.Tiles[water]))
                         shores.Add((i, water, flow));
                 }
                 ocean.Sort(ByFlow);
@@ -359,7 +359,7 @@ namespace Planets.Patches.WorldGen
                     int host = LakeAt(course.target);
                     if (host < 0 || joined.Contains(host))
                         continue;
-                    if (layer.Tiles[course.target]?.biome != BiomeDefOf.Lake)
+                    if (!IsStandingWater(layer.Tiles[course.target]))
                         continue;
                     pending.Add(course);
                 }
@@ -593,8 +593,18 @@ namespace Planets.Patches.WorldGen
             {
                 if (tileId < 0 || tileId >= count)
                     return false;
-                Tile t = layer.Tiles[tileId];
-                return t != null && t.biome == BiomeDefOf.Lake;
+                return IsStandingWater(layer.Tiles[tileId]);
+            }
+
+            /// <summary>
+            /// Open lakes and frozen basins. A filled basin that never thaws is Sea Ice, and rivers still end on it.
+            /// Ocean sea ice is handled earlier, as a true-ocean mouth.
+            /// </summary>
+            private static bool IsStandingWater(Tile tile)
+            {
+                if (tile?.biome == null)
+                    return false;
+                return tile.biome == BiomeDefOf.Lake || tile.biome == BiomeDefOf.SeaIce;
             }
 
             /// <summary>
@@ -670,7 +680,7 @@ namespace Planets.Patches.WorldGen
                 if (tileId < 0 || tileId >= count)
                     return false;
                 Tile t = layer.Tiles[tileId];
-                if (t == null || t.WaterCovered || t.biome == BiomeDefOf.Ocean || t.biome == BiomeDefOf.Lake)
+                if (t == null || t.WaterCovered || t.biome == BiomeDefOf.Ocean || IsStandingWater(t))
                     return false;
                 return true;
             }

@@ -176,6 +176,7 @@ namespace Planets.Core
             BiomeWorkerManager.ApplySavedOverrides(defOverrides);
 
             SyncEarthScaleFromSurface();
+            AxialTiltCurves.SetSeasonalCurve();
             DynamicAtmosphereCompat.PushTilt();
             Planets.API.RealisticPlanetsAPI.LogContract();
         }

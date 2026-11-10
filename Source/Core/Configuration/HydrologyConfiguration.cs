@@ -42,12 +42,12 @@ namespace Planets.Core.Configuration
             maxEvaporationMmDay = new ConfigValue<float>(12f, "maxEvaporationMmDay", entries);
             minEvaporationMmDay = new ConfigValue<float>(1f, "minEvaporationMmDay", entries);
 
-            LakeConversionEnabled = new ConfigValue<bool>(true, "LakeConversionEnabled", entries, isFeatureToggle: true);
+            LakeConversionEnabled = new ConfigValue<bool>(false, "LakeConversionEnabled", entries, isFeatureToggle: true);
             LakeBiomeConversionEnabled = new ConfigValue<bool>(false, "LakeBiomeConversionEnabled", entries, isFeatureToggle: true);
             LakeMutatorsEnabled = new ConfigValue<bool>(true, "LakeMutatorsEnabled", entries, isFeatureToggle: true);
             CustomRiversEnabled = new ConfigValue<bool>(true, "CustomRiversEnabled", entries, isFeatureToggle: true);
             riversIntoLakes = new ConfigValue<bool>(true, "riversIntoLakes", entries, isFeatureToggle: true);
-            minRiverLengthTiles = new ConfigValue<int>(3, "minRiverLengthTiles", entries, isFeatureToggle: true);
+            minRiverLengthTiles = new ConfigValue<int>(5, "minRiverLengthTiles", entries, isFeatureToggle: true);
             WetlandMutatorsEnabled = new ConfigValue<bool>(true, "WetlandMutatorsEnabled", entries, isFeatureToggle: true);
         }
 

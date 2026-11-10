@@ -85,16 +85,22 @@ namespace Planets.WorldGen.Geography
             return true;
         }
 
-        public static void MeasureEnclosed(PlanetLayer layer, WorldGrid grid, bool[] trueOcean, float[] bodyStrength, List<EnclosedBody> bodies)
+        public static void MeasureEnclosed(PlanetLayer layer, WorldGrid grid, bool[] trueOcean, float[] bodyStrength, List<EnclosedBody> bodies, int[] waterBodyId = null)
         {
             bodies?.Clear();
             int count = layer?.Tiles?.Count ?? 0;
             if (grid == null || bodyStrength == null || count == 0 || bodyStrength.Length < count)
                 return;
 
+            bool assignIds = waterBodyId != null && waterBodyId.Length >= count;
             for (int i = 0; i < count; i++)
+            {
                 bodyStrength[i] = 0f;
+                if (assignIds)
+                    waterBodyId[i] = trueOcean != null && i < trueOcean.Length && trueOcean[i] ? 0 : -1;
+            }
 
+            int nextBodyId = 1;
             var visited = new bool[count];
             var members = new List<int>();
             var queue = new Queue<int>();
@@ -107,8 +113,14 @@ namespace Planets.WorldGen.Geography
                 FloodEnclosed(layer, grid, trueOcean, i, visited, members, queue, neighbors);
                 float area = members.Count * EarthScaleConstants.TILE_AREA_KM2;
                 float strength = StrengthForArea(area);
+                int bodyId = nextBodyId++;
                 for (int m = 0; m < members.Count; m++)
-                    bodyStrength[members[m]] = strength;
+                {
+                    int tileId = members[m];
+                    bodyStrength[tileId] = strength;
+                    if (assignIds)
+                        waterBodyId[tileId] = bodyId;
+                }
                 bodies?.Add(new EnclosedBody { Tiles = members.Count, AreaKm2 = area, Strength = strength });
             }
         }

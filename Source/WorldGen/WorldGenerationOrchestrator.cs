@@ -629,7 +629,7 @@ namespace Planets.WorldGen
                 // Create and execute ClimateOrchestrator with state's ClimateData and PlanetLayer
                 // ClimateOrchestrator will populate the provided ClimateData in-place
                 // Pass Layer so GeographyLayer can read from layer.Tiles (created in Phase 1)
-                var orchestrator = new ClimateOrchestrator(state.ClimateData, state.Layer, state.ClimateConfig, state.Features);
+                var orchestrator = new ClimateOrchestrator(state.ClimateData, state.Layer, state.ClimateConfig, state.Features, state.HydroConfig);
                 
                 // Execute all layers (orchestrator populates state.ClimateData directly)
                 orchestrator.Compute();
@@ -921,28 +921,27 @@ namespace Planets.WorldGen
                         PlanetTile planetTile = new PlanetTile(i, layer);
                         if (tier2Lakes && i < climateData.WaterBodyType.Length && climateData.WaterBodyType[i] == 2 && !climateData.OceanMask[i])
                         {
-                            tile.biome = BiomeDefOf.Lake;
+                            // Above-sea-level basins are not water-covered, so the Sea Ice worker cannot claim them.
+                            // A summer that stays below 0°C is ice; a summer that reaches 0°C stays open water.
+                            bool frozen = climateData.MaxSummerTemp != null
+                                && i < climateData.MaxSummerTemp.Length
+                                && climateData.MaxSummerTemp[i] < 0f;
+                            BiomeDef standing = frozen ? BiomeDefOf.SeaIce : BiomeDefOf.Lake;
+                            tile.biome = standing;
                             tile.hilliness = Hilliness.Flat;
                             tile.swampiness = 0f;
                             if (climateData.HillinessClassification != null && i < climateData.HillinessClassification.Length)
                                 climateData.HillinessClassification[i] = Hilliness.Flat;
                             if (climateData.Swampiness != null && i < climateData.Swampiness.Length)
                                 climateData.Swampiness[i] = 0f;
-                            biomeWinCounts.TryGetValue(BiomeDefOf.Lake.defName, out int lc);
-                            biomeWinCounts[BiomeDefOf.Lake.defName] = lc + 1;
+                            biomeWinCounts.TryGetValue(standing.defName, out int lc);
+                            biomeWinCounts[standing.defName] = lc + 1;
+                            if (frozen)
+                                ClampSeaIceRainfall(tile, climateData, i);
                             continue;
                         }
                         tile.biome = SelectBestBiome(tile, planetTile);
-
-                        // Sea Ice tiles act as moisture sinks in the physical model, receiving massive
-                        // advected rainfall, but the biome itself represents a frozen polar desert.
-                        // Clamp gameplay rainfall to Ice Sheet levels (100-250mm).
-                        if (tile.biome != null && tile.biome.defName == "SeaIce")
-                        {
-                            float maxAllowedRain = DeterministicRng.Range(i, 100f, 250f, DeterministicRng.Salts.SeaIceExtent);
-                            tile.rainfall = Mathf.Min(tile.rainfall, maxAllowedRain);
-                            BakeQuantizer.QuantizeRainfallTile(tile, climateData.AnnualRainfall, i);
-                        }
+                        ClampSeaIceRainfall(tile, climateData, i);
                     }
                     catch (Exception ex)
                     {
@@ -968,6 +967,19 @@ namespace Planets.WorldGen
             }
         }
         
+        /// <summary>
+        /// Sea Ice stands in for a frozen polar desert, but the moisture solve can leave rainforest totals on it.
+        /// Clamp the published rainfall to the Ice Sheet band, 100–250 mm.
+        /// </summary>
+        private static void ClampSeaIceRainfall(Tile tile, ClimateData climateData, int tileId)
+        {
+            if (tile?.biome != BiomeDefOf.SeaIce)
+                return;
+            float maxAllowedRain = DeterministicRng.Range(tileId, 100f, 250f, DeterministicRng.Salts.SeaIceExtent);
+            tile.rainfall = Mathf.Min(tile.rainfall, maxAllowedRain);
+            BakeQuantizer.QuantizeRainfallTile(tile, climateData.AnnualRainfall, tileId);
+        }
+
         /// <summary>
         /// The Advanced Biomes checkbox applies to every biome that has metadata, including vanilla.
         /// Ocean and Lake are not chosen through this flag: on water, the Phase 1 ocean or lake is a baseline candidate.

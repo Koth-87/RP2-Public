@@ -69,6 +69,12 @@ namespace Planets.WorldGen.Climate
             Stopwatch watch = Stopwatch.StartNew();
             PlanetLayer surface = Find.WorldGrid.Surface;
             Planets_GameComponent.SyncEarthScaleFromSurface();
+            if (target.bakeRecord != null)
+            {
+                Planets_GameComponent.axialTilt = target.bakeRecord.axialTilt;
+                Planets_GameComponent.seaLevel = target.bakeRecord.seaLevel;
+                Planets.WorldGen.Astronomy.AxialTiltCurves.SetSeasonalCurve();
+            }
             bool lifted = false;
             try
             {
@@ -86,7 +92,8 @@ namespace Planets.WorldGen.Climate
                     scratch,
                     surface,
                     target.bakeRecord?.climateSettings,
-                    features);
+                    features,
+                    target.bakeRecord?.hydrologySettings);
                 foreach (object step in orchestrator.ComputeSteps())
                     yield return step;
 
@@ -110,15 +117,60 @@ namespace Planets.WorldGen.Climate
         {
             if (!Controller.DebugEnabled || saved.SeasonalAmp == null || rebuilt.SeasonalAmp == null)
                 return;
-            int mismatches = 0;
+            if (saved.bakeRecord == null || saved.bakeRecord.modelVersion != ClimateModelVersion.Current)
+                return;
+
             int n = saved.SeasonalAmp.Length < rebuilt.SeasonalAmp.Length ? saved.SeasonalAmp.Length : rebuilt.SeasonalAmp.Length;
+            PlanetLayer layer = Find.WorldGrid?.Surface;
+            int mismatches = 0;
+            int contDiff = 0;
+            int aridDiff = 0;
+            float maxAbs = 0f;
+            const int detailCap = 400;
+
             for (int i = 0; i < n; i++)
             {
-                if (UnityEngine.Mathf.Abs(saved.SeasonalAmp[i] - rebuilt.SeasonalAmp[i]) > 0.015f)
-                    mismatches++;
+                float savedAmp = saved.SeasonalAmp[i];
+                float rebuiltAmp = rebuilt.SeasonalAmp[i];
+                float dAmp = rebuiltAmp - savedAmp;
+                if (UnityEngine.Mathf.Abs(dAmp) <= 0.015f)
+                    continue;
+
+                mismatches++;
+                float abs = UnityEngine.Mathf.Abs(dAmp);
+                if (abs > maxAbs)
+                    maxAbs = abs;
+
+                float savedCont = At(saved.Continentality, i);
+                float rebuiltCont = At(rebuilt.Continentality, i);
+                float savedArid = At(saved.AridityIndex, i);
+                float rebuiltArid = At(rebuilt.AridityIndex, i);
+                if (UnityEngine.Mathf.Abs(rebuiltCont - savedCont) > 0.5f / 255f)
+                    contDiff++;
+                if (UnityEngine.Mathf.Abs(rebuiltArid - savedArid) > 0.0005f)
+                    aridDiff++;
+
+                if (mismatches > detailCap)
+                    continue;
+
+                Tile tile = layer != null && i < layer.Tiles.Count ? layer.Tiles[i] : null;
+                float lat = Find.WorldGrid != null ? Find.WorldGrid.LongLatOf(i).y : 0f;
+                float elev = tile != null ? tile.elevation : 0f;
+                string biome = tile?.biome != null ? tile.biome.defName : "none";
+                RPLog.D($"[Climate] Tile {i} lat {lat:F1} elev {elev:F1} biome {biome} amp {savedAmp:F2} -> {rebuiltAmp:F2} (d {dAmp:+0.00;-0.00}) cont {savedCont:F3} -> {rebuiltCont:F3} arid {savedArid:F3} -> {rebuiltArid:F3}");
             }
-            if (mismatches > 0 && saved.bakeRecord != null && saved.bakeRecord.modelVersion == ClimateModelVersion.Current)
-                RPLog.W($"[Climate] Rebuilt seasonal amplitude differs on {mismatches} tiles.");
+
+            if (mismatches == 0)
+                return;
+
+            RPLog.W($"[Climate] Rebuilt seasonal amplitude differs on {mismatches} tiles. Continentality also differs on {contDiff}, aridity on {aridDiff}. Largest swing change {maxAbs:F2}°C.");
+            if (mismatches > detailCap)
+                RPLog.W($"[Climate] Logged the first {detailCap} differing tiles.");
+        }
+
+        private static float At(float[] values, int index)
+        {
+            return values != null && index >= 0 && index < values.Length ? values[index] : 0f;
         }
     }
 }

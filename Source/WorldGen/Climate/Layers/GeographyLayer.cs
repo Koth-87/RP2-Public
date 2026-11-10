@@ -104,7 +104,7 @@ namespace Planets.WorldGen.Climate.Layers
             // Hilliness classification
             // Uses Relief/Ruggedness (from here) and Prominence/Peaks (from TerrainAnalysisOrchestrator)
             var hills = Stopwatch.StartNew();
-            hillinessAnalyzer.Execute(climate, Find.WorldGrid);
+            hillinessAnalyzer.Execute(climate, Find.WorldGrid, settings);
             hills.Stop();
             if (Planets.Core.Controller.DebugEnabled)
                 RPLog.D($"[Geography] Hilliness took {hills.ElapsedMilliseconds} ms");
@@ -145,21 +145,16 @@ namespace Planets.WorldGen.Climate.Layers
         // ========== OCEAN CLASSIFICATION ==========
 
         /// <summary>
-        /// Mark ocean tiles
-        /// Sets: OceanMask
-        /// 
-        /// Ocean = any tile with Ocean or Lake biome (elevation <= 0)
-        /// WaterCovered property isn't set yet during worldgen, so check biome directly.
-        /// 
-        /// NOTE: Reads from layer.Tiles (created in base geometry step), not Find.WorldGrid.
+        /// Mark ocean tiles. Sets <see cref="ClimateData.OceanMask"/>.
+        /// A tile is ocean when its elevation is at or below sea level. That is the mask Phase 2 baked with:
+        /// below-sea lakes already sit under 0 m, and above-sea lake biomes are assigned only after the bake.
         /// </summary>
         private void ComputeOceanMask()
         {
             for (int i = 0; i < tileCount; i++)
             {
                 Tile tile = layer.Tiles[i];
-                // WaterCovered isn't set during worldgen - check biome and elevation instead
-                climate.OceanMask[i] = (tile.biome == BiomeDefOf.Ocean || tile.biome == BiomeDefOf.Lake || tile.elevation <= 0f);
+                climate.OceanMask[i] = tile != null && tile.elevation <= 0f;
             }
         }
 
@@ -304,7 +299,7 @@ namespace Planets.WorldGen.Climate.Layers
             WorldGrid grid = Find.WorldGrid;
             if (grid == null)
                 return;
-            WaterBodies.MeasureEnclosed(layer, grid, climate.TrueOceanMask, climate.InlandBodyStrength, bodies);
+            WaterBodies.MeasureEnclosed(layer, grid, climate.TrueOceanMask, climate.InlandBodyStrength, bodies, climate.WaterBodyID);
             LogEnclosedBodies(bodies);
 
             float[] influence = climate.InlandWaterInfluence;

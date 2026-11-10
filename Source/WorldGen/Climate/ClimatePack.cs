@@ -15,6 +15,55 @@ namespace Planets.WorldGen.Climate
             LookSigned(ref values, label, 100f, short.MinValue, short.MaxValue);
         }
 
+        /// <summary>Three signed hundredths per tile. Wind in m/s and normalized convergence both fit in a short.</summary>
+        public static void LookVector3Hundredths(ref Vector3[] values, string label)
+        {
+            short[] raw = null;
+            if (Scribe.mode == LoadSaveMode.Saving && values != null)
+            {
+                raw = new short[values.Length * 3];
+                for (int i = 0; i < values.Length; i++)
+                {
+                    Vector3 v = values[i];
+                    raw[i * 3] = PackHundredths(v.x);
+                    raw[i * 3 + 1] = PackHundredths(v.y);
+                    raw[i * 3 + 2] = PackHundredths(v.z);
+                }
+            }
+            byte[] bytes = null;
+            if (Scribe.mode == LoadSaveMode.Saving && raw != null)
+            {
+                bytes = new byte[raw.Length * 2];
+                Buffer.BlockCopy(raw, 0, bytes, 0, bytes.Length);
+            }
+            BinaryDataExposeUtility.Look(ref bytes, label);
+            if (Scribe.mode != LoadSaveMode.LoadingVars)
+                return;
+            if (bytes == null)
+            {
+                values = null;
+                return;
+            }
+            if (bytes.Length % 6 != 0)
+            {
+                Log.Error($"[RP] Climate pack '{label}' byte length {bytes.Length} is not a multiple of 6.");
+                values = null;
+                return;
+            }
+            raw = new short[bytes.Length / 2];
+            Buffer.BlockCopy(bytes, 0, raw, 0, bytes.Length);
+            values = new Vector3[raw.Length / 3];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = new Vector3(raw[i * 3] / 100f, raw[i * 3 + 1] / 100f, raw[i * 3 + 2] / 100f);
+            }
+        }
+
+        private static short PackHundredths(float value)
+        {
+            return (short)Mathf.Clamp(Mathf.RoundToInt(value * 100f), short.MinValue, short.MaxValue);
+        }
+
         public static void LookThousandths(ref float[] values, string label)
         {
             LookUnsigned(ref values, label, 1000f);

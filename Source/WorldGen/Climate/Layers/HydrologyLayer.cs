@@ -21,14 +21,22 @@ namespace Planets.WorldGen.Climate.Layers
     {
         private ClimateData climate;
         private FeatureConfiguration features;
+        private HydrologyConfiguration hydrologyConfig;
+        private ClimateConfiguration climateConfig;
         private int tileCount;
 
         public string LayerName => "Hydrology";
 
-        public HydrologyLayer(ClimateData climateData, FeatureConfiguration featureConfiguration = null)
+        public HydrologyLayer(
+            ClimateData climateData,
+            FeatureConfiguration featureConfiguration = null,
+            HydrologyConfiguration hydrologyConfiguration = null,
+            ClimateConfiguration climateConfiguration = null)
         {
             climate = climateData;
             features = featureConfiguration;
+            hydrologyConfig = hydrologyConfiguration ?? Controller.Settings?.hydrologyConfig;
+            climateConfig = climateConfiguration ?? Controller.Settings?.climateConfig;
             tileCount = climate.Latitude.Length;
         }
 
@@ -85,12 +93,12 @@ namespace Planets.WorldGen.Climate.Layers
             // Runoff uses the rain the moisture solve produced. AnnualRainfall may include
             // a few millimetres added afterwards on dry land, and that must not become river water.
             float[] rainForFlow = climate.AdvectedCondensationMm ?? climate.AnnualRainfall;
-            var flowInput = new ClimateFlowInput(rainForFlow, climate.LandEvaporationMm);
+            var flowInput = new ClimateFlowInput(rainForFlow, climate.LandEvaporationMm, climate.MaxSummerTemp);
             var evaporationInput = new ClimateEvaporationInput(
                 climate.PotentialEvapotranspiration,
-                Controller.Settings?.hydrologyConfig,
+                hydrologyConfig,
                 climate,
-                Controller.Settings?.climateConfig);
+                climateConfig);
             var config = new HydrologyConfig
             {
                 MaxIterations = MAX_ITERATIONS,
@@ -124,7 +132,7 @@ namespace Planets.WorldGen.Climate.Layers
         /// <summary>
         /// Populate RiverPresence, RiverMagnitude, WaterBodyType from Tier 2 flow and lake data (WS21).
         /// Fill-and-spill water balance is the sole lake classifier:
-        /// - 2+ flooded tiles in a lake chunk -> WaterBodyType = 2 (Lake biome when LakeConversionEnabled is on).
+        /// - 2+ flooded tiles in a lake chunk -> WaterBodyType = 2 (Lake biome when LakeConversionEnabled is on; Sea Ice when that basin never thaws).
         /// - 1-tile basins remain normal land tiles (not converted to Lake biome).
         /// </summary>
         private void ClassifyTier2RiversAndLakes()
@@ -134,7 +142,7 @@ namespace Planets.WorldGen.Climate.Layers
                 || climate.RiverMagnitude == null || climate.WaterBodyType == null)
                 return;
 
-            float referenceRainfall = Mathf.Max(1f, Controller.Settings?.hydrologyConfig?.referenceRainfallMm?.CurrentValue ?? 1000f);
+            float referenceRainfall = Mathf.Max(1f, hydrologyConfig?.referenceRainfallMm?.CurrentValue ?? 1000f);
 
             var lakeTileCount = new Dictionary<int, int>();
             for (int i = 0; i < tileCount; i++)
@@ -198,7 +206,7 @@ namespace Planets.WorldGen.Climate.Layers
                 ? climate.FlowAccumulationHydrology
                 : climate.FlowAccumulationTopology;
             float referenceRainfall = useTier2Flow
-                ? Mathf.Max(1f, Controller.Settings?.hydrologyConfig?.referenceRainfallMm?.CurrentValue ?? 1000f)
+                ? Mathf.Max(1f, hydrologyConfig?.referenceRainfallMm?.CurrentValue ?? 1000f)
                 : 1000f;
 
             for (int i = 0; i < tileCount; i++)

@@ -1391,30 +1391,7 @@ namespace Planets.WorldGen.Climate.Circulation
 
         void WriteAnnual()
         {
-            for (int t = 0; t < tileCount; t++)
-            {
-                Vector3 sumW = climate.SummerWind[t];
-                Vector3 winW = climate.WinterWind[t];
-                Vector3 eqW = climate.EquinoxWind[t];
-                Vector3 wind = 0.25f * sumW + 0.25f * winW + 0.5f * eqW;
-                float meanSpd = 0.25f * sumW.magnitude + 0.25f * winW.magnitude + 0.5f * eqW.magnitude;
-                climate.WindSpeed[t] = meanSpd;
-                if (wind.sqrMagnitude > 0.25f)
-                {
-                    climate.WindDirection[t] = wind.normalized;
-                }
-                else if (meanSpd > 0.5f)
-                {
-                    // Where opposite seasonal monsoons cancel in the vector mean, show the stronger solstice direction.
-                    Vector3 dom = sumW.sqrMagnitude >= winW.sqrMagnitude ? sumW : winW;
-                    climate.WindDirection[t] = dom.sqrMagnitude > 0.04f ? dom.normalized : Vector3.zero;
-                }
-                else
-                {
-                    climate.WindDirection[t] = Vector3.zero;
-                }
-                climate.ConvergenceIndex[t] = 0.25f * climate.JuneConvergence[t] + 0.25f * climate.DecemberConvergence[t] + 0.5f * climate.EquinoxConvergence[t];
-            }
+            climate.DeriveAnnualWind();
         }
 
         void LogBands(CoarseMesh mesh, int[] tileCell, float[] eastMs, float[] northMs)

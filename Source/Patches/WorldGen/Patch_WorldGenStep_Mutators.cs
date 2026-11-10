@@ -109,7 +109,7 @@ namespace Planets.Patches.WorldGen
         /// <summary>Replicate vanilla TryAddMutator logic (method is private), ensuring water tiles never receive mutators.</summary>
         private static bool TryAddMutator(Tile tile, PlanetLayer layer, TileMutatorDef mutator)
         {
-            if (tile == null || tile.WaterCovered || tile.biome == BiomeDefOf.Ocean || tile.biome == BiomeDefOf.Lake)
+            if (tile == null || tile.WaterCovered || tile.biome == BiomeDefOf.Ocean || tile.biome == BiomeDefOf.Lake || tile.biome == BiomeDefOf.SeaIce)
                 return false;
             if (tile.Mutators.Contains(mutator)) return false;
             if (!mutator.IsValidTile(tile.tile, layer)) return false;

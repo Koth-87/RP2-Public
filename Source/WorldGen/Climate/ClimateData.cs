@@ -257,12 +257,86 @@ namespace Planets.WorldGen.Climate
                 return;
             }
 
+            if (bakeRecord != null)
+            {
+                Core.Planets_GameComponent.axialTilt = bakeRecord.axialTilt;
+                Core.Planets_GameComponent.seaLevel = bakeRecord.seaLevel;
+                Astronomy.AxialTiltCurves.SetSeasonalCurve();
+            }
             ApplyExactElevations(Find.WorldGrid?.Surface);
             DeriveGameplayFromTiles();
             ArraysReady = true;
             ValidateArrayLengths();
             ClimateDiagnostics.NoteLoadedBake(this);
+            if (HasSavedWind() && ClimateDiagnostics.StalenessBanner == null && bakeRecord != null && bakeRecord.modelVersion == ClimateModelVersion.Current)
+            {
+                DeriveAnnualWind();
+                if (Core.Controller.DebugEnabled)
+                    Utilities.Logging.RPLog.D("[Climate] Saved wind restored. Climate rebuild skipped.");
+                return;
+            }
             ClimateDiagnostics.QueueRebuild(this);
+        }
+
+        private bool HasSavedWind()
+        {
+            int count = Find.WorldGrid?.TilesCount ?? 0;
+            return count > 0
+                && LengthIs(SummerWind, count)
+                && LengthIs(WinterWind, count)
+                && LengthIs(EquinoxWind, count)
+                && LengthIs(TransportJune, count)
+                && LengthIs(TransportDecember, count)
+                && LengthIs(TransportEquinox, count)
+                && LengthIs(JuneConvergence, count)
+                && LengthIs(DecemberConvergence, count)
+                && LengthIs(EquinoxConvergence, count);
+        }
+
+        private static bool LengthIs(Vector3[] values, int count) => values != null && values.Length == count;
+
+        private static bool LengthIs(float[] values, int count) => values != null && values.Length == count;
+
+        /// <summary>
+        /// Annual wind direction, mean speed, and convergence from the three saved seasonal fields.
+        /// Same weights as <see cref="Circulation.CirculationLayer"/> after the rain-heated wind pass.
+        /// </summary>
+        public void DeriveAnnualWind()
+        {
+            if (SummerWind == null || WinterWind == null || EquinoxWind == null)
+                return;
+            int n = SummerWind.Length;
+            if (WinterWind.Length < n || EquinoxWind.Length < n)
+                return;
+            if (WindSpeed == null || WindSpeed.Length != n)
+                WindSpeed = new float[n];
+            if (WindDirection == null || WindDirection.Length != n)
+                WindDirection = new Vector3[n];
+            if (ConvergenceIndex == null || ConvergenceIndex.Length != n)
+                ConvergenceIndex = new float[n];
+            bool haveConv = JuneConvergence != null && DecemberConvergence != null && EquinoxConvergence != null
+                && JuneConvergence.Length >= n && DecemberConvergence.Length >= n && EquinoxConvergence.Length >= n;
+            for (int t = 0; t < n; t++)
+            {
+                Vector3 sumW = SummerWind[t];
+                Vector3 winW = WinterWind[t];
+                Vector3 eqW = EquinoxWind[t];
+                Vector3 wind = 0.25f * sumW + 0.25f * winW + 0.5f * eqW;
+                float meanSpd = 0.25f * sumW.magnitude + 0.25f * winW.magnitude + 0.5f * eqW.magnitude;
+                WindSpeed[t] = meanSpd;
+                if (wind.sqrMagnitude > 0.25f)
+                    WindDirection[t] = wind.normalized;
+                else if (meanSpd > 0.5f)
+                {
+                    Vector3 dom = sumW.sqrMagnitude >= winW.sqrMagnitude ? sumW : winW;
+                    WindDirection[t] = dom.sqrMagnitude > 0.04f ? dom.normalized : Vector3.zero;
+                }
+                else
+                    WindDirection[t] = Vector3.zero;
+                ConvergenceIndex[t] = haveConv
+                    ? 0.25f * JuneConvergence[t] + 0.25f * DecemberConvergence[t] + 0.5f * EquinoxConvergence[t]
+                    : 0f;
+            }
         }
 
         private void ExposeGameplayPack()
@@ -277,6 +351,15 @@ namespace Planets.WorldGen.Climate
             ClimatePack.LookMillimeters(ref DriestSeasonRainMm, "driestRain_q");
             ClimatePack.LookMillimeters(ref WettestSeasonRainMm, "wettestRain_q");
             BinaryDataExposeUtility.Look(ref ExactElevationMeters, "exactElevationM");
+            ClimatePack.LookVector3Hundredths(ref SummerWind, "summerWind_q");
+            ClimatePack.LookVector3Hundredths(ref WinterWind, "winterWind_q");
+            ClimatePack.LookVector3Hundredths(ref EquinoxWind, "equinoxWind_q");
+            ClimatePack.LookVector3Hundredths(ref TransportJune, "transportJune_q");
+            ClimatePack.LookVector3Hundredths(ref TransportDecember, "transportDecember_q");
+            ClimatePack.LookVector3Hundredths(ref TransportEquinox, "transportEquinox_q");
+            ClimatePack.LookHundredths(ref JuneConvergence, "juneConv_q");
+            ClimatePack.LookHundredths(ref DecemberConvergence, "decemberConv_q");
+            ClimatePack.LookHundredths(ref EquinoxConvergence, "equinoxConv_q");
         }
 
         private void ExposeLegacyV1()
@@ -426,7 +509,7 @@ namespace Planets.WorldGen.Climate
                 LatitudeSigned[i] = longLat.y * Mathf.Deg2Rad;
                 Longitude[i] = longLat.x * Mathf.Deg2Rad;
                 TileCenters[i] = grid.GetTileCenter(i).normalized;
-                OceanMask[i] = tile.biome == BiomeDefOf.Ocean || tile.biome == BiomeDefOf.Lake || tile.elevation <= 0f;
+                OceanMask[i] = tile.elevation <= 0f;
                 float heightKm = OceanMask[i] ? 0f : Mathf.Max(0f, ElevationKm[i]);
                 ColumnDepth[i] = Mathf.Exp(-heightKm / 8f);
                 float half = SeasonalAmp != null && i < SeasonalAmp.Length ? SeasonalAmp[i] / 2f : 0f;
@@ -505,8 +588,6 @@ namespace Planets.WorldGen.Climate
             SummerCondensationMm = source.SummerCondensationMm;
             WinterCondensationMm = source.WinterCondensationMm;
             EquinoxCondensationMm = source.EquinoxCondensationMm;
-            DriestSeasonRainMm = source.DriestSeasonRainMm;
-            WettestSeasonRainMm = source.WettestSeasonRainMm;
             PrecipitableWaterMm = source.PrecipitableWaterMm;
             UpperColumnWaterMm = source.UpperColumnWaterMm;
             OceanEvaporationMm = source.OceanEvaporationMm;

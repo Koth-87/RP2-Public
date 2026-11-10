@@ -29,13 +29,13 @@ namespace Planets.WorldGen.TerrainAnalysis
 
         private readonly List<PlanetTile> neighborBuffer = new List<PlanetTile>();
 
-        public void Execute(ClimateData climateData, WorldGrid grid)
+        public void Execute(ClimateData climateData, WorldGrid grid, ClimateConfiguration climateConfig = null)
         {
             climate = climateData;
             worldGrid = grid;
             tileCount = climate.ElevationKm.Length;
 
-            LoadConfiguration();
+            LoadConfiguration(climateConfig);
 
             if (Controller.DebugEnabled)
                 RPLog.D($"[HillinessAnalyzer] Starting terrain classification with mountain frequency {mountainousness:F2}");
@@ -378,9 +378,9 @@ namespace Planets.WorldGen.TerrainAnalysis
             RPLog.D($"[HillinessAnalyzer] Distribution: Flat {100f * flat / landTiles:F1}%, Small {100f * small / landTiles:F1}%, Large {100f * large / landTiles:F1}%, Mountainous {100f * mountainous / landTiles:F1}%, Impassable {100f * impassable / landTiles:F1}%");
         }
 
-        private void LoadConfiguration()
+        private void LoadConfiguration(ClimateConfiguration climateConfig)
         {
-            ClimateConfiguration config = Controller.Settings?.climateConfig;
+            ClimateConfiguration config = climateConfig ?? Controller.Settings?.climateConfig;
             if (config != null)
                 mountainousness = config.mountainousness.CurrentValue;
         }

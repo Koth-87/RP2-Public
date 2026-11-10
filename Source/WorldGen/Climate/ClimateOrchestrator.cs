@@ -32,6 +32,7 @@ namespace Planets.WorldGen.Climate
         private ClimateData climateData;
         private ClimateConfiguration config;
         private FeatureConfiguration features;
+        private HydrologyConfiguration hydrologyConfig;
         private RimWorld.Planet.PlanetLayer planetLayer;
         private GeographyLayer geography;
         private TemperatureLayer temperature;
@@ -55,7 +56,12 @@ namespace Planets.WorldGen.Climate
         /// <param name="featureConfiguration">Feature toggles (null = Tier 2 hydrology disabled)</param>
         /// <exception cref="ArgumentNullException">If climateData or layer is null</exception>
         /// <exception cref="InvalidOperationException">If ClimateData arrays not initialized</exception>
-        public ClimateOrchestrator(ClimateData existingClimateData, RimWorld.Planet.PlanetLayer layer, ClimateConfiguration configuration = null, FeatureConfiguration featureConfiguration = null)
+        public ClimateOrchestrator(
+            ClimateData existingClimateData,
+            RimWorld.Planet.PlanetLayer layer,
+            ClimateConfiguration configuration = null,
+            FeatureConfiguration featureConfiguration = null,
+            HydrologyConfiguration hydrologyConfiguration = null)
         {
             climateData = existingClimateData ?? throw new ArgumentNullException(nameof(existingClimateData),
                 "ClimateData cannot be null. Create and initialize ClimateData before creating orchestrator.");
@@ -72,6 +78,7 @@ namespace Planets.WorldGen.Climate
             
             config = configuration ?? new ClimateConfiguration();
             features = featureConfiguration;
+            hydrologyConfig = hydrologyConfiguration ?? Controller.Settings?.hydrologyConfig;
             InitializeLayers();
         }
 
@@ -92,7 +99,7 @@ namespace Planets.WorldGen.Climate
             circulation = new CirculationLayer(climateData, config);
             maritime = new MaritimeLayer(climateData, config);
             moistureBudget = new MoistureBudgetLayer(climateData, config, circulation);
-            hydrology = new HydrologyLayer(climateData, features);
+            hydrology = new HydrologyLayer(climateData, features, hydrologyConfig, config);
         }
 
         /// <summary>
