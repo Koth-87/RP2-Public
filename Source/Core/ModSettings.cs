@@ -180,6 +180,8 @@ namespace Planets.Core
                             Rect pathRect = list.GetRect(30f);
                             string path = climateConfig.earthHeightmapPath.CurrentValue ?? "";
                             climateConfig.earthHeightmapPath.CurrentValue = Widgets.TextField(pathRect, path);
+                            list.CheckboxLabeled("Tectonics", ref climateConfig.tectonicHeightmap.CurrentValue,
+                                "Keep the file's ocean depths. Coastal shelves, trenches, and inland seas stay at the metres in the file. Off, water tiles are rewritten to the usual shallow bands.");
                         }
                     }
                 }
@@ -205,6 +207,7 @@ namespace Planets.Core
             perfOptimizeGL.Reset();
             climateConfig.useEarthHeightmap.Reset();
             climateConfig.earthHeightmapPath.Reset();
+            climateConfig.tectonicHeightmap.Reset();
             featureConfig.ResetToDefaults();
             hydrologyConfig.ResetFeatureToggles();
             integrationConfig.ResetPageDefaults();

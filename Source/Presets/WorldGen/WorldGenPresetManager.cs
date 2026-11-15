@@ -107,9 +107,11 @@ namespace Planets.Presets.WorldGen
                 ClimateConfiguration live = Controller.Settings.climateConfig;
                 bool earth = live.useEarthHeightmap.CurrentValue;
                 string earthPath = live.earthHeightmapPath.CurrentValue;
+                bool tectonic = live.tectonicHeightmap.CurrentValue;
                 live.CopyFrom(preset.climateConfig);
                 live.useEarthHeightmap.CurrentValue = earth;
                 live.earthHeightmapPath.CurrentValue = earthPath;
+                live.tectonicHeightmap.CurrentValue = tectonic;
             }
             if (Controller.Settings?.hydrologyConfig != null)
             {

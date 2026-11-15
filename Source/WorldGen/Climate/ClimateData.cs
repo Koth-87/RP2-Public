@@ -148,6 +148,23 @@ namespace Planets.WorldGen.Climate
         public float[] RainHumidMm;
         public float[] RainRisingMm;
         public float[] RainUpperMm;
+        // Season columns are that season's contribution to the annual total. Weights 0.25, 0.25, 0.50 are already applied.
+        public float[] RainHumidJuneMm;
+        public float[] RainHumidDecemberMm;
+        public float[] RainHumidEquinoxMm;
+        public float[] RainRisingJuneMm;
+        public float[] RainRisingDecemberMm;
+        public float[] RainRisingEquinoxMm;
+        public float[] RainUpperJuneMm;
+        public float[] RainUpperDecemberMm;
+        public float[] RainUpperEquinoxMm;
+        public float[] OceanEvapJuneMm;
+        public float[] OceanEvapDecemberMm;
+        public float[] OceanEvapEquinoxMm;
+        // Moisture-carrier divergence (s^-1) after the rising-air cap. Positive is sinking.
+        public float[] CarrierDivergenceJune;
+        public float[] CarrierDivergenceDecember;
+        public float[] CarrierDivergenceEquinox;
         public float[] DistanceAlongWindKm;
         public float[] OceanWaterShare;
 
@@ -595,6 +612,21 @@ namespace Planets.WorldGen.Climate
             RainHumidMm = source.RainHumidMm;
             RainRisingMm = source.RainRisingMm;
             RainUpperMm = source.RainUpperMm;
+            RainHumidJuneMm = source.RainHumidJuneMm;
+            RainHumidDecemberMm = source.RainHumidDecemberMm;
+            RainHumidEquinoxMm = source.RainHumidEquinoxMm;
+            RainRisingJuneMm = source.RainRisingJuneMm;
+            RainRisingDecemberMm = source.RainRisingDecemberMm;
+            RainRisingEquinoxMm = source.RainRisingEquinoxMm;
+            RainUpperJuneMm = source.RainUpperJuneMm;
+            RainUpperDecemberMm = source.RainUpperDecemberMm;
+            RainUpperEquinoxMm = source.RainUpperEquinoxMm;
+            OceanEvapJuneMm = source.OceanEvapJuneMm;
+            OceanEvapDecemberMm = source.OceanEvapDecemberMm;
+            OceanEvapEquinoxMm = source.OceanEvapEquinoxMm;
+            CarrierDivergenceJune = source.CarrierDivergenceJune;
+            CarrierDivergenceDecember = source.CarrierDivergenceDecember;
+            CarrierDivergenceEquinox = source.CarrierDivergenceEquinox;
             DistanceAlongWindKm = source.DistanceAlongWindKm;
             OceanWaterShare = source.OceanWaterShare;
             ColumnDepth = source.ColumnDepth;

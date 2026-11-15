@@ -41,8 +41,9 @@ namespace Planets.Presets.Factions
         public static bool PresetExists(string name) => Store.Exists(name);
 
         /// <summary>
-        /// Applies a faction preset to the target faction list, enforcing <c>maxConfigurableAtWorldCreation</c>
-        /// and <c>replacesFaction</c> constraints while respecting mod-expanded total faction caps.
+        /// Restores a saved faction list as stored. Extra copies beyond <c>maxConfigurableAtWorldCreation</c>
+        /// are dropped, as are def names whose mod is not loaded. <c>replacesFaction</c> is not applied here;
+        /// vanilla <c>ResetFactionCounts</c> uses that rule only when building the default list.
         /// </summary>
         public static bool ApplyPreset(FactionSetupPreset preset, List<FactionDef> targetList)
         {
@@ -56,13 +57,6 @@ namespace Planets.Presets.Factions
                 return false;
             }
 
-            var replaced = new HashSet<FactionDef>();
-            for (int i = 0; i < factionDefs.Count; i++)
-            {
-                if (factionDefs[i]?.replacesFaction != null)
-                    replaced.Add(factionDefs[i].replacesFaction);
-            }
-
             var accepted = new List<FactionDef>();
             var dropped = new List<string>();
             for (int i = 0; i < factionDefs.Count; i++)
@@ -70,12 +64,6 @@ namespace Planets.Presets.Factions
                 FactionDef def = factionDefs[i];
                 if (def == null)
                     continue;
-
-                if (replaced.Contains(def))
-                {
-                    dropped.Add(def.LabelCap + " (replaced by another faction)");
-                    continue;
-                }
 
                 int copies = 0;
                 for (int j = 0; j < accepted.Count; j++)

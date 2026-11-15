@@ -32,6 +32,9 @@ namespace Planets.WorldGen.Climate
         public string source = "Generation";
         public bool earthHeightmap;
 
+        /// <summary>The heightmap's ocean metres were kept. Water tiles were not rewritten to the shallow bands.</summary>
+        public bool tectonicHeightmap;
+
         public void ExposeData()
         {
             if (climateSettings != null)
@@ -53,6 +56,7 @@ namespace Planets.WorldGen.Climate
             Scribe_Values.Look(ref bakedAtTick, "bakedAtTick", 0);
             Scribe_Values.Look(ref source, "source", "Generation");
             Scribe_Values.Look(ref earthHeightmap, "earthHeightmap", false);
+            Scribe_Values.Look(ref tectonicHeightmap, "tectonicHeightmap", false);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 if (climateSettings == null)

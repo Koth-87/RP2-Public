@@ -49,6 +49,7 @@ namespace Planets.WorldGen
         private readonly int[] energyBuckets = new int[6];
         private readonly int[] rainfallBuckets = new int[8];
         private bool usedEarthHeightmap;
+        private bool keptHeightmapBathymetry;
         private int fallbackTileCount;
         private int foreignWinCount;
         private int deadZoneCount;
@@ -189,9 +190,18 @@ namespace Planets.WorldGen
                 
                 // Convert isolated water bodies to lakes (ALWAYS enabled)
                 int lakesCreated = ConvertIsolatedWaterToLakes();
-                
-                // Normalize ocean depths (must happen after lake detection)
-                NormalizeOceanDepths();
+
+                // Tectonics keeps the file's shelves, trenches, and inland seas.
+                // The rewrite still runs for noise worlds and for a heightmap load with the toggle off.
+                keptHeightmapBathymetry = usedEarthHeightmap
+                    && (Controller.Settings?.climateConfig?.tectonicHeightmap.CurrentValue ?? false);
+                if (keptHeightmapBathymetry)
+                {
+                    if (Controller.DebugEnabled)
+                        RPLog.D("[WorldGen] Tectonics: keeping heightmap ocean depths.");
+                }
+                else
+                    NormalizeOceanDepths();
                 WarnIfAlmostNoWater();
 
                 if (Controller.DebugEnabled)
@@ -953,6 +963,7 @@ namespace Planets.WorldGen
                 LogSelectionSummary();
                 climateData.bakeRecord.Capture(state.ClimateConfig, state.HydroConfig, "Generation");
                 climateData.bakeRecord.earthHeightmap = usedEarthHeightmap;
+                climateData.bakeRecord.tectonicHeightmap = keptHeightmapBathymetry;
                 climateData.ArraysReady = true;
                 
                 if (Controller.DebugEnabled)

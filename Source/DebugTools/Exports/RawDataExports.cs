@@ -76,11 +76,18 @@ namespace Planets.DebugTools.Exports
                 writer.WriteLine($"# ClimateModel: {climateData?.bakeRecord?.modelVersion ?? 0}");
                 writer.WriteLine("# EarthHeightmap: " + (climateData?.bakeRecord?.earthHeightmap == true ? "yes" : "no"));
                 writer.WriteLine("# OceanDistKm is distance to the true ocean. Lakes are not ocean.");
-                writer.WriteLine("# Rainfall is the climate result. MonsoonBoost is not added to it.");
+                writer.WriteLine("# MonsoonBoost is not added to Rainfall.");
                 writer.WriteLine("# Elevation is the rounded tile meter. ExactElevationM is the height used for drainage.");
                 writer.WriteLine("# BiomeScore is 100*exp(-energy/2). Higher is a better fit.");
-                writer.WriteLine("# SummerWind and WinterWind are east and north components of the solstice wind.");
-                writer.WriteLine("# Summer and winter condensation, incoming, and deleted moisture are the two seasonal passes. Deleted is calm tiles plus wind off the map.");
+                writer.WriteLine("# SummerWind, WinterWind, and EquinoxWind are east and north components. Transport winds carry moisture. Positive east is eastward.");
+                writer.WriteLine("# Rainfall is the published tile value. AdvectedCondensationMm is physical annual rain before the dry-day residual.");
+                writer.WriteLine("# RainHumidMm, RainRisingMm, and RainUpperMm are annual millimetres and sum to the physical rain.");
+                writer.WriteLine("# June, December, and Equinox rain-source and ocean-evaporation columns already include weights 0.25, 0.25, and 0.50.");
+                writer.WriteLine("# SummerCondensationMm, WinterCondensationMm, and EquinoxCondensationMm are unweighted snapshot rates, as if that wind blew all year.");
+                writer.WriteLine("# CarrierDivergence is the moisture-carrier divergence in s^-1 after the rising-air cap. Positive is sinking.");
+                writer.WriteLine("# ConvergenceJune, ConvergenceDec, and ConvergenceEq are each scaled to about -1..1. Positive is convergence. The scale differs by season.");
+                writer.WriteLine("# OceanWaterShare is 1 on ocean. On land it is the share of supply that is not recycled evaporation.");
+                writer.WriteLine("# ContinentalAir is 0 for maritime air and 1 for continental air. ColumnDepth is exp(-height/8 km).");
                 writer.WriteLine("# ElevationBandEdgesM: " + BandEdges(climateData));
                 writer.WriteLine($"# TileAreaKm2: {EarthScaleConstants.TILE_AREA_KM2:F1}");
                 writer.WriteLine("# FlowDir and SpillDir are indexes into NeighborIDs. RiverSystemID is the topographic fill-and-spill, run with no evaporation.");
@@ -95,11 +102,20 @@ namespace Planets.DebugTools.Exports
                     "OceanDistKm,InlandWaterDistKm,InlandWaterInfluence,ElevationBand,IsRidgeTile,RidgeTier,RidgeNeighborSystemID,IsMajorPeak,RidgeEast,RidgeNorth," +
                     "Prominence,Relief,Ruggedness,Steepness," +
                     "UpwindReliefIndex,LeewardShadowIndex,MonsoonBoost,MonsoonMoistureSource,MonsoonLiftIndex," +
-                    "AdvectedCondensationMm,SummerCondensationMm,WinterCondensationMm,SummerIncomingMm,WinterIncomingMm,SummerDeletedMm,WinterDeletedMm," +
+                    "AdvectedCondensationMm,SummerCondensationMm,WinterCondensationMm,EquinoxCondensationMm,DriestSeasonRainMm,WettestSeasonRainMm," +
+                    "SummerIncomingMm,WinterIncomingMm,SummerDeletedMm,WinterDeletedMm," +
+                    "RainHumidMm,RainRisingMm,RainUpperMm," +
+                    "RainHumidJuneMm,RainHumidDecemberMm,RainHumidEquinoxMm," +
+                    "RainRisingJuneMm,RainRisingDecemberMm,RainRisingEquinoxMm," +
+                    "RainUpperJuneMm,RainUpperDecemberMm,RainUpperEquinoxMm," +
+                    "OceanEvaporationMm,LandEvaporationMm,OceanEvapJuneMm,OceanEvapDecemberMm,OceanEvapEquinoxMm," +
+                    "PrecipitableWaterMm,UpperColumnWaterMm,OceanWaterShare,DistanceAlongWindKm,ColumnDepth," +
+                    "CarrierDivergenceJune,CarrierDivergenceDecember,CarrierDivergenceEquinox," +
                     "LatSeaLevelTemp,SST,CurrentsAnomaly,CoastalModStrength,PET,DailyRangeC," +
                     "AdvectedIncomingMm,AdvectedRemainingMm,AdvectedDryingRatio,WindSpeed," +
-                    "SummerWindEast,SummerWindNorth,WinterWindEast,WinterWindNorth," +
-                    "ConvergenceIndex,TemperatureCapacity," +
+                    "SummerWindEast,SummerWindNorth,WinterWindEast,WinterWindNorth,EquinoxWindEast,EquinoxWindNorth," +
+                    "TransportJuneEast,TransportJuneNorth,TransportDecEast,TransportDecNorth,TransportEqEast,TransportEqNorth," +
+                    "ConvergenceIndex,ConvergenceJune,ConvergenceDec,ConvergenceEq,TemperatureCapacity,ContinentalAir," +
                     "MaritimeJune,MaritimeDec,MaritimeEq,MaritimeAnnual,UpwindSST," +
                     "Biome,BiomeScore," +
                     "NeighborCount,NeighborIDs");
@@ -382,10 +398,18 @@ namespace Planets.DebugTools.Exports
                 ? climateData.WindSpeed[tileId].ToString("F2") : "0";
             WindParts(climateData, tileId, climateData?.SummerWind, out string summerEast, out string summerNorth);
             WindParts(climateData, tileId, climateData?.WinterWind, out string winterEast, out string winterNorth);
+            WindParts(climateData, tileId, climateData?.EquinoxWind, out string equinoxEast, out string equinoxNorth);
+            WindParts(climateData, tileId, climateData?.TransportJune, out string transportJunEast, out string transportJunNorth);
+            WindParts(climateData, tileId, climateData?.TransportDecember, out string transportDecEast, out string transportDecNorth);
+            WindParts(climateData, tileId, climateData?.TransportEquinox, out string transportEqEast, out string transportEqNorth);
             string convergenceIndex = (climateData?.ConvergenceIndex != null && tileId < climateData.ConvergenceIndex.Length)
                 ? climateData.ConvergenceIndex[tileId].ToString("F3") : "0";
+            string convJun = Num(climateData?.JuneConvergence, tileId, "F3");
+            string convDec = Num(climateData?.DecemberConvergence, tileId, "F3");
+            string convEq = Num(climateData?.EquinoxConvergence, tileId, "F3");
             string temperatureCapacity = (climateData?.TemperatureCapacity != null && tileId < climateData.TemperatureCapacity.Length)
                 ? climateData.TemperatureCapacity[tileId].ToString("F3") : "0";
+            string continentalAir = Num(climateData?.ContinentalAir, tileId, "F3");
 
             string maritimeJune = Num(climateData?.MaritimeJune, tileId, "F3");
             string maritimeDec = Num(climateData?.MaritimeDecember, tileId, "F3");
@@ -396,10 +420,38 @@ namespace Planets.DebugTools.Exports
             string advectedCondStr = advectedCondMm.ToString("F1");
             string summerCond = Num(climateData?.SummerCondensationMm, tileId, "F1");
             string winterCond = Num(climateData?.WinterCondensationMm, tileId, "F1");
+            string equinoxCond = Num(climateData?.EquinoxCondensationMm, tileId, "F1");
+            string driestRain = Num(climateData?.DriestSeasonRainMm, tileId, "F1");
+            string wettestRain = Num(climateData?.WettestSeasonRainMm, tileId, "F1");
             string summerIn = Num(climateData?.SummerIncomingMm, tileId, "F1");
             string winterIn = Num(climateData?.WinterIncomingMm, tileId, "F1");
             string summerDeleted = Num(climateData?.SummerDeletedMm, tileId, "F1");
             string winterDeleted = Num(climateData?.WinterDeletedMm, tileId, "F1");
+            string rainHumid = Num(climateData?.RainHumidMm, tileId, "F1");
+            string rainRising = Num(climateData?.RainRisingMm, tileId, "F1");
+            string rainUpper = Num(climateData?.RainUpperMm, tileId, "F1");
+            string rainHumidJun = Num(climateData?.RainHumidJuneMm, tileId, "F1");
+            string rainHumidDec = Num(climateData?.RainHumidDecemberMm, tileId, "F1");
+            string rainHumidEq = Num(climateData?.RainHumidEquinoxMm, tileId, "F1");
+            string rainRisingJun = Num(climateData?.RainRisingJuneMm, tileId, "F1");
+            string rainRisingDec = Num(climateData?.RainRisingDecemberMm, tileId, "F1");
+            string rainRisingEq = Num(climateData?.RainRisingEquinoxMm, tileId, "F1");
+            string rainUpperJun = Num(climateData?.RainUpperJuneMm, tileId, "F1");
+            string rainUpperDec = Num(climateData?.RainUpperDecemberMm, tileId, "F1");
+            string rainUpperEq = Num(climateData?.RainUpperEquinoxMm, tileId, "F1");
+            string oceanEvap = Num(climateData?.OceanEvaporationMm, tileId, "F1");
+            string landEvap = Num(climateData?.LandEvaporationMm, tileId, "F1");
+            string oceanEvapJun = Num(climateData?.OceanEvapJuneMm, tileId, "F1");
+            string oceanEvapDec = Num(climateData?.OceanEvapDecemberMm, tileId, "F1");
+            string oceanEvapEq = Num(climateData?.OceanEvapEquinoxMm, tileId, "F1");
+            string precipitable = Num(climateData?.PrecipitableWaterMm, tileId, "F2");
+            string upperColumn = Num(climateData?.UpperColumnWaterMm, tileId, "F2");
+            string oceanShare = Num(climateData?.OceanWaterShare, tileId, "F3");
+            string distanceWind = Num(climateData?.DistanceAlongWindKm, tileId, "F1");
+            string columnDepth = Num(climateData?.ColumnDepth, tileId, "F3");
+            string divJun = Num(climateData?.CarrierDivergenceJune, tileId, "E3");
+            string divDec = Num(climateData?.CarrierDivergenceDecember, tileId, "E3");
+            string divEq = Num(climateData?.CarrierDivergenceEquinox, tileId, "E3");
 
             // Biome
             string biome = tile.biome?.defName ?? "unknown";
@@ -436,11 +488,20 @@ namespace Planets.DebugTools.Exports
                    $"{oceanDistKm},{inlandDist},{inlandInfluence},{elevationBand},{isRidgeTile},{ridgeTier},{ridgeNeighborSystemID},{isMajorPeak},{ridgeEast},{ridgeNorth}," +
                    $"{prominence},{relief},{ruggedness},{steepness}," +
                    $"{upwindReliefIndex},{leewardShadowIndex},{monsoonBoost},{monsoonMoistureSource},{monsoonLiftIndex}," +
-                   $"{advectedCondStr},{summerCond},{winterCond},{summerIn},{winterIn},{summerDeleted},{winterDeleted}," +
+                   $"{advectedCondStr},{summerCond},{winterCond},{equinoxCond},{driestRain},{wettestRain}," +
+                   $"{summerIn},{winterIn},{summerDeleted},{winterDeleted}," +
+                   $"{rainHumid},{rainRising},{rainUpper}," +
+                   $"{rainHumidJun},{rainHumidDec},{rainHumidEq}," +
+                   $"{rainRisingJun},{rainRisingDec},{rainRisingEq}," +
+                   $"{rainUpperJun},{rainUpperDec},{rainUpperEq}," +
+                   $"{oceanEvap},{landEvap},{oceanEvapJun},{oceanEvapDec},{oceanEvapEq}," +
+                   $"{precipitable},{upperColumn},{oceanShare},{distanceWind},{columnDepth}," +
+                   $"{divJun},{divDec},{divEq}," +
                    $"{latSeaLevelTemp},{sst},{currentsAnomaly},{coastalModStrength},{pet},{dailyRange}," +
                    $"{advectedIncomingMm},{advectedRemainingMm},{advectedDryingRatio},{windSpeed}," +
-                   $"{summerEast},{summerNorth},{winterEast},{winterNorth}," +
-                   $"{convergenceIndex},{temperatureCapacity}," +
+                   $"{summerEast},{summerNorth},{winterEast},{winterNorth},{equinoxEast},{equinoxNorth}," +
+                   $"{transportJunEast},{transportJunNorth},{transportDecEast},{transportDecNorth},{transportEqEast},{transportEqNorth}," +
+                   $"{convergenceIndex},{convJun},{convDec},{convEq},{temperatureCapacity},{continentalAir}," +
                    $"{maritimeJune},{maritimeDec},{maritimeEq},{maritimeAnnual},{upwindSst}," +
                    $"{biome},{biomeScore}," +
                    $"{neighborCount},{neighborIDs}";

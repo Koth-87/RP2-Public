@@ -93,6 +93,9 @@ namespace Planets.Core.Configuration
         /// <summary>Path to <c>etopo_0p25.bin</c> when <see cref="useEarthHeightmap"/> is enabled.</summary>
         public ConfigValue<string> earthHeightmapPath;
 
+        /// <summary>When the Earth heightmap is used, keep its ocean metres instead of rewriting them to the shallow bands.</summary>
+        public ConfigValue<bool> tectonicHeightmap;
+
         // ========== DIAGNOSTIC CIRCULATION PARAMETERS ==========
 
         /// <summary>Broad warm-land pressure response (hPa/°C) applied to both layers.</summary>
@@ -283,6 +286,7 @@ namespace Planets.Core.Configuration
 
             useEarthHeightmap = new ConfigValue<bool>(false, "useEarthHeightmap", entries, isDebugOnly: true);
             earthHeightmapPath = new ConfigValue<string>("", "earthHeightmapPath", entries, isDebugOnly: true);
+            tectonicHeightmap = new ConfigValue<bool>(false, "tectonicHeightmap", entries, isDebugOnly: true);
 
             circHeatWarmHpaPerC = new ConfigValue<float>(2.5f, "circHeatWarmHpaPerC", entries, isDebugOnly: true);
             circHeatColdHpaPerC = new ConfigValue<float>(2f, "circHeatColdHpaPerC", entries, isDebugOnly: true);
@@ -364,7 +368,7 @@ namespace Planets.Core.Configuration
             for (int i = 0; i < entries.Count; i++)
             {
                 IConfigValue entry = entries[i];
-                if (entry.IsDebugOnly && entry != useEarthHeightmap && entry != earthHeightmapPath)
+                if (entry.IsDebugOnly && entry != useEarthHeightmap && entry != earthHeightmapPath && entry != tectonicHeightmap)
                     entry.Reset();
             }
         }

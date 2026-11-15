@@ -9,6 +9,7 @@ using Planets.Core;
 using Planets.Core.Configuration;
 using Planets.Utilities.Logging;
 using Planets.WorldGen.Astronomy;
+using Planets.WorldGen.Climate;
 using Planets.WorldGen.Climate.Circulation;
 using Planets.WorldGen.Climate.Mesh;
 using Planets.WorldGen.Constants;
@@ -1072,9 +1073,15 @@ namespace Planets.WorldGen.Climate.Moisture
                     {
                         float inFl = spd * meanEdgeLengthM;
                         fiRaw[i] += inFl;
+                        // Same ocean curve as TemperatureLayer, so a hot or cold partial world
+                        // does not inherit an Earth-shaped hidden ocean.
                         float latRad = climate.Latitude[i];
-                        float c = Mathf.Cos(latRad);
-                        float tHidden = -18f + 45f * c * c;
+                        float cosLat = Mathf.Max(0f, Mathf.Cos(latRad));
+                        float oceanExponent = config.latTempExponent.CurrentValue * 0.91f;
+                        float cOcean = Mathf.Pow(cosLat, oceanExponent);
+                        float oceanEquator = climate.EquatorMean + ClimateReferenceData.OceanEquatorOffset;
+                        float oceanPole = climate.PoleMean + ClimateReferenceData.OceanPoleOffset;
+                        float tHidden = Mathf.Lerp(oceanPole, oceanEquator, cOcean);
                         float wHidden = 0.78f * MoistureMath.PrecipitableCapacity(tHidden);
                         edgeInflowSource[i] = inFl * wHidden;
                     }
@@ -1844,6 +1851,22 @@ namespace Planets.WorldGen.Climate.Moisture
                     ? 1f
                     : Mathf.Clamp01(1f - etMm[i] / Mathf.Max(rAnn + etMm[i], 1f));
             }
+
+            climate.RainHumidJuneMm = snapHumidMm[0];
+            climate.RainHumidDecemberMm = snapHumidMm[1];
+            climate.RainHumidEquinoxMm = snapHumidMm[2];
+            climate.RainRisingJuneMm = snapRiseMm[0];
+            climate.RainRisingDecemberMm = snapRiseMm[1];
+            climate.RainRisingEquinoxMm = snapRiseMm[2];
+            climate.RainUpperJuneMm = snapUpperMm[0];
+            climate.RainUpperDecemberMm = snapUpperMm[1];
+            climate.RainUpperEquinoxMm = snapUpperMm[2];
+            climate.OceanEvapJuneMm = snapOceanEvapMm[0];
+            climate.OceanEvapDecemberMm = snapOceanEvapMm[1];
+            climate.OceanEvapEquinoxMm = snapOceanEvapMm[2];
+            climate.CarrierDivergenceJune = snapshots[0].Divergence;
+            climate.CarrierDivergenceDecember = snapshots[1].Divergence;
+            climate.CarrierDivergenceEquinox = snapshots[2].Divergence;
 
             ComputeDistanceAlongWind(snapshots);
             ApplySurfaceMoistureFeedback(etMm);

@@ -313,12 +313,14 @@ namespace Planets.WorldGen.Climate.Layers
 
                 Vector3 w = 0.25f * climate.SummerWind[i] + 0.25f * climate.WinterWind[i] + 0.50f * climate.EquinoxWind[i];
                 Vector3 up = climate.TileCenters[i].normalized;
-                Vector3 east = Vector3.Cross(Vector3.up, up);
+                // Same frame as CoarseMesh.Frame. The opposite cross product reverses zonal wind,
+                // so easterlies (negative u) were read as westerlies.
+                Vector3 east = Vector3.Cross(up, Vector3.up);
                 if (east.sqrMagnitude < 1e-8f)
                     east = Vector3.right;
                 else
                     east.Normalize();
-                Vector3 north = Vector3.Cross(up, east).normalized;
+                Vector3 north = Vector3.Cross(east, up).normalized;
 
                 float u = Vector3.Dot(w, east);
                 float v = Vector3.Dot(w, north);
