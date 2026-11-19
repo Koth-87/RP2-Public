@@ -20,6 +20,7 @@ namespace MapModeFramework
             patchedMods = new Dictionary<string, string>
             {
                 { "regrowth.botr.core", "ReGrowthCore" },
+                // WMBP 1.6 ships BiomesKit.dll. WMBP 1.7 renamed the file to WMBP.dll; the types stay in the BiomesKit namespace.
                 { "zal.wmbp", "BiomesKit" },
                 { "thelastbulletbender.rwexploration", "RimworldExplorationMode" },
                 { "m00nl1ght.geologicallandforms", "GeologicalLandforms" }
@@ -37,8 +38,7 @@ namespace MapModeFramework
                 string assemblyName = patchedMods[modPackageId];
                 foreach (Assembly loadedAssembly in mod.assemblies.loadedAssemblies)
                 {
-                    string name = loadedAssembly.GetName().Name;
-                    if (name.Contains(assemblyName))
+                    if (AssemblyNameMatches(assemblyName, loadedAssembly.GetName().Name))
                     {
                         found = true;
                         assemblies.Add(loadedAssembly);
@@ -116,9 +116,22 @@ namespace MapModeFramework
             Core.Error("BiomesKitWorldLayer [ReGrowthCore] not found. Render patch not applied.");
         }
 
+        /// <summary>
+        /// True when a loaded assembly is the one this package id was registered under.
+        /// World Map Beautification Project 1.7 renamed BiomesKit.dll to WMBP.dll.
+        /// </summary>
+        public static bool AssemblyNameMatches(string expectedName, string loadedName)
+        {
+            if (string.IsNullOrEmpty(expectedName) || string.IsNullOrEmpty(loadedName))
+                return false;
+            if (loadedName.Contains(expectedName))
+                return true;
+            return expectedName == "BiomesKit" && loadedName == "WMBP";
+        }
+
         public static void PatchWMBPCompatibility()
         {
-            Assembly wmbpAssembly = assemblies.FirstOrDefault(x => x.GetName().Name.Contains("BiomesKit"));
+            Assembly wmbpAssembly = assemblies.FirstOrDefault(x => AssemblyNameMatches("BiomesKit", x.GetName().Name));
             if (wmbpAssembly == null)
             {
                 return;

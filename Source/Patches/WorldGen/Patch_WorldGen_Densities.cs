@@ -4,7 +4,6 @@ using RimWorld;
 using RimWorld.Planet;
 using Verse;
 using Planets.Core;
-using Planets.Compatibility.FernyMods;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -35,11 +34,6 @@ namespace Planets.Patches.WorldGen
     [HarmonyPatch(typeof(WorldGenStep_AncientSites), "GenerateAncientSites")]
     public static class Patch_WorldGenStep_AncientSites
     {
-        public static bool Prepare()
-        {
-            return !ModsConfig.IsActive("ferny.Worldbuilder");
-        }
-
         public static void Prefix(WorldGenStep_AncientSites __instance, out FloatRange __state)
         {
             __state = __instance.ancientSitesPer100kTiles;
@@ -69,8 +63,6 @@ namespace Planets.Patches.WorldGen
     [HarmonyPatch]
     public static class Patch_WorldGenStep_Roads_Lambda
     {
-        public static bool Prepare() => !ModsConfig.IsActive("ferny.Worldbuilder");
-
         private static MethodBase TargetMethod()
         {
             foreach (var nestType in typeof(WorldGenStep_Roads).GetNestedTypes(AccessTools.all))
@@ -116,8 +108,6 @@ namespace Planets.Patches.WorldGen
     [HarmonyPatch(typeof(WorldGenStep_Roads), "GenerateRoadEndpoints")]
     public static class Patch_WorldGenStep_Roads_ExtraNodes
     {
-        public static bool Prepare() => !ModsConfig.IsActive("ferny.Worldbuilder");
-
         public static float GetRoadDensity() => Planets_GameComponent.factionRoadDensity;
 
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

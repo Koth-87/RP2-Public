@@ -139,6 +139,17 @@ namespace Planets.Compatibility.FernyMods
                                 RPLog.Message("[Compat] Successfully unpatched Worldbuilder's seasonal temperature override");
                             }
                         }
+
+                        // Rivers, ancient sites, and faction roads are RP2's. Worldbuilder's copies
+                        // read worldGenerationData, which is only created when its create-world page opens.
+                        UnpatchWorldbuilder(wbAssembly, "Worldbuilder.WorldGenStep_Rivers_GenerateRivers_Patch", "Prefix",
+                            AccessTools.Method(typeof(WorldGenStep_Rivers), "GenerateRivers"), "river density");
+                        UnpatchWorldbuilder(wbAssembly, "Worldbuilder.WorldGenStep_AncientSites_GenerateAncientSites_Patch", "Prefix",
+                            AccessTools.Method(typeof(WorldGenStep_AncientSites), "GenerateAncientSites"), "ancient-site density");
+                        UnpatchWorldbuilder(wbAssembly, "Worldbuilder.WorldGenStep_Roads_GenerateRoadEndpoints_Void_Patch", "Transpiler",
+                            AccessTools.Method(typeof(WorldGenStep_Roads), "GenerateRoadEndpoints"), "faction-road endpoint count");
+                        UnpatchWorldbuilder(wbAssembly, "Worldbuilder.WorldGenStep_Roads_GenerateRoadEndpoints_Bool_Patch", "Transpiler",
+                            FindRoadEndpointPredicate(), "faction-road skip chance");
                     }
                     else
                     {
@@ -163,6 +174,36 @@ namespace Planets.Compatibility.FernyMods
             }
         }
         
+        private static void UnpatchWorldbuilder(Assembly assembly, string typeName, string patchName, MethodBase original, string label)
+        {
+            var patchType = assembly?.GetType(typeName);
+            var patch = patchType != null ? AccessTools.Method(patchType, patchName) : null;
+            if (patch == null || original == null)
+            {
+                RPLog.Warning($"[Compat] Worldbuilder's {label} patch was not found");
+                return;
+            }
+            Controller.harmony.Unpatch(original, patch);
+            RPLog.Message($"[Compat] Unpatched Worldbuilder's {label}");
+        }
+
+        /// <summary>
+        /// The faction-road skip is a compiler-generated predicate inside WorldGenStep_Roads.
+        /// Worldbuilder's transpiler divides the 0.05 threshold by worldGenerationData.factionRoadDensity.
+        /// </summary>
+        private static MethodInfo FindRoadEndpointPredicate()
+        {
+            foreach (var nestType in typeof(WorldGenStep_Roads).GetNestedTypes(AccessTools.all))
+            {
+                foreach (var method in AccessTools.GetDeclaredMethods(nestType))
+                {
+                    if (method.Name.Contains("GenerateRoadEndpoints") && method.ReturnType == typeof(bool))
+                        return method;
+                }
+            }
+            return null;
+        }
+
         public bool HasPreview => IsActive && drawPreviewMethod != null;
 
         /// <summary>
@@ -290,16 +331,6 @@ namespace Planets.Compatibility.FernyMods
                     }
                 }
 
-                // Sync new densities to Worldbuilder's worldGenerationData
-                var riverDensityField = AccessTools.Field(dataType, "riverDensity");
-                if (riverDensityField != null) riverDensityField.SetValue(worldGenData, Planets_GameComponent.riverDensity);
-
-                var ancientRoadDensityField = AccessTools.Field(dataType, "ancientRoadDensity");
-                if (ancientRoadDensityField != null) ancientRoadDensityField.SetValue(worldGenData, Planets_GameComponent.ancientRoadDensity);
-
-                var factionRoadDensityField = AccessTools.Field(dataType, "factionRoadDensity");
-                if (factionRoadDensityField != null) factionRoadDensityField.SetValue(worldGenData, Planets_GameComponent.factionRoadDensity);
-                
                 // subdivisions: keep in sync with Planets_GameComponent.subcount for MLP/RP2
                 if (Compatibility.MyLittlePlanetCompat.IsEnabled)
                 {

@@ -509,23 +509,15 @@ namespace Planets.UI.Pages
             yPos += 40f;
             DoMountainFrequencySlider(yPos, width);
 
-            // Densities
+            // Densities. Worldbuilder's copies of these three are unpatched while RP2 is loaded.
             yPos += 40f;
-            bool worldbuilderControlsDensity = ModsConfig.IsActive("ferny.Worldbuilder");
-            string riverTip = worldbuilderControlsDensity ? "Controlled by Worldbuilder" : "Planets.RiverDensityTip".Translate();
-            string ancientTip = worldbuilderControlsDensity ? "Controlled by Worldbuilder" : "Planets.AncientRoadDensityTip".Translate();
-            string factionTip = worldbuilderControlsDensity ? "Controlled by Worldbuilder" : "Planets.FactionRoadDensityTip".Translate();
-            bool densityEnabled = GUI.enabled;
-            if (worldbuilderControlsDensity)
-                GUI.enabled = false;
-            DoDensitySlider(yPos, width, "Planets.RiverDensity".Translate(), riverTip, ref Planets_GameComponent.riverDensity);
+            DoDensitySlider(yPos, width, "Planets.RiverDensity".Translate(), "Planets.RiverDensityTip".Translate(), ref Planets_GameComponent.riverDensity);
 
             yPos += 40f;
-            DoDensitySlider(yPos, width, "Planets.AncientRoadDensity".Translate(), ancientTip, ref Planets_GameComponent.ancientRoadDensity);
+            DoDensitySlider(yPos, width, "Planets.AncientRoadDensity".Translate(), "Planets.AncientRoadDensityTip".Translate(), ref Planets_GameComponent.ancientRoadDensity);
 
             yPos += 40f;
-            DoDensitySlider(yPos, width, "Planets.FactionRoadDensity".Translate(), factionTip, ref Planets_GameComponent.factionRoadDensity);
-            GUI.enabled = densityEnabled;
+            DoDensitySlider(yPos, width, "Planets.FactionRoadDensity".Translate(), "Planets.FactionRoadDensityTip".Translate(), ref Planets_GameComponent.factionRoadDensity);
             
             // Geological Landforms integration
             // GL's cave system generation uses RP2's actual terrain data via translation layer

@@ -816,19 +816,7 @@ namespace Planets.Patches.WorldGen
             return best;
         }
 
-        private static float RiverDensity()
-        {
-            if (ModsConfig.IsActive("ferny.Worldbuilder"))
-            {
-                var dataType = AccessTools.TypeByName("Worldbuilder.World_ExposeData_Patch");
-                var dataField = AccessTools.Field(dataType, "worldGenerationData");
-                object data = dataField?.GetValue(null);
-                var densityField = AccessTools.Field(data?.GetType(), "riverDensity");
-                if (densityField?.GetValue(data) is float density)
-                    return density;
-            }
-            return Planets_GameComponent.riverDensity;
-        }
+        private static float RiverDensity() => Planets_GameComponent.riverDensity;
 
         // Vanilla's lines were written for a sum of each tile's full rainfall. RP2 mouths
         // are leftover runoff after evaporation, stitched across spilling basins, so a 3.5x
